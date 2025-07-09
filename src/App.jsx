@@ -35,7 +35,7 @@ function App() {
 
   return (
     <div className="chess-app">
-      <h1>Pass & Play Chess</h1>
+      <h1>Pass &amp; Play Chess</h1>
       <div className="board-container">
         <Chessboard
           position={game.fen()}
