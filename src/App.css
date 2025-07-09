@@ -1,42 +1,53 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+.chess-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 2rem;
-  text-align: center;
+  height: 100vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.board-container {
+  width: 70vmin;
+  height: 70vmin;
+  margin: 1rem 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.turn-indicator {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.game-status {
+  font-weight: bold;
+  color: #f39c12;
+}
+
+.reset-button {
+  padding: 0.8rem 1.5rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.reset-button:hover {
+  background-color: #c0392b;
+}
+
+@media (max-height: 700px) {
+  .board-container {
+    width: 60vmin;
+    height: 60vmin;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
