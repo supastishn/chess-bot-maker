@@ -1,17 +1,28 @@
 import { useState } from 'react';
-import { Chess } from 'chess.js';
+import { Chess } from '@chrisoakman/chess.js';
 import { Chessboard } from 'react-chessboard';
 import './App.css';
 
 function App() {
   const [game, setGame] = useState(new Chess());
-  const [boardOrientation, setBoardOrientation] = useState('white');
+  const [boardOrientation] = useState('white');
+  const [gameMode] = useState('vsComputer');
 
   const makeMove = (move) => {
     const gameCopy = new Chess(game.fen());
     const result = gameCopy.move(move);
     setGame(gameCopy);
     return result;
+  };
+
+  const makeRandomMove = () => {
+    const moves = game.moves({ verbose: true });
+    if (moves.length > 0) {
+      const randomIndex = Math.floor(Math.random() * moves.length);
+      const move = moves[randomIndex];
+      return makeMove(move);
+    }
+    return null;
   };
 
   const onDrop = (sourceSquare, targetSquare) => {
@@ -22,20 +33,23 @@ function App() {
     });
 
     if (move === null) return false;
-    
-    // Flip board on successful move
-    setBoardOrientation(boardOrientation === 'white' ? 'black' : 'white');
+
+    setTimeout(() => {
+      if (!game.isGameOver()) {
+        makeRandomMove();
+      }
+    }, 200);
+
     return true;
   };
 
   const resetBoard = () => {
     setGame(new Chess());
-    setBoardOrientation('white');
   };
 
   return (
     <div className="chess-app">
-      <h1>Pass &amp; Play Chess</h1>
+      <h1>Chess vs Computer</h1>
       <div className="board-container">
         <Chessboard
           position={game.fen()}
