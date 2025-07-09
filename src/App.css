@@ -51,3 +51,100 @@
     height: 60vmin;
   }
 }
+.chess-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  height: 100vh;
+}
+
+.board-container {
+  width: 70vmin;
+  height: 70vmin;
+  margin: 1rem 0;
+}
+
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.turn-indicator {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.game-status {
+  font-weight: bold;
+  color: #f39c12;
+}
+
+.reset-button {
+  padding: 0.8rem 1.5rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.reset-button:hover {
+  background-color: #c0392b;
+}
+
+@media (max-height: 700px) {
+  .board-container {
+    width: 60vmin;
+    height: 60vmin;
+  }
+}
+
+/* Bot Panel Styles */
+.bot-panel {
+  width: 70vmin;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #202020;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.bot-selector, .custom-bot-creator {
+  margin: 1rem 0;
+}
+
+.bot-selector select {
+  margin-left: 1rem;
+  padding: 0.4rem;
+  background: #333;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+
+.custom-bot-creator input, 
+.custom-bot-creator textarea {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.8rem;
+  background: #2d2d2d;
+  color: #f0f0f0;
+  border: 1px solid #444;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.custom-bot-creator button {
+  padding: 0.6rem 1.2rem;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
