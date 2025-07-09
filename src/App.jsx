@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Chess } from '@chrisoakman/chess.js';
 import { Chessboard } from 'react-chessboard';
 import './App.css';
+import { makeBotMove } from './bot';
 
 function App() {
   const [game, setGame] = useState(new Chess());
@@ -15,16 +16,6 @@ function App() {
     return result;
   };
 
-  const makeRandomMove = () => {
-    const moves = game.moves({ verbose: true });
-    if (moves.length > 0) {
-      const randomIndex = Math.floor(Math.random() * moves.length);
-      const move = moves[randomIndex];
-      return makeMove(move);
-    }
-    return null;
-  };
-
   const onDrop = (sourceSquare, targetSquare) => {
     const move = makeMove({
       from: sourceSquare,
@@ -36,7 +27,11 @@ function App() {
 
     setTimeout(() => {
       if (!game.isGameOver()) {
-        makeRandomMove();
+        // Get bot move using the new function
+        const botMove = makeBotMove(game.fen());
+        if (botMove) {
+          makeMove(botMove);
+        }
       }
     }, 200);
 
