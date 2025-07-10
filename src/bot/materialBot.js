@@ -1,8 +1,4 @@
-function getTurnFromStatus(status) {
-    if (!status.notatedMoves || Object.keys(status.notatedMoves).length === 0) return 'w';
-    const firstMove = Object.values(status.notatedMoves)[0];
-    return firstMove.src.piece.side.name === 'white' ? 'w' : 'b';
-}
+import { getTurnFromStatus } from '../chessAdapter.js';
 
 export const materialBot = (gameClient) => {
   const status = gameClient.getStatus();

@@ -4,7 +4,7 @@
 
 // --- Helper Functions ---
 
-function getTurnFromStatus(status) {
+export function getTurnFromStatus(status) {
     if (!status.notatedMoves || Object.keys(status.notatedMoves).length === 0) {
         return 'w'; // Fallback
     }

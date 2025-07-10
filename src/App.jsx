@@ -4,29 +4,15 @@ import { Chessboard } from 'react-chessboard';
 import './App.css';
 import { getBot, getBotNames, registerBot } from './bot/botInterface';
 import { getFen, findMoveNotation } from './chessAdapter';
-
-const CUSTOM_BOT_PLACEHOLDER = `(gameClient) => {
-  // Access game status via gameClient.getStatus()
-  // Return move as { from: 'e2', to: 'e4' }
-  const status = gameClient.getStatus();
-  const moves = status.notatedMoves;
-  const moveKeys = Object.keys(moves);
-  if (moveKeys.length === 0) return null;
-  const randomKey = moveKeys[Math.floor(Math.random() * moveKeys.length)];
-  const moveDetails = moves[randomKey];
-  return { 
-    from: moveDetails.src.file + moveDetails.src.rank, 
-    to: moveDetails.dest.file + moveDetails.dest.rank 
-  };
-}`;
+import InfoPanel from './components/InfoPanel';
+import BotPanel from './components/BotPanel';
 
 function App() {
   const gameRef = useRef(chess.create({ PGN: true }));
   const [fen, setFen] = useState(() => getFen(gameRef.current));
   const [boardOrientation] = useState('white');
   const [selectedBot, setSelectedBot] = useState('material-bot');
-  const [customBotCode, setCustomBotCode] = useState('');
-  const [customBotName, setCustomBotName] = useState('');
+  const [botNames, setBotNames] = useState(getBotNames());
 
   const makeMove = (move) => {
     const moveNotation = findMoveNotation(gameRef.current, move);
@@ -63,6 +49,22 @@ function App() {
     setFen(getFen(gameRef.current));
   };
 
+  const handleRegisterBot = (name, code) => {
+    if (!name || !code) {
+      alert('Please provide a name and code for the bot.');
+      return;
+    }
+    try {
+      // Using new Function() can be a security risk in production environments
+      const botFunc = new Function('gameClient', `return (${code});`)();
+      registerBot(name, botFunc);
+      setBotNames(getBotNames()); // Refresh bot names
+      setSelectedBot(name); // Select the newly registered bot
+    } catch (e) {
+      alert(`Bot Error: ${e.message}`);
+    }
+  };
+
   const status = gameRef.current.getStatus();
   const turn = fen.includes(' w ') ? 'white' : 'black';
 
@@ -81,76 +83,14 @@ function App() {
         />
       </div>
 
-      <div className="info-panel">
-        <div className="turn-indicator">
-          {status.isCheckmate ? (
-            <div className="game-status">
-              Checkmate! {turn === 'white' ? 'Black' : 'White'} wins.
-            </div>
-          ) : status.isStalemate ? (
-            <div className="game-status">Draw by Stalemate!</div>
-          ) : status.isRepetition ? (
-            <div className="game-status">Draw by Repetition!</div>
-          ) : (
-            `Current turn: ${turn.charAt(0).toUpperCase() + turn.slice(1)}`
-          )}
-        </div>
+      <InfoPanel status={status} turn={turn} onReset={resetBoard} />
 
-        <button className="reset-button" onClick={resetBoard}>
-          Reset Game
-        </button>
-      </div>
-
-      <div className="bot-panel">
-        <h3>Bot Configuration</h3>
-
-        <div className="bot-selector">
-          <label>Active Bot:</label>
-          <select
-            value={selectedBot}
-            onChange={(e) => setSelectedBot(e.target.value)}
-          >
-            {getBotNames().map(name => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="custom-bot-creator">
-          <h4>Create New Bot</h4>
-          <input
-            type="text"
-            placeholder="Bot name"
-            value={customBotName}
-            onChange={(e) => setCustomBotName(e.target.value)}
-          />
-          <textarea
-            value={customBotCode}
-            onChange={(e) => setCustomBotCode(e.target.value)}
-            placeholder={CUSTOM_BOT_PLACEHOLDER}
-            rows={12}
-          />
-          <button
-            onClick={() => {
-              if (!customBotName || !customBotCode) {
-                alert('Please provide a name and code for the bot.');
-                return;
-              }
-              try {
-                const botFunc = new Function('gameClient', `return (${customBotCode});`)();
-                registerBot(customBotName, botFunc);
-                setSelectedBot(customBotName);
-                setCustomBotName('');
-                setCustomBotCode('');
-              } catch (e) {
-                alert(`Bot Error: ${e.message}`);
-              }
-            }}
-          >
-            Register Bot
-          </button>
-        </div>
-      </div>
+      <BotPanel
+        selectedBot={selectedBot}
+        onBotChange={setSelectedBot}
+        botNames={botNames}
+        onRegisterBot={handleRegisterBot}
+      />
     </div>
   );
 }
