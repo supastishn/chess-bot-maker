@@ -1,3 +1,55 @@
+.chess-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+h1 {
+  margin-bottom: 1rem;
+  color: #e0e0e0;
+}
+
+.board-container {
+  width: 70vmin;
+  max-width: 70vh;
+}
+
+.info-panel {
+  width: 70vmin;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+}
+
+.turn-indicator {
+  font-weight: bold;
+}
+
+.game-status {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.reset-button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.reset-button:hover {
+  background-color: #c0392b;
+}
+
 /* Bot Panel Styles */
 .bot-panel {
   width: 70vmin;

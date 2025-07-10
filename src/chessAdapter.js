@@ -13,12 +13,18 @@ function getTurnFromStatus(status) {
 }
 
 function squareToFen(piece) {
-  if (!piece) return '1';
+  // This function is only called when a piece exists on a square.
   const typeToNotation = {
     pawn: 'p', knight: 'n', bishop: 'b', rook: 'r', queen: 'q', king: 'k'
   };
   const notation = typeToNotation[piece.type];
-  if (!notation) return '1'; // Add guard for undefined types
+
+  // Return empty string for unknown piece types to avoid creating an invalid FEN.
+  if (!notation) {
+    console.error("Unknown piece type:", piece.type);
+    return '';
+  }
+  
   return piece.side.name === 'white' ? notation.toUpperCase() : notation;
 }
 

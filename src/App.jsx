@@ -51,7 +51,6 @@ function App() {
         const botMove = getBot(selectedBot)(gameRef.current);
         if (botMove) {
           makeMove(botMove);
-          setFen(getFen(gameRef.current)); // Add this line
         }
       }
     }, 200);
