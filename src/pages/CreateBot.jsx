@@ -1,19 +1,47 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const CUSTOM_BOT_PLACEHOLDER = `(gameClient) => {
-  // Access game status via gameClient.getStatus()
-  // Return move as { from: 'e2', to: 'e4' }
-  const status = gameClient.getStatus();
-  const moves = status.notatedMoves;
-  const moveKeys = Object.keys(moves);
-  if (moveKeys.length === 0) return null;
-  const randomKey = moveKeys[Math.floor(Math.random() * moveKeys.length)];
-  const moveDetails = moves[randomKey];
-  return { 
-    from: moveDetails.src.file + moveDetails.src.rank, 
-    to: moveDetails.dest.file + moveDetails.dest.rank 
-  };
+const CUSTOM_BOT_PLACEHOLDER = `(game) => {
+  /**
+   * Bot API Documentation
+   * 
+   * Available methods on 'game' object:
+   * - game.getStatus(): Get current game status
+   * - game.getAvailableMoves(): Array of all legal move keys
+   * - game.getBoardState(): Board square data
+   * - game.getTurn(): 'w' or 'b' for current turn
+   * - game.getGameResult(): Current game result ('ongoing', 'checkmate', 'stalemate', 'repetition')
+   * - game.evaluateMaterial(): Material score (+ for white, - for black)
+   * - game.move(moveKey): Execute a move (returns game state)
+   * - game.undoMove(): Undo the last move
+   * 
+   * Return format: 
+   * - A move key string (e.g. 'e2e4')
+   * - An object { from: 'e2', to: 'e4', promotion: 'q' }
+   * - null for no move
+   */
+  
+  // Example: Material-driven bot
+  const moves = game.getAvailableMoves();
+  if (moves.length === 0) return null;
+
+  let bestScore = -Infinity;
+  let bestMoves = [];
+  
+  for (const moveKey of moves) {
+    game.move(moveKey);
+    const score = -game.evaluateMaterial(); // Invert for black
+    game.undoMove(); // New helper method
+    
+    if (score > bestScore) {
+      bestScore = score;
+      bestMoves = [moveKey];
+    } else if (score === bestScore) {
+      bestMoves.push(moveKey);
+    }
+  }
+  
+  return bestMoves[Math.floor(Math.random() * bestMoves.length)];
 }`;
 
 const CreateBot = ({ onRegisterBot }) => {
