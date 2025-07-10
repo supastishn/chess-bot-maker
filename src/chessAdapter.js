@@ -49,18 +49,24 @@ export const getFen = (gameClient) => {
         let emptyCount = 0;
         for (let j = 0; j < 8; j++) {
             const piece = ranks[i][j];
-            if (!piece) {
-                emptyCount++;
-            } else {
+            const fenChar = piece ? squareToFen(piece) : '';
+
+            if (fenChar) {
                 if (emptyCount > 0) {
                     fen += emptyCount;
                     emptyCount = 0;
                 }
-                fen += squareToFen(piece);
+                fen += fenChar;
+            } else {
+                emptyCount++;
             }
         }
-        if (emptyCount > 0) fen += emptyCount;
-        if (i > 1) fen += '/';
+        if (emptyCount > 0) {
+            fen += emptyCount;
+        }
+        if (i > 1) {
+            fen += '/';
+        }
     }
 
     // 2. Active color
