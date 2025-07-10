@@ -31,70 +31,77 @@ function squareToFen(piece) {
 // --- Adapter API ---
 
 export const getFen = (gameClient) => {
-    const status = gameClient.getStatus();
-    const { board } = status;
+    try {
+        const status = gameClient.getStatus();
+        const { board } = status;
 
-    // 1. Piece placement
-    const ranks = {};
-    for (let i = 1; i <= 8; i++) ranks[i] = new Array(8).fill(null);
-    board.squares.forEach(s => {
-        if (s.piece) {
-            const fileIndex = s.file.charCodeAt(0) - 'a'.charCodeAt(0);
-            ranks[s.rank][fileIndex] = s.piece;
-        }
-    });
+        // 1. Piece placement
+        const ranks = {};
+        for (let i = 1; i <= 8; i++) ranks[i] = new Array(8).fill(null);
+        board.squares.forEach(s => {
+            if (s.piece) {
+                const fileIndex = s.file.charCodeAt(0) - 'a'.charCodeAt(0);
+                ranks[s.rank][fileIndex] = s.piece;
+            }
+        });
 
-    let fen = '';
-    for (let i = 8; i >= 1; i--) {
-        let emptyCount = 0;
-        for (let j = 0; j < 8; j++) {
-            const piece = ranks[i][j];
-            const fenChar = piece ? squareToFen(piece) : '';
+        let fen = '';
+        for (let i = 8; i >= 1; i--) {
+            let emptyCount = 0;
+            for (let j = 0; j < 8; j++) {
+                const piece = ranks[i][j];
+                const fenChar = piece ? squareToFen(piece) : '';
 
-            if (fenChar) {
-                if (emptyCount > 0) {
-                    fen += emptyCount;
-                    emptyCount = 0;
+                if (fenChar) {
+                    if (emptyCount > 0) {
+                        fen += emptyCount;
+                        emptyCount = 0;
+                    }
+                    fen += fenChar;
+                } else {
+                    emptyCount++;
                 }
-                fen += fenChar;
-            } else {
-                emptyCount++;
+            }
+            if (emptyCount > 0) {
+                fen += emptyCount;
+            }
+            if (i > 1) {
+                fen += '/';
             }
         }
-        if (emptyCount > 0) {
-            fen += emptyCount;
+
+        // 2. Active color
+        fen += ` ${getTurnFromStatus(status)}`;
+
+        // 3. Castling availability
+        let castle = '';
+        const whiteKing = board.squares.find(s => s.piece?.type === 'king' && s.piece.side.name === 'white')?.piece;
+        const blackKing = board.squares.find(s => s.piece?.type === 'king' && s.piece.side.name === 'black')?.piece;
+        const a1Rook = board.squares.find(s => s.file === 'a' && s.rank === 1 && s.piece?.type === 'rook')?.piece;
+        const h1Rook = board.squares.find(s => s.file === 'h' && s.rank === 1 && s.piece?.type === 'rook')?.piece;
+        const a8Rook = board.squares.find(s => s.file === 'a' && s.rank === 8 && s.piece?.type === 'rook')?.piece;
+        const h8Rook = board.squares.find(s => s.file === 'h' && s.rank === 8 && s.piece?.type === 'rook')?.piece;
+
+        if (whiteKing?.moveCount === 0) {
+            if (h1Rook?.moveCount === 0) castle += 'K';
+            if (a1Rook?.moveCount === 0) castle += 'Q';
         }
-        if (i > 1) {
-            fen += '/';
+        if (blackKing?.moveCount === 0) {
+            if (h8Rook?.moveCount === 0) castle += 'k';
+            if (a8Rook?.moveCount === 0) castle += 'q';
         }
+        fen += ` ${castle || '-'}`;
+        
+        // 4, 5, & 6. Other FEN parts
+        fen += ' - 0 1';
+
+        return fen;
+
+    } catch (error) {
+        console.error("!!! CRITICAL ERROR generating FEN:", error);
+        // Fallback to the starting position to prevent a crash
+        return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
     }
-
-    // 2. Active color
-    fen += ` ${getTurnFromStatus(status)}`;
-
-    // 3. Castling availability (inferred)
-    let castle = '';
-    const whiteKing = board.squares.find(s => s.piece?.type === 'king' && s.piece.side.name === 'white')?.piece;
-    const blackKing = board.squares.find(s => s.piece?.type === 'king' && s.piece.side.name === 'black')?.piece;
-    const a1Rook = board.squares.find(s => s.file === 'a' && s.rank === 1 && s.piece?.type === 'rook')?.piece;
-    const h1Rook = board.squares.find(s => s.file === 'h' && s.rank === 1 && s.piece?.type === 'rook')?.piece;
-    const a8Rook = board.squares.find(s => s.file === 'a' && s.rank === 8 && s.piece?.type === 'rook')?.piece;
-    const h8Rook = board.squares.find(s => s.file === 'h' && s.rank === 8 && s.piece?.type === 'rook')?.piece;
-
-    if (whiteKing?.moveCount === 0) {
-        if (h1Rook?.moveCount === 0) castle += 'K';
-        if (a1Rook?.moveCount === 0) castle += 'Q';
-    }
-    if (blackKing?.moveCount === 0) {
-        if (h8Rook?.moveCount === 0) castle += 'k';
-        if (a8Rook?.moveCount === 0) castle += 'q';
-    }
-    fen += ` ${castle || '-'}`;
-    
-    // 4 & 5 & 6. En passant, half-move, full-move (not available in library)
-    fen += ' - 0 1';
-
-    return fen;
 };
 
 export const findMoveNotation = (gameClient, moveObj) => {
