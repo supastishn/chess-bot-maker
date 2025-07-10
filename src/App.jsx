@@ -5,9 +5,11 @@ import './App.css';
 import { getBot, getBotNames, registerBot } from './bot/botInterface';
 import { getFen, findMoveNotation } from './chessAdapter';
 import InfoPanel from './components/InfoPanel';
-import BotPanel from './components/BotPanel';
+import BotSelectorPanel from './components/BotSelectorPanel';
+import CreateBot from './pages/CreateBot.jsx';
 
 function App() {
+  const [page, setPage] = useState('game');
   const gameRef = useRef(chess.create({ PGN: true }));
   const [fen, setFen] = useState(() => getFen(gameRef.current));
   const [boardOrientation] = useState('white');
@@ -60,6 +62,7 @@ function App() {
       registerBot(name, botFunc);
       setBotNames(getBotNames()); // Refresh bot names
       setSelectedBot(name); // Select the newly registered bot
+      setPage('game');
     } catch (e) {
       alert(`Bot Error: ${e.message}`);
     }
@@ -70,27 +73,35 @@ function App() {
 
   return (
     <div className="chess-app">
-      <h1>Chess vs Computer</h1>
-      <div className="board-container">
-        <Chessboard
-          position={fen}
-          onPieceDrop={onDrop}
-          boardOrientation={boardOrientation}
-          customBoardStyle={{
-            borderRadius: '4px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-          }}
-        />
-      </div>
-
-      <InfoPanel status={status} turn={turn} onReset={resetBoard} />
-
-      <BotPanel
-        selectedBot={selectedBot}
-        onBotChange={setSelectedBot}
-        botNames={botNames}
-        onRegisterBot={handleRegisterBot}
-      />
+      <nav style={{ marginBottom: '1rem', width: '70vmin', display: 'flex', justifyContent: 'space-between' }}>
+        <button className="reset-button" onClick={() => setPage('game')}>Game</button>
+        <button className="reset-button" onClick={() => setPage('create-bot')}>Create Bot</button>
+      </nav>
+      {page === 'game' && (
+        <>
+          <h1>Chess vs Computer</h1>
+          <div className="board-container">
+            <Chessboard
+              position={fen}
+              onPieceDrop={onDrop}
+              boardOrientation={boardOrientation}
+              customBoardStyle={{
+                borderRadius: '4px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+              }}
+            />
+          </div>
+          <InfoPanel status={status} turn={turn} onReset={resetBoard} />
+          <BotSelectorPanel
+            selectedBot={selectedBot}
+            onBotChange={setSelectedBot}
+            botNames={botNames}
+          />
+        </>
+      )}
+      {page === 'create-bot' && (
+        <CreateBot onRegisterBot={handleRegisterBot} />
+      )}
     </div>
   );
 }
