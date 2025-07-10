@@ -1,60 +1,19 @@
-import { useState, useRef } from 'react';
-import chess from 'chess';
-import { Chessboard } from 'react-chessboard';
+import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import './App.css';
-import { getBot, getBotNames, registerBot } from './bot/botInterface';
-import { getFen, findMoveNotation } from './chessAdapter';
-import InfoPanel from './components/InfoPanel';
-import BotSelectorPanel from './components/BotSelectorPanel';
-import CreateBot from './pages/CreateBot.jsx';
+import { getBotNames, registerBot } from './bot/botInterface';
+import Navbar from './components/Navbar';
+import GamePage from './pages/Game';
+import CreateBotPage from './pages/CreateBot';
 
 function App() {
-  const [page, setPage] = useState('game');
-  const gameRef = useRef(chess.create({ PGN: true }));
-  const [fen, setFen] = useState(() => getFen(gameRef.current));
-  const [boardOrientation] = useState('white');
   const [selectedBot, setSelectedBot] = useState('material-bot');
   const [botNames, setBotNames] = useState(getBotNames());
-
-  const makeMove = (move) => {
-    const moveNotation = findMoveNotation(gameRef.current, move);
-    if (!moveNotation) return null;
-    const result = gameRef.current.move(moveNotation);
-    setFen(getFen(gameRef.current));
-    return result;
-  };
-
-  const onDrop = (sourceSquare, targetSquare) => {
-    const moveResult = makeMove({
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: 'q',
-    });
-
-    if (moveResult === null) return false;
-
-    setTimeout(() => {
-      const status = gameRef.current.getStatus();
-      if (!status.isCheckmate && !status.isStalemate) {
-        const botMove = getBot(selectedBot)(gameRef.current);
-        if (botMove) {
-          makeMove(botMove);
-        }
-      }
-    }, 200);
-
-    return true;
-  };
-
-  const resetBoard = () => {
-    gameRef.current = chess.create({ PGN: true });
-    setFen(getFen(gameRef.current));
-  };
 
   const handleRegisterBot = (name, code) => {
     if (!name || !code) {
       alert('Please provide a name and code for the bot.');
-      return;
+      return false;
     }
     try {
       // Using new Function() can be a security risk in production environments
@@ -62,46 +21,34 @@ function App() {
       registerBot(name, botFunc);
       setBotNames(getBotNames()); // Refresh bot names
       setSelectedBot(name); // Select the newly registered bot
-      setPage('game');
+      return true;
     } catch (e) {
       alert(`Bot Error: ${e.message}`);
+      return false;
     }
   };
 
-  const status = gameRef.current.getStatus();
-  const turn = fen.includes(' w ') ? 'white' : 'black';
-
   return (
-    <div className="chess-app">
-      <nav style={{ marginBottom: '1rem', width: '70vmin', display: 'flex', justifyContent: 'space-between' }}>
-        <button className="reset-button" onClick={() => setPage('game')}>Game</button>
-        <button className="reset-button" onClick={() => setPage('create-bot')}>Create Bot</button>
-      </nav>
-      {page === 'game' && (
-        <>
-          <h1>Chess vs Computer</h1>
-          <div className="board-container">
-            <Chessboard
-              position={fen}
-              onPieceDrop={onDrop}
-              boardOrientation={boardOrientation}
-              customBoardStyle={{
-                borderRadius: '4px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-              }}
-            />
-          </div>
-          <InfoPanel status={status} turn={turn} onReset={resetBoard} />
-          <BotSelectorPanel
-            selectedBot={selectedBot}
-            onBotChange={setSelectedBot}
-            botNames={botNames}
+    <div className="app-container">
+      <Navbar />
+      <main className="main-content">
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <GamePage 
+                selectedBot={selectedBot}
+                onBotChange={setSelectedBot}
+                botNames={botNames}
+              />
+            } 
           />
-        </>
-      )}
-      {page === 'create-bot' && (
-        <CreateBot onRegisterBot={handleRegisterBot} />
-      )}
+          <Route 
+            path="/create-bot" 
+            element={<CreateBotPage onRegisterBot={handleRegisterBot} />} 
+          />
+        </Routes>
+      </main>
     </div>
   );
 }
