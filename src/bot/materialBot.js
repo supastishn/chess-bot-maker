@@ -1,53 +1,34 @@
-import { getTurnFromStatus } from '../chessAdapter.js';
-
-export const materialBot = (gameClient) => {
-  const status = gameClient.getStatus();
-  const moves = status.notatedMoves;
-  const moveKeys = Object.keys(moves);
-
-  if (moveKeys.length === 0) return null;
+export const materialBot = (game) => {
+  const moves = game.getAvailableMoves();
+  if (moves.length === 0) return null;
   
-  // Look for an immediate checkmating move
-  for (const moveKey of moveKeys) {
-      const moveResult = gameClient.move(moveKey);
-      if (gameClient.getStatus().isCheckmate) {
-          moveResult.undo();
-          const moveDetails = moves[moveKey];
-          return { from: moveDetails.src.file + moveDetails.src.rank, to: moveDetails.dest.file + moveDetails.dest.rank };
-      }
-      moveResult.undo();
+  // Check for immediate checkmate
+  for (const move of moves) {
+    game.move(move);
+    if (game.getGameResult() === 'checkmate') {
+      game.undoMove();
+      return move;
+    }
+    game.undoMove();
   }
 
-  // Evaluate material
-  const turn = getTurnFromStatus(status);
-  const isBlackTurn = turn === 'b';
-  let bestScore = isBlackTurn ? Infinity : -Infinity;
+  // Material evaluation
+  const isBlack = game.getTurn() === 'b';
+  let bestScore = isBlack ? Infinity : -Infinity;
   let bestMoves = [];
-  const pieceValues = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9 };
-
-  for (const moveKey of moveKeys) {
-    const moveResult = gameClient.move(moveKey);
-    const newStatus = gameClient.getStatus();
+  
+  for (const move of moves) {
+    game.move(move);
+    const score = game.evaluateMaterial();
+    game.undoMove();
     
-    let score = 0;
-    newStatus.board.squares.forEach(s => {
-        if (s.piece) {
-            const value = pieceValues[s.piece.type] || 0;
-            score += s.piece.side.name === 'white' ? value : -value;
-        }
-    });
-    
-    moveResult.undo();
-    
-    if ((isBlackTurn && score < bestScore) || (!isBlackTurn && score > bestScore)) {
+    if ((isBlack && score < bestScore) || (!isBlack && score > bestScore)) {
       bestScore = score;
-      bestMoves = [moveKey];
+      bestMoves = [move];
     } else if (score === bestScore) {
-      bestMoves.push(moveKey);
+      bestMoves.push(move);
     }
   }
-
-  const randomBestMoveKey = bestMoves[Math.floor(Math.random() * bestMoves.length)];
-  const moveDetails = moves[randomBestMoveKey];
-  return { from: moveDetails.src.file + moveDetails.src.rank, to: moveDetails.dest.file + moveDetails.dest.rank };
+  
+  return bestMoves[Math.floor(Math.random() * bestMoves.length)];
 };

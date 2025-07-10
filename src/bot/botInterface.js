@@ -4,59 +4,65 @@
  * - Example: (game) => { from: 'e2', to: 'e4' } or (game) => 'e2e4'
  */
 
-import { getTurnFromStatus } from '../chessAdapter.js';
-
 const registeredBots = new Map();
 const DEFAULT_BOT_NAME = 'starter-bot';
 
 // Helper API for bots
 const createBotHelper = (gameClient) => ({
-  // Existing gameClient methods
-  getStatus: gameClient.getStatus,
-  move: gameClient.move,
-
-  // New helper methods
+  // Game state methods
   getAvailableMoves: () => {
-    const status = gameClient.getStatus();
-    return status.notatedMoves ? Object.keys(status.notatedMoves) : [];
+    return gameClient.moves({ verbose: true }).map(move => 
+      move.promotion ? move.from + move.to + move.promotion : move.from + move.to
+    );
   },
+  
   getBoardState: () => {
-    const { board } = gameClient.getStatus();
-    return board.squares;
+    return gameClient.board().flatMap((row, rankIdx) => 
+      row.map((piece, fileIdx) => ({
+        file: String.fromCharCode(97 + fileIdx),
+        rank: 8 - rankIdx,
+        piece: piece ? {
+          type: piece.type,
+          side: { name: piece.color }
+        } : null
+      }))
+    );
   },
-  getTurn: () => getTurnFromStatus(gameClient.getStatus()),
+
+  getTurn: () => gameClient.turn(),
+  
   getGameResult: () => {
-    const status = gameClient.getStatus();
-    if (status.isCheckmate) return 'checkmate';
-    if (status.isStalemate) return 'stalemate';
-    if (status.isRepetition) return 'repetition';
+    if (gameClient.isCheckmate()) return 'checkmate';
+    if (gameClient.isStalemate()) return 'stalemate';
+    if (gameClient.isThreefoldRepetition()) return 'repetition';
     return 'ongoing';
   },
+  
   evaluateMaterial: () => {
-    const status = gameClient.getStatus();
-    const pieceValues = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9 };
+    const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9 };
     let score = 0;
-    status.board.squares.forEach(s => {
-      if (s.piece) {
-        const value = pieceValues[s.piece.type] || 0;
-        score += s.piece.side.name === 'white' ? value : -value;
-      }
+    gameClient.board().flat().forEach(piece => {
+      if (!piece) return;
+      const value = pieceValues[piece.type] || 0;
+      score += piece.color === 'w' ? value : -value;
     });
     return score;
   },
-  undoMove: () => {
+  
+  undoMove: () => gameClient.undo(),
+  
+  move: (move) => {
     try {
-      if (typeof gameClient.undoMove === 'function') {
-        return gameClient.undoMove();
+      if (typeof move === 'string') {
+        return gameClient.move({
+          from: move.slice(0, 2),
+          to: move.slice(2, 4),
+          promotion: move[4] || 'q'
+        });
       }
-      // fallback: try to pop from history and call undoMove(lastMove)
-      const history = [...(gameClient.history || [])];
-      const lastMove = history.pop();
-      if (lastMove) {
-        return gameClient.undoMove(lastMove);
-      }
-    } catch (e) {
-      console.error("Undo failed:", e);
+      return gameClient.move(move);
+    } catch {
+      return null;
     }
   }
 });

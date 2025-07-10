@@ -1,22 +1,27 @@
 import { useState, useRef } from 'react';
-import chess from 'chess';
+import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
-import { getFen, findMoveNotation } from '../chessAdapter';
 import { getBot } from '../bot/botInterface';
 import InfoPanel from '../components/InfoPanel';
 import BotSelectorPanel from '../components/BotSelectorPanel';
 
 const GamePage = ({ selectedBot, onBotChange, botNames }) => {
-  const gameRef = useRef(chess.create({ PGN: true }));
-  const [fen, setFen] = useState(() => getFen(gameRef.current));
+  const gameRef = useRef(new Chess());
+  const [fen, setFen] = useState(gameRef.current.fen());
   const [boardOrientation] = useState('white');
-  
+
   const makeMove = (move) => {
-    const moveNotation = findMoveNotation(gameRef.current, move);
-    if (!moveNotation) return null;
-    const result = gameRef.current.move(moveNotation);
-    setFen(getFen(gameRef.current));
-    return result;
+    try {
+      const result = gameRef.current.move({
+        from: move.from,
+        to: move.to,
+        promotion: move.promotion || 'q'
+      });
+      setFen(gameRef.current.fen());
+      return result;
+    } catch {
+      return null;
+    }
   };
 
   const onDrop = (sourceSquare, targetSquare) => {
@@ -29,26 +34,28 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     if (moveResult === null) return false;
 
     setTimeout(() => {
-      const status = gameRef.current.getStatus();
-      if (!status.isCheckmate && !status.isStalemate) {
+      if (!gameRef.current.isGameOver()) {
         const botMove = getBot(selectedBot)(gameRef.current);
-        if (botMove) {
-          makeMove(botMove);
-        }
+        if (botMove) makeMove(botMove);
+        setFen(gameRef.current.fen());
       }
     }, 200);
 
     return true;
   };
-  
+
   const resetBoard = () => {
-    gameRef.current = chess.create({ PGN: true });
-    setFen(getFen(gameRef.current));
+    gameRef.current = new Chess();
+    setFen(gameRef.current.fen());
   };
-  
-  const status = gameRef.current.getStatus();
-  const turn = fen.includes(' w ') ? 'white' : 'black';
-  
+
+  const turn = gameRef.current.turn() === 'w' ? 'white' : 'black';
+  const status = {
+    isCheckmate: gameRef.current.isCheckmate(),
+    isStalemate: gameRef.current.isStalemate(),
+    isRepetition: gameRef.current.isThreefoldRepetition(),
+  };
+
   return (
     <div className="page-container">
       <div className="game-content">
