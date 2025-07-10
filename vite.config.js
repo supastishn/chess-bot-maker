@@ -1,11 +1,19 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    nodePolyfills(),
-  ],
+  plugins: [react()],
+  optimizeDeps: {
+    include: ['chess'],
+    esbuildOptions: {
+      // For browsers, we need to polyfill these
+      target: 'es2020',
+      define: {
+        global: 'globalThis'
+      },
+      supported: { 
+        bigint: true 
+      },
+    }
+  }
 })
