@@ -1,46 +1,57 @@
-import { Chess } from '@chrisoakman/chess.js';
+function getTurnFromStatus(status) {
+    if (!status.notatedMoves || Object.keys(status.notatedMoves).length === 0) return 'w';
+    const firstMove = Object.values(status.notatedMoves)[0];
+    return firstMove.src.piece.side.name === 'white' ? 'w' : 'b';
+}
 
-export const materialBot = (currentGame) => {
-  const game = new Chess(currentGame.fen());
-  const moves = game.moves({ verbose: true });
+export const materialBot = (gameClient) => {
+  const status = gameClient.getStatus();
+  const moves = status.notatedMoves;
+  const moveKeys = Object.keys(moves);
+
+  if (moveKeys.length === 0) return null;
   
-  // Immediate win detection
-  const winningMove = moves.find(move => {
-    const gameCopy = new Chess(game.fen());
-    gameCopy.move(move);
-    return gameCopy.isCheckmate();
-  });
-  if (winningMove) return winningMove;
+  // Look for an immediate checkmating move
+  for (const moveKey of moveKeys) {
+      const moveResult = gameClient.move(moveKey);
+      if (gameClient.getStatus().isCheckmate) {
+          moveResult.undo();
+          const moveDetails = moves[moveKey];
+          return { from: moveDetails.src.file + moveDetails.src.rank, to: moveDetails.dest.file + moveDetails.dest.rank };
+      }
+      moveResult.undo();
+  }
 
-  // Material evaluation
-  const isBlackTurn = game.turn() === 'b';
+  // Evaluate material
+  const turn = getTurnFromStatus(status);
+  const isBlackTurn = turn === 'b';
   let bestScore = isBlackTurn ? Infinity : -Infinity;
   let bestMoves = [];
-  const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9 };
+  const pieceValues = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9 };
 
-  for (const move of moves) {
-    const gameCopy = new Chess(game.fen());
-    gameCopy.move(move);
+  for (const moveKey of moveKeys) {
+    const moveResult = gameClient.move(moveKey);
+    const newStatus = gameClient.getStatus();
     
     let score = 0;
-    const board = gameCopy.board();
-    board.forEach(row => {
-      row.forEach(piece => {
-        if (piece) {
-          const value = pieceValues[piece.type] || 0;
-          score += piece.color === 'w' ? value : -value;
+    newStatus.board.squares.forEach(s => {
+        if (s.piece) {
+            const value = pieceValues[s.piece.type] || 0;
+            score += s.piece.side.name === 'white' ? value : -value;
         }
-      });
     });
     
-    if ((isBlackTurn && score < bestScore) || 
-        (!isBlackTurn && score > bestScore)) {
+    moveResult.undo();
+    
+    if ((isBlackTurn && score < bestScore) || (!isBlackTurn && score > bestScore)) {
       bestScore = score;
-      bestMoves = [move];
+      bestMoves = [moveKey];
     } else if (score === bestScore) {
-      bestMoves.push(move);
+      bestMoves.push(moveKey);
     }
   }
 
-  return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+  const randomBestMoveKey = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+  const moveDetails = moves[randomBestMoveKey];
+  return { from: moveDetails.src.file + moveDetails.src.rank, to: moveDetails.dest.file + moveDetails.dest.rank };
 };

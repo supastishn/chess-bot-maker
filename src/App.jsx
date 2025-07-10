@@ -1,35 +1,53 @@
 import { useState } from 'react';
-import { Chess } from '@chrisoakman/chess.js';
+import chess from 'chess';
 import { Chessboard } from 'react-chessboard';
 import './App.css';
 import { getBot, getBotNames, registerBot } from './bot/botInterface';
+import { getFen, findMoveNotation } from './chessAdapter';
+
+const CUSTOM_BOT_PLACEHOLDER = `(gameClient) => {
+  // Access game status via gameClient.getStatus()
+  // Return move as { from: 'e2', to: 'e4' }
+  const status = gameClient.getStatus();
+  const moves = status.notatedMoves;
+  const moveKeys = Object.keys(moves);
+  if (moveKeys.length === 0) return null;
+  const randomKey = moveKeys[Math.floor(Math.random() * moveKeys.length)];
+  const moveDetails = moves[randomKey];
+  return { 
+    from: moveDetails.src.file + moveDetails.src.rank, 
+    to: moveDetails.dest.file + moveDetails.dest.rank 
+  };
+}`;
 
 function App() {
-  const [game, setGame] = useState(new Chess());
+  const [game, setGame] = useState(() => chess.create({ PGN: true }));
   const [boardOrientation] = useState('white');
-  const [gameMode] = useState('vsComputer');
   const [selectedBot, setSelectedBot] = useState('material-bot');
   const [customBotCode, setCustomBotCode] = useState('');
   const [customBotName, setCustomBotName] = useState('');
 
   const makeMove = (move) => {
-    const gameCopy = new Chess(game.fen());
-    const result = gameCopy.move(move);
-    setGame(gameCopy);
+    const moveNotation = findMoveNotation(game, move);
+    if (!moveNotation) return null;
+    
+    const result = game.move(moveNotation);
+    setGame(Object.assign(Object.create(Object.getPrototypeOf(game)), game)); // Force re-render
     return result;
   };
 
   const onDrop = (sourceSquare, targetSquare) => {
-    const move = makeMove({
+    const moveResult = makeMove({
       from: sourceSquare,
       to: targetSquare,
       promotion: 'q',
     });
 
-    if (move === null) return false;
+    if (moveResult === null) return false;
 
     setTimeout(() => {
-      if (!game.isGameOver()) {
+      const status = game.getStatus();
+      if (!status.isCheckmate && !status.isStalemate) {
         const botMove = getBot(selectedBot)(game);
         if (botMove) {
           makeMove(botMove);
@@ -41,15 +59,19 @@ function App() {
   };
 
   const resetBoard = () => {
-    setGame(new Chess());
+    setGame(() => chess.create({ PGN: true }));
   };
+  
+  const status = game.getStatus();
+  const fen = getFen(game);
+  const turn = status.board.squares.find(s => s.piece?.side.name === (fen.includes(' w ') ? 'white' : 'black'))?.piece.side.name || 'white';
 
   return (
     <div className="chess-app">
       <h1>Chess vs Computer</h1>
       <div className="board-container">
         <Chessboard
-          position={game.fen()}
+          position={fen}
           onPieceDrop={onDrop}
           boardOrientation={boardOrientation}
           customBoardStyle={{
@@ -61,15 +83,16 @@ function App() {
       
       <div className="info-panel">
         <div className="turn-indicator">
-          {game.isGameOver() ? (
+          {status.isCheckmate ? (
             <div className="game-status">
-              {game.isCheckmate() && 'Checkmate! '}
-              {game.isDraw() && 'Draw! '}
-              {game.isStalemate() && 'Stalemate! '}
-              {!game.isDraw() && game.turn() === 'b' ? 'White wins' : 'Black wins'}
+              Checkmate! {turn === 'white' ? 'Black' : 'White'} wins.
             </div>
+          ) : status.isStalemate ? (
+            <div className="game-status">Draw by Stalemate!</div>
+          ) : status.isRepetition ? (
+            <div className="game-status">Draw by Repetition!</div>
           ) : (
-            `Current turn: ${game.turn() === 'w' ? 'White' : 'Black'}`
+            `Current turn: ${turn.charAt(0).toUpperCase() + turn.slice(1)}`
           )}
         </div>
         
@@ -104,20 +127,21 @@ function App() {
           <textarea
             value={customBotCode}
             onChange={(e) => setCustomBotCode(e.target.value)}
-            placeholder="(game) => { /* bot logic */ }"
-            rows={5}
+            placeholder={CUSTOM_BOT_PLACEHOLDER}
+            rows={12}
           />
           <button
             onClick={() => {
+              if (!customBotName || !customBotCode) {
+                alert('Please provide a name and code for the bot.');
+                return;
+              }
               try {
-                // The user code should be a function body or an arrow function
-                // We wrap it in a function that receives Chess as an argument
-                // so users can use Chess if they want.
-                // Example: (game) => { ... }
                 // eslint-disable-next-line no-new-func
-                const botFunc = new Function('Chess', `return (${customBotCode});`)(Chess);
+                const botFunc = new Function('gameClient', `return (${customBotCode});`)();
                 registerBot(customBotName, botFunc);
                 setSelectedBot(customBotName);
+                setCustomBotName('');
                 setCustomBotCode('');
               } catch (e) {
                 alert(`Bot Error: ${e.message}`);
