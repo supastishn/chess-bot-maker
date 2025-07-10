@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import chess from 'chess';
 import { Chessboard } from 'react-chessboard';
 import './App.css';
@@ -21,18 +21,18 @@ const CUSTOM_BOT_PLACEHOLDER = `(gameClient) => {
 }`;
 
 function App() {
-  const [game, setGame] = useState(() => chess.create({ PGN: true }));
+  const gameRef = useRef(chess.create({ PGN: true }));
+  const [fen, setFen] = useState(() => getFen(gameRef.current));
   const [boardOrientation] = useState('white');
   const [selectedBot, setSelectedBot] = useState('material-bot');
   const [customBotCode, setCustomBotCode] = useState('');
   const [customBotName, setCustomBotName] = useState('');
 
   const makeMove = (move) => {
-    const moveNotation = findMoveNotation(game, move);
+    const moveNotation = findMoveNotation(gameRef.current, move);
     if (!moveNotation) return null;
-    
-    const result = game.move(moveNotation);
-    setGame(Object.assign(Object.create(Object.getPrototypeOf(game)), game)); // Force re-render
+    const result = gameRef.current.move(moveNotation);
+    setFen(getFen(gameRef.current));
     return result;
   };
 
@@ -46,9 +46,9 @@ function App() {
     if (moveResult === null) return false;
 
     setTimeout(() => {
-      const status = game.getStatus();
+      const status = gameRef.current.getStatus();
       if (!status.isCheckmate && !status.isStalemate) {
-        const botMove = getBot(selectedBot)(game);
+        const botMove = getBot(selectedBot)(gameRef.current);
         if (botMove) {
           makeMove(botMove);
         }
@@ -59,11 +59,11 @@ function App() {
   };
 
   const resetBoard = () => {
-    setGame(() => chess.create({ PGN: true }));
+    gameRef.current = chess.create({ PGN: true });
+    setFen(getFen(gameRef.current));
   };
-  
-  const status = game.getStatus();
-  const fen = getFen(game);
+
+  const status = gameRef.current.getStatus();
   const turn = status.board.squares.find(s => s.piece?.side.name === (fen.includes(' w ') ? 'white' : 'black'))?.piece.side.name || 'white';
 
   return (
@@ -80,7 +80,7 @@ function App() {
           }}
         />
       </div>
-      
+
       <div className="info-panel">
         <div className="turn-indicator">
           {status.isCheckmate ? (
@@ -95,7 +95,7 @@ function App() {
             `Current turn: ${turn.charAt(0).toUpperCase() + turn.slice(1)}`
           )}
         </div>
-        
+
         <button className="reset-button" onClick={resetBoard}>
           Reset Game
         </button>
@@ -103,11 +103,11 @@ function App() {
 
       <div className="bot-panel">
         <h3>Bot Configuration</h3>
-        
+
         <div className="bot-selector">
           <label>Active Bot:</label>
-          <select 
-            value={selectedBot} 
+          <select
+            value={selectedBot}
             onChange={(e) => setSelectedBot(e.target.value)}
           >
             {getBotNames().map(name => (
@@ -115,7 +115,7 @@ function App() {
             ))}
           </select>
         </div>
-        
+
         <div className="custom-bot-creator">
           <h4>Create New Bot</h4>
           <input
@@ -137,7 +137,6 @@ function App() {
                 return;
               }
               try {
-                // eslint-disable-next-line no-new-func
                 const botFunc = new Function('gameClient', `return (${customBotCode});`)();
                 registerBot(customBotName, botFunc);
                 setSelectedBot(customBotName);
