@@ -51,6 +51,7 @@ function App() {
         const botMove = getBot(selectedBot)(gameRef.current);
         if (botMove) {
           makeMove(botMove);
+          setFen(getFen(gameRef.current)); // Add this line
         }
       }
     }, 200);
@@ -64,7 +65,7 @@ function App() {
   };
 
   const status = gameRef.current.getStatus();
-  const turn = status.board.squares.find(s => s.piece?.side.name === (fen.includes(' w ') ? 'white' : 'black'))?.piece.side.name || 'white';
+  const turn = fen.includes(' w ') ? 'white' : 'black';
 
   return (
     <div className="chess-app">

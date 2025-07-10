@@ -14,11 +14,11 @@ function getTurnFromStatus(status) {
 
 function squareToFen(piece) {
   if (!piece) return '1';
-  // Use piece type for reliability
   const typeToNotation = {
     pawn: 'p', knight: 'n', bishop: 'b', rook: 'r', queen: 'q', king: 'k'
   };
   const notation = typeToNotation[piece.type];
+  if (!notation) return '1'; // Add guard for undefined types
   return piece.side.name === 'white' ? notation.toUpperCase() : notation;
 }
 
