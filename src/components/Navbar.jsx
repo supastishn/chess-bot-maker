@@ -21,6 +21,10 @@ const Navbar = () => {
             <span className="nav-icon">⚡</span>
             Create Bot
           </NavLink>
+          <NavLink to="/docs" className="nav-link">
+            <span className="nav-icon">📝</span>
+            Docs
+          </NavLink>
         </div>
       </div>
     </nav>

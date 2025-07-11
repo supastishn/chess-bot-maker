@@ -278,3 +278,60 @@
     width: 90vmin;
   }
 }
+
+/* Documentation Styles */
+.docs-content {
+  max-width: 800px;
+  padding: 2rem;
+}
+
+.docs-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.method-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.method-card {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.method-card h3 {
+  color: #4f9cf9;
+  margin-bottom: 0.5rem;
+}
+
+.method-summary {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+.method-summary li {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+.syntax-highlighting {
+  background: #1e1e1e;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Fira Code', monospace;
+  tab-size: 2;
+  margin: 1.5rem 0;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

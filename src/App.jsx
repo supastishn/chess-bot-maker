@@ -5,6 +5,7 @@ import { getBotNames, registerBot } from './bot/botInterface';
 import Navbar from './components/Navbar';
 import GamePage from './pages/Game';
 import CreateBotPage from './pages/CreateBot';
+import DocsPage from './pages/Docs';
 
 function App() {
   const [selectedBot, setSelectedBot] = useState('material-bot');
@@ -46,6 +47,10 @@ function App() {
           <Route 
             path="/create-bot" 
             element={<CreateBotPage onRegisterBot={handleRegisterBot} />} 
+          />
+          <Route 
+            path="/docs" 
+            element={<DocsPage />}
           />
         </Routes>
       </main>
