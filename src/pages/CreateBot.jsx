@@ -25,9 +25,9 @@ const CreateBot = ({ onRegisterBot }) => {
 
   return (
     <div className="page-container">
-      <div className="create-bot-content">
+      <div className="create-bot-content fade-in">
         <h1 className="page-title">Create New Bot</h1>
-        <div className="bot-creator-card">
+        <div className="bot-creator-card glass-card">
           <div className="form-group">
             <label htmlFor="bot-name">Bot Name</label>
             <input
@@ -50,7 +50,7 @@ const CreateBot = ({ onRegisterBot }) => {
               className="form-textarea"
             />
           </div>
-          <button onClick={handleRegisterClick} className="primary-button">
+          <button onClick={handleRegisterClick} className="btn primary-button">
             <span>⚡</span>
             Register Bot and Play
           </button>

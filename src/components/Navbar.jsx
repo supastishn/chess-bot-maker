@@ -1,8 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 import './Navbar.css';
 
 const Navbar = () => {
+  const { isDark, toggleTheme } = useTheme();
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -25,6 +28,15 @@ const Navbar = () => {
             <span className="nav-icon">📝</span>
             Docs
           </NavLink>
+          <button 
+            onClick={toggleTheme}
+            className="theme-toggle"
+            aria-label="Toggle theme"
+          >
+            <span className="theme-icon">
+              {isDark ? '☀️' : '🌙'}
+            </span>
+          </button>
         </div>
       </div>
     </nav>

@@ -3,10 +3,11 @@
   top: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
   z-index: 1000;
-  backdrop-filter: blur(10px);
 }
 
 .navbar-container {
@@ -25,7 +26,7 @@
   gap: 0.5rem;
   font-weight: 700;
   font-size: 1.5rem;
-  color: #ffffff;
+  color: var(--color-text-primary);
   text-decoration: none;
   transition: all 0.3s ease;
 }
@@ -37,12 +38,13 @@
 
 .brand-link:hover {
   transform: translateY(-1px);
-  color: #f8f9fa;
+  color: var(--color-accent);
 }
 
 .navbar-menu {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
 .nav-link {
@@ -50,7 +52,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-text-secondary);
   text-decoration: none;
   font-weight: 500;
   font-size: 1rem;
@@ -65,26 +67,46 @@
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .nav-link.active {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-md);
 }
 
-.nav-link.active::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
-  border-radius: 2px 2px 0 0;
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 0.5rem;
+}
+
+.theme-toggle:hover {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-icon {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover .theme-icon {
+  transform: scale(1.1);
 }
 
 @media (max-width: 768px) {
@@ -103,5 +125,14 @@
   
   .nav-icon {
     font-size: 1rem;
+  }
+  
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .theme-icon {
+    font-size: 1.1rem;
   }
 }

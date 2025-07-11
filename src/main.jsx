@@ -5,6 +5,7 @@ import eruda from 'eruda'
 import './index.css'
 import App from './App.jsx'
 import ErrorBoundary from './ErrorBoundary.jsx'
+import { ThemeProvider } from './context/ThemeContext.jsx'
 
 if (import.meta.env.DEV) {
   eruda.init()
@@ -14,7 +15,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <ErrorBoundary>
-        <App />
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
       </ErrorBoundary>
     </BrowserRouter>
   </StrictMode>,

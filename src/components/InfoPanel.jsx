@@ -2,7 +2,7 @@ import React from 'react';
 
 const InfoPanel = ({ status, turn, onReset }) => {
   return (
-    <div className="info-panel">
+    <div className="info-panel glass-card">
       <div className="turn-indicator">
         {status.isCheckmate ? (
           <div className="game-status">
@@ -17,7 +17,8 @@ const InfoPanel = ({ status, turn, onReset }) => {
         )}
       </div>
 
-      <button className="reset-button" onClick={onReset}>
+      <button className="btn reset-button" onClick={onReset}>
+        <span>🔄</span>
         Reset Game
       </button>
     </div>

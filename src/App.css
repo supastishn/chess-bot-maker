@@ -3,13 +3,13 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-background);
 }
 
 .main-content {
   flex: 1;
-  padding-top: 70px; /* Account for fixed navbar */
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  padding-top: 70px;
+  background: var(--gradient-background);
   min-height: calc(100vh - 70px);
 }
 
@@ -34,11 +34,11 @@
 .page-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--color-text-primary);
   margin-bottom: 2rem;
   text-align: center;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(45deg, #fff, #e0e6ff);
+  text-shadow: var(--shadow-sm);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -48,7 +48,24 @@
 .board-container {
   width: min(70vmin, 600px);
   margin-bottom: 2rem;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(var(--shadow-xl));
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Modern Glass Cards */
+.glass-card {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-border-hover);
 }
 
 /* Info Panel */
@@ -59,29 +76,27 @@
   align-items: center;
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
 }
 
 .turn-indicator {
   font-weight: 600;
   font-size: 1.1rem;
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: var(--color-text-primary);
 }
 
 .game-status {
-  color: #4ade80;
+  color: var(--color-success);
   font-weight: 700;
   font-size: 1.2rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-/* Buttons */
-.reset-button, .primary-button {
+/* Modern Buttons */
+.btn {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
@@ -93,23 +108,32 @@
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
+  font-family: inherit;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 .reset-button {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
 }
 
 .reset-button:hover {
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  background: var(--color-danger-hover);
 }
 
 .primary-button {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: white;
+  background: var(--color-success);
+  color: var(--color-text-inverse);
   width: 100%;
   justify-content: center;
   font-size: 1.1rem;
@@ -117,28 +141,25 @@
 }
 
 .primary-button:hover {
-  background: linear-gradient(135deg, #059669, #047857);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  background: var(--color-success-hover);
 }
 
 /* Bot Panel */
 .bot-panel {
   width: min(70vmin, 600px);
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
 }
 
 .bot-panel h3 {
-  color: #ffffff;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
   font-size: 1.3rem;
   font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .bot-selector {
@@ -149,39 +170,39 @@
 }
 
 .bot-selector label {
-  color: #ffffff;
+  color: var(--color-text-primary);
   font-weight: 500;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .bot-selector select {
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
   font-size: 1rem;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+  min-width: 150px;
 }
 
 .bot-selector select:hover, .bot-selector select:focus {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: var(--color-bg-card);
+  border-color: var(--color-border-hover);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 /* Create Bot Page */
 .bot-creator-card {
   width: 100%;
   max-width: 700px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
   padding: 2rem;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-xl);
 }
 
 .form-group {
@@ -192,21 +213,20 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--color-text-primary);
   font-size: 1.1rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .form-input, .form-textarea {
   width: 100%;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   font-size: 1rem;
   font-family: inherit;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
   transition: all 0.3s ease;
   box-sizing: border-box;
   resize: vertical;
@@ -220,13 +240,102 @@
 
 .form-input:focus, .form-textarea:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  background: var(--color-bg-card);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .form-input::placeholder, .form-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--color-text-tertiary);
+}
+
+/* Documentation Styles */
+.docs-content {
+  max-width: 800px;
+  padding: 2rem;
+  width: 100%;
+}
+
+.docs-card {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.docs-card h2 {
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.method-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.method-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.method-card h3 {
+  color: var(--color-accent);
+  margin-bottom: 0.5rem;
+}
+
+.method-card p {
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+}
+
+.method-summary {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+.method-summary li {
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+}
+
+.syntax-highlighting {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  padding: 1rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-family: 'Fira Code', monospace;
+  tab-size: 2;
+  margin: 1.5rem 0;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+code {
+  background: var(--color-bg-tertiary);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9em;
+  color: var(--color-accent);
 }
 
 /* Responsive Design */
@@ -252,7 +361,7 @@
     text-align: center;
   }
   
-  .bot-creator-card {
+  .bot-creator-card, .docs-card {
     padding: 1.5rem;
   }
   
@@ -279,59 +388,43 @@
   }
 }
 
-/* Documentation Styles */
-.docs-content {
-  max-width: 800px;
-  padding: 2rem;
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-.docs-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 2rem;
-  margin-bottom: 2rem;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.method-list {
-  display: grid;
-  gap: 1.5rem;
+/* Loading states */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
 }
 
-.method-card {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1.5rem;
-  border-radius: 12px;
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--color-border);
+  border-top: 2px solid var(--color-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-.method-card h3 {
-  color: #4f9cf9;
-  margin-bottom: 0.5rem;
-}
-
-.method-summary {
-  list-style: none;
-  padding-left: 1rem;
-}
-
-.method-summary li {
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-}
-
-.syntax-highlighting {
-  background: #1e1e1e;
-  padding: 1rem;
-  border-radius: 8px;
-  overflow-x: auto;
-  font-family: 'Fira Code', monospace;
-  tab-size: 2;
-  margin: 1.5rem 0;
-}
-
-pre {
-  white-space: pre-wrap;
-  word-break: break-word;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

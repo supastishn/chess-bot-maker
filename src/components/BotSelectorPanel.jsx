@@ -1,7 +1,7 @@
 import React from 'react';
 
 const BotSelectorPanel = ({ selectedBot, onBotChange, botNames }) => (
-  <div className="bot-panel">
+  <div className="bot-panel glass-card">
     <div className="bot-selector">
       <label>Active Bot:</label>
       <select value={selectedBot} onChange={(e) => onBotChange(e.target.value)}>
