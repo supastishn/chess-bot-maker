@@ -428,3 +428,73 @@ code {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Modernized Docs Page Styles */
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.docs-card {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.3s ease;
+}
+
+.docs-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+}
+
+.docs-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.8rem;
+}
+
+.method-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.method-item {
+  background: var(--color-bg-tertiary);
+  padding: 1.25rem;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+}
+
+.method-item h3 {
+  color: var(--color-accent);
+  margin-bottom: 0.5rem;
+}
+
+.method-item pre {
+  background: var(--color-bg-secondary);
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.example-card {
+  margin-top: 2rem;
+  background: var(--color-bg-tertiary);
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+}
+
+.example-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
