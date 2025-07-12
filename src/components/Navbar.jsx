@@ -28,6 +28,10 @@ const Navbar = () => {
             <span className="nav-icon">📝</span>
             Docs
           </NavLink>
+          <NavLink to="/visual-bot-builder" className="nav-link">
+            <span className="nav-icon">🔧</span>
+            Visual Builder
+          </NavLink>
           <button 
             onClick={toggleTheme}
             className="theme-toggle"
