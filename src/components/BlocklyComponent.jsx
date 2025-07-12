@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import * as Blockly from 'blockly/core';
-import { javascriptGenerator } from 'blockly/javascript'; // Add this import
+import 'blockly/javascript';  // Import JavaScript generators
 import 'blockly/blocks';
 import toolbox from '../blockly/toolbox';
 
-// load custom blocks & generators
+// Load custom blocks & generators
 import '../blockly/blocks/game';
 import '../blockly/generators/game';
 
@@ -13,14 +13,14 @@ const BlocklyComponent = forwardRef((_, ref) => {
   const workspace = useRef(null);
 
   useEffect(() => {
+    // Proper initialization using inject()
     workspace.current = Blockly.inject(blocklyDiv.current, {
-      toolbox,
+      toolbox: toolbox, // Pass toolbox object directly
       trashcan: true,
       grid: { spacing: 20, length: 3, colour: '#ccc', snap: true }
     });
     
     // Register JavaScript generator
-    Blockly.JavaScript = javascriptGenerator;
     Blockly.JavaScript.addReservedWords('game');
   }, []);
 

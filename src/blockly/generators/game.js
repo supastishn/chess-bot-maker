@@ -1,9 +1,7 @@
 import * as Blockly from 'blockly/core';
-import { javascriptGenerator } from 'blockly/javascript'; // Import the generator
+import 'blockly/javascript';
 
-// Initialize Blockly.JavaScript first
-Blockly.JavaScript = javascriptGenerator;
-
+// Custom generators
 Blockly.JavaScript['get_available_moves'] = function() {
   return ['game.getAvailableMoves()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
