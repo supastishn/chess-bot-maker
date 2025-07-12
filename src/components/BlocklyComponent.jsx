@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import * as Blockly from 'blockly/core';
+import { javascriptGenerator } from 'blockly/javascript'; // Add this import
 import 'blockly/blocks';
-import 'blockly/javascript';
 import toolbox from '../blockly/toolbox';
 
 // load custom blocks & generators
@@ -18,6 +18,10 @@ const BlocklyComponent = forwardRef((_, ref) => {
       trashcan: true,
       grid: { spacing: 20, length: 3, colour: '#ccc', snap: true }
     });
+    
+    // Register JavaScript generator
+    Blockly.JavaScript = javascriptGenerator;
+    Blockly.JavaScript.addReservedWords('game');
   }, []);
 
   useImperativeHandle(ref, () => ({
