@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import * as Blockly from 'blockly/core';
-import 'blockly/javascript';  // Import JavaScript generators
+import { javascriptGenerator } from 'blockly/javascript';  // Add this import
 import 'blockly/blocks';
 import toolbox from '../blockly/toolbox';
 
@@ -20,12 +20,11 @@ const BlocklyComponent = forwardRef((_, ref) => {
       grid: { spacing: 20, length: 3, colour: '#ccc', snap: true }
     });
     
-    // Register JavaScript generator
-    Blockly.JavaScript.addReservedWords('game');
+    javascriptGenerator.addReservedWords('game');  // Update this line
   }, []);
 
   useImperativeHandle(ref, () => ({
-    workspaceToCode: () => Blockly.JavaScript.workspaceToCode(workspace.current)
+    workspaceToCode: () => javascriptGenerator.workspaceToCode(workspace.current)  // Update this line
   }));
 
   return <div ref={blocklyDiv} style={{ height: '480px', width: '100%' }} />;
