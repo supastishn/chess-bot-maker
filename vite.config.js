@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import react from '@vitejs/plugin-react-swc'  // Updated React 19 compatible plugin
 
 export default defineConfig({
   plugins: [react()],
