@@ -31,11 +31,17 @@ const VisualBotBuilder = ({ onRegisterBot }) => {
           onChange={e => setBotName(e.target.value)}
           className="form-input"
         />
-        <BlocklyComponent ref={workspaceRef} />
-        <button onClick={handleGenerate} className="btn primary-button">
-          Generate Code
-        </button>
-        {code && (
+        
+        {!code ? (
+          // Show Blockly and Generate button when no code generated
+          <>
+            <BlocklyComponent ref={workspaceRef} />
+            <button onClick={handleGenerate} className="btn primary-button">
+              Generate Code
+            </button>
+          </>
+        ) : (
+          // Show generated code and action buttons
           <>
             <textarea
               className="form-textarea"
@@ -43,9 +49,17 @@ const VisualBotBuilder = ({ onRegisterBot }) => {
               rows={10}
               value={code}
             />
-            <button onClick={handleRegister} className="btn primary-button">
-              Register Bot
-            </button>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button onClick={handleRegister} className="btn primary-button">
+                Register Bot
+              </button>
+              <button 
+                onClick={() => setCode('')}
+                className="btn reset-button"
+              >
+                Edit Code
+              </button>
+            </div>
           </>
         )}
       </div>
