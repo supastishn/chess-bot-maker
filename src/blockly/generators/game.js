@@ -1,4 +1,4 @@
-import Blockly from 'blockly/core';
+import * as Blockly from 'blockly/core';
 import 'blockly/javascript';
 
 Blockly.JavaScript['get_available_moves'] = function() {

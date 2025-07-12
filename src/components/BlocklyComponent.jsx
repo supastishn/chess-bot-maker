@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import Blockly from 'blockly/core';
+import * as Blockly from 'blockly/core';
 import 'blockly/blocks';
 import 'blockly/javascript';
 import toolbox from '../blockly/toolbox';
