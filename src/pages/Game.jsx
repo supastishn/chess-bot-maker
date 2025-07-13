@@ -92,16 +92,32 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   // Modified makeMove to clear highlights
   const makeMove = (move) => {
     try {
-      // Create move object with optional promotion
-      const moveObj = { from: move.from, to: move.to };
-      if (move.promotion) {
-        moveObj.promotion = move.promotion;
+      // Check if move is a UCI string
+      if (typeof move === 'string' && move.length >= 4) {
+        // For UCI strings like "e2e4" or "e7e8q"
+        const moveObj = {
+          from: move.slice(0, 2),
+          to: move.slice(2, 4),
+          promotion: move.length > 4 ? move[4] : 'q'
+        };
+        const result = gameRef.current.move(moveObj);
+        setFen(gameRef.current.fen());
+        clearValidMoves();
+        return result;
+      } 
+      // Handle move object {from, to} format
+      else if (move && typeof move === 'object') {
+        const result = gameRef.current.move({
+          from: move.from, 
+          to: move.to,
+          promotion: move.promotion || 'q'
+        });
+        setFen(gameRef.current.fen());
+        clearValidMoves();
+        return result;
       }
-
-      const result = gameRef.current.move(moveObj);
-      setFen(gameRef.current.fen());
-      clearValidMoves();
-      return result;
+      // Move format is invalid
+      return null;
     } catch (e) {
       console.error("Move failed:", e);
       return null;
@@ -112,7 +128,11 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const onDrop = (sourceSquare, targetSquare) => {
     const game = gameRef.current;
     const piece = game.get(sourceSquare);
-    const isPawnPromotion = piece?.type === 'pawn' &&
+
+    if (!piece) return false;
+
+    // Check for pawn promotion
+    const isPawnPromotion = piece.type === 'p' &&
       ((piece.color === 'w' && targetSquare[1] === '8') ||
        (piece.color === 'b' && targetSquare[1] === '1'));
 
