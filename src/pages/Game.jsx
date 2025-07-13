@@ -51,6 +51,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Simplified handleSquareClick
   const handleSquareClick = (square) => {
+    console.log(`Square clicked: ${square}`);  // Added click logging
     const game = gameRef.current;
     const piece = game.get(square);
 
@@ -76,7 +77,8 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     }
     // If valid destination is clicked
     else if (activeSquare && validMoves.includes(square)) {
-      handleMove(activeSquare, square);
+      console.log(`Attempting move from ${activeSquare} to ${square}`); // Added
+      handleMove(activeSquare, square);       // This is the actual fix
       clearValidMoves();
     }
     // Clear moves on any other click
