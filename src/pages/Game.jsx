@@ -101,25 +101,6 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     }
   };
 
-  // Debug logging for e2e4 move attempts
-  const logMoveDebugInfo = (move) => {
-    console.group('Move Debug: e2e4');
-    console.log('Move attempt:', move);
-    console.log('Game FEN before move:', gameRef.current.fen());
-    console.log('Active chess.js state:', gameRef.current.ascii());
-    console.log('Game over status:', gameRef.current.isGameOver());
-    console.log('Turn:', gameRef.current.turn());
-    console.log('Available moves for e2:');
-    try {
-      const moves = gameRef.current.moves({ square: 'e2', verbose: true });
-      console.log(moves.map(m =>
-        `${m.from}${m.to}${m.promotion || ''} - ${m.san}`
-      ));
-    } catch (e) {
-      console.error('Error fetching moves:', e);
-    }
-    console.groupEnd();
-  };
 
   // Always use object format for moves
   const makeMove = (move) => {
