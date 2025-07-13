@@ -1,6 +1,7 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ThemeContext } from './useTheme';
 
-export const ThemeContext = createContext();
+// The ThemeContext definition has been moved.
 
 export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
