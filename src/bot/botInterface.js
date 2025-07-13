@@ -4,19 +4,23 @@
  * - Example: (game) => { from: 'e2', to: 'e4' } or (game) => 'e2e4'
  */
 
+console.log("[BotInterface] Initializing bot interface");
+
 const registeredBots = new Map();
 const DEFAULT_BOT_NAME = 'starter-bot';
 
-// Helper API for bots
 const createBotHelper = (gameClient) => ({
   // Game state methods
   getAvailableMoves: () => {
-    return gameClient.moves({ verbose: true }).map(move => 
+    const moves = gameClient.moves({ verbose: true });
+    console.log(`[Bot] getAvailableMoves returned ${moves.length} moves`);
+    return moves.map(move => 
       move.promotion ? move.from + move.to + move.promotion : move.from + move.to
     );
   },
   
   getBoardState: () => {
+    console.log("[Bot] getBoardState called");
     return gameClient.board().flatMap((row, rankIdx) => 
       row.map((piece, fileIdx) => ({
         file: String.fromCharCode(97 + fileIdx),
@@ -29,7 +33,10 @@ const createBotHelper = (gameClient) => ({
     );
   },
 
-  getTurn: () => gameClient.turn(),
+  getTurn: () => {
+    console.log("[Bot] getTurn called");
+    return gameClient.turn();
+  },
   
   getGameResult: () => {
     if (gameClient.isCheckmate()) return 'checkmate';
@@ -52,22 +59,29 @@ const createBotHelper = (gameClient) => ({
   undoMove: () => gameClient.undo(),
   
   move: (move) => {
+    console.log(`[Bot] Attempting move: ${JSON.stringify(move)}`);
     try {
+      let result;
       if (typeof move === 'string') {
-        return gameClient.move({
+        result = gameClient.move({
           from: move.slice(0, 2),
           to: move.slice(2, 4),
           promotion: move[4] || 'q'
         });
+      } else {
+        result = gameClient.move(move);
       }
-      return gameClient.move(move);
-    } catch {
+      console.log(`[Bot] Move result: ${result ? "success" + result.san : "failure"}`);
+      return result;
+    } catch (e) {
+      console.error("[Bot] Move error:", e.message);
       return null;
     }
   }
 });
 
 export const registerBot = (name, botFunction) => {
+  console.log(`[Bot] Registering bot: ${name}`);
   if (typeof botFunction !== 'function') {
     throw new Error('Bot must be a function');
   }

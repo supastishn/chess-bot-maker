@@ -1,9 +1,11 @@
 export const materialBot = (game) => {
+  console.log("[MaterialBot] Calculating move");
   const moves = game.getAvailableMoves();
   if (moves.length === 0) return null;
   
   // Check for immediate checkmate
   for (const move of moves) {
+    console.log(`[MaterialBot] Evaluating move: ${JSON.stringify(move)}`);
     game.move(move);
     if (game.getGameResult() === 'checkmate') {
       game.undoMove();
@@ -18,6 +20,7 @@ export const materialBot = (game) => {
   let bestMoves = [];
   
   for (const move of moves) {
+    console.log(`[MaterialBot] Evaluating move: ${JSON.stringify(move)}`);
     game.move(move);
     const score = game.evaluateMaterial();
     game.undoMove();
@@ -30,5 +33,6 @@ export const materialBot = (game) => {
     }
   }
   
+  console.log(`[MaterialBot] Selected move: ${JSON.stringify(bestMoves[0])}`);
   return bestMoves[Math.floor(Math.random() * bestMoves.length)];
 };

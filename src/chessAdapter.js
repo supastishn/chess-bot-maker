@@ -31,6 +31,7 @@ function squareToFen(piece) {
 // --- Adapter API ---
 
 export const getFen = (gameClient) => {
+    console.log("[Adapter] Generating FEN");
     try {
         const status = gameClient.getStatus();
         const { board } = status;
@@ -98,7 +99,7 @@ export const getFen = (gameClient) => {
         return fen;
 
     } catch (error) {
-        console.error("!!! CRITICAL ERROR generating FEN:", error);
+        console.error("[Adapter] Critical FEN generation error:", error);
         // Fallback to the starting position to prevent a crash
         return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
     }

@@ -5,7 +5,10 @@ import { getBot } from '../bot/botInterface';
 import InfoPanel from '../components/InfoPanel';
 import BotSelectorPanel from '../components/BotSelectorPanel';
 
+console.log("[GamePage] Component initialized");
+
 const GamePage = ({ selectedBot, onBotChange, botNames }) => {
+  console.log(`[GamePage] Rendering with bot: ${selectedBot}`);
   const gameRef = useRef(new Chess());
   const [fen, setFen] = useState(gameRef.current.fen());
   const [boardOrientation] = useState('white');
@@ -24,13 +27,24 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Update handleMove to use object format and handle bot moves
   const handleMove = (from, to, promotion = undefined) => {
+    console.log(`[GamePage] Handling move: ${from}->${to}`);
+
+    // Log game state before human move
+    console.group("Pre-move game state");
+    console.log("FEN:", gameRef.current.fen());
+    console.log("Turn:", gameRef.current.turn());
+    console.log("Status:", gameRef.current.game_over() ? "game over" : "active");
+    console.groupEnd();
+
     const moveResult = makeMove({ from, to, promotion });
 
     // Only proceed with bot move if human move was successful
     if (moveResult) {
       setTimeout(() => {
         if (!gameRef.current.isGameOver()) {
+          console.log(`[GamePage] Calling bot: ${selectedBot}`);
           const botMove = getBot(selectedBot)(gameRef.current);
+          console.log(`[GamePage] Bot responded with move: ${JSON.stringify(botMove)}`);
           if (botMove) {
             // Handle string moves correctly
             if (typeof botMove === 'string') {
@@ -51,7 +65,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Simplified handleSquareClick
   const handleSquareClick = (square) => {
-    console.log(`Square clicked: ${square}`);  // Added click logging
+    console.log(`[SquareClick] ${square} ${gameRef.current.get(square) ? "has piece" : "empty"}`);
     const game = gameRef.current;
     const piece = game.get(square);
 
@@ -167,6 +181,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Modified resetBoard to clear highlights
   const resetBoard = () => {
+    console.log("[GamePage] Resetting board to start position");
     gameRef.current = new Chess();
     setFen(gameRef.current.fen());
     clearValidMoves();
