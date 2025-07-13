@@ -107,9 +107,23 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Always use object format for moves
   const makeMove = (move) => {
-    if (move.from === 'e2' && move.to === 'e4') {
-      logMoveDebugInfo(move);
+    // Log debug info for all moves
+    console.group(`Move Debug: ${move.from} to ${move.to}`);
+    console.log('Move attempt:', move);
+    console.log('Game FEN before move:', gameRef.current.fen());
+    console.log('Active chess.js state:', gameRef.current.ascii());
+    console.log('Game over status:', gameRef.current.isGameOver());
+    console.log('Turn:', gameRef.current.turn());
+    console.log('Available moves for position:');
+    try {
+      const moves = gameRef.current.moves({ square: move.from, verbose: true });
+      console.log(moves.map(m => 
+        `${m.from}${m.to}${m.promotion || ''} - ${m.san}`
+      ));
+    } catch (e) {
+      console.error('Error fetching moves:', e);
     }
+    console.groupEnd();
 
     try {
       console.log(`Attempting move: ${move.from} to ${move.to}${move.promotion ? ` (promotion: ${move.promotion})` : ''}`);
@@ -137,7 +151,8 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       console.error('Game state:', {
         fen: gameRef.current.fen(),
         turn: gameRef.current.turn(),
-        in_check: gameRef.current.inCheck()
+        in_check: gameRef.current.inCheck(),
+        game_over: gameRef.current.isGameOver()
       });
       return null;
     }
