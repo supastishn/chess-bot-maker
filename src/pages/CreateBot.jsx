@@ -36,7 +36,7 @@ const CreateBot = ({ onRegisterBot }) => {
               placeholder="Enter a unique name for your bot"
               value={customBotName}
               onChange={(e) => setCustomBotName(e.target.value)}
-              className="form-input"
+              className="form-input mobile-optimized-input"
             />
           </div>
           <div className="form-group">
@@ -47,7 +47,7 @@ const CreateBot = ({ onRegisterBot }) => {
               onChange={(e) => setCustomBotCode(e.target.value)}
               placeholder={CUSTOM_BOT_PLACEHOLDER}
               rows={18}
-              className="form-textarea"
+              className="form-textarea mobile-optimized-textarea"
             />
           </div>
           <button onClick={handleRegisterClick} className="btn primary-button">

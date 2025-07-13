@@ -198,7 +198,11 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     <div className="page-container">
       <div className="game-content">
         <h1 className="page-title">Chess vs Computer</h1>
-        <div className="board-container">
+        <div className="board-container" style={{
+          width: '100%',
+          maxWidth: '500px',
+          aspectRatio: '1/1'
+        }}>
           <Chessboard
             position={fen}
             onPieceDrop={onDrop}

@@ -27,7 +27,11 @@ const BlocklyComponent = forwardRef((_, ref) => {
     workspaceToCode: () => javascriptGenerator.workspaceToCode(workspace.current)  // Update this line
   }));
 
-  return <div ref={blocklyDiv} style={{ height: '480px', width: '100%' }} />;
+  return <div ref={blocklyDiv} style={{
+    height: '50vh',
+    minHeight: '300px',
+    width: '100%'
+  }} />;
 });
 
 export default BlocklyComponent;

@@ -355,6 +355,10 @@ code {
     text-align: center;
   }
   
+  .game-status {
+    font-size: 1.1rem;
+  }
+  
   .bot-selector {
     flex-direction: column;
     align-items: stretch;

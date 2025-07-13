@@ -12,6 +12,59 @@
   scrollbar-width: thin;
 }
 
+/* Add mobile-first viewport scaling */
+@viewport {
+  width: device-width;
+  zoom: 1.0;
+}
+
+/* Prevent horizontal overflow */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Global mobile adjustments */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .board-container, 
+  .info-panel, 
+  .bot-panel {
+    width: 95vw;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+  
+  button, .btn {
+    min-height: 44px;
+    font-size: 1rem;
+  }
+  
+  .page-title {
+    font-size: 1.8rem;
+  }
+}
+
+/* Form mobile optimizations */
+.mobile-optimized-input,
+.mobile-optimized-textarea {
+  font-size: 16px; /* Prevents iOS zoom */
+}
+
+.mobile-optimized-textarea {
+  max-height: 60vh;
+}
+
 /* Light theme variables */
 :root[data-theme="light"] {
   --color-bg-primary: #f8fafc;
