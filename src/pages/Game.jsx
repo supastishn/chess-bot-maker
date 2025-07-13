@@ -85,9 +85,34 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     }
   };
 
+  // Debug logging for e2e4 move attempts
+  const logMoveDebugInfo = (move) => {
+    console.group('Move Debug: e2e4');
+    console.log('Move attempt:', move);
+    console.log('Game FEN before move:', gameRef.current.fen());
+    console.log('Active chess.js state:', gameRef.current.ascii());
+    console.log('Game over status:', gameRef.current.isGameOver());
+    console.log('Turn:', gameRef.current.turn());
+    console.log('Available moves for e2:');
+    try {
+      const moves = gameRef.current.moves({ square: 'e2', verbose: true });
+      console.log(moves.map(m =>
+        `${m.from}${m.to}${m.promotion || ''} - ${m.san}`
+      ));
+    } catch (e) {
+      console.error('Error fetching moves:', e);
+    }
+    console.groupEnd();
+  };
+
   // Always use object format for moves
   const makeMove = (move) => {
+    if (move.from === 'e2' && move.to === 'e4') {
+      logMoveDebugInfo(move);
+    }
+
     try {
+      console.log(`Attempting move: ${move.from} to ${move.to}${move.promotion ? ` (promotion: ${move.promotion})` : ''}`);
       const moveObj = {
         from: move.from,
         to: move.to
@@ -97,11 +122,23 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
         moveObj.promotion = move.promotion;
       }
       const result = gameRef.current.move(moveObj);
+      if (result) {
+        console.log('Move successful:', result.san);
+        console.log('New FEN:', gameRef.current.fen());
+      } else {
+        console.warn('Move returned null result');
+      }
       setFen(gameRef.current.fen());
       clearValidMoves();
       return result;
     } catch (e) {
-      console.error("Move failed:", e);
+      console.error(`Move failed: ${e.message}`);
+      console.error('Attempted move:', move);
+      console.error('Game state:', {
+        fen: gameRef.current.fen(),
+        turn: gameRef.current.turn(),
+        in_check: gameRef.current.inCheck()
+      });
       return null;
     }
   };
