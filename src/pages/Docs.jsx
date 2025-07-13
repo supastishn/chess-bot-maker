@@ -1,4 +1,5 @@
 import React from 'react';
+import { Robot, Puzzle, Library } from 'lucide-react';
 
 const DocsPage = () => {
   return (
@@ -8,7 +9,7 @@ const DocsPage = () => {
         
         <div className="docs-grid">
           <div className="docs-card glass-card">
-            <h2>🤖 Bot Function Structure</h2>
+            <h2><Robot size={24} /> Bot Function Structure</h2>
             <p>Each bot must be a JavaScript function that takes a <code>game</code> object and returns a move:</p>
             <div className="syntax-highlighting">
               <pre>
@@ -21,7 +22,7 @@ const DocsPage = () => {
           </div>
           
           <div className="docs-card glass-card">
-            <h2>🧩 Game Helper API</h2>
+            <h2><Puzzle size={24} /> Game Helper API</h2>
             <div className="method-list">
               <div className="method-item">
                 <h3><code>getAvailableMoves()</code></h3>
@@ -44,7 +45,7 @@ const DocsPage = () => {
           </div>
           
           <div className="docs-card glass-card">
-            <h2>📚 Bot Examples</h2>
+            <h2><Library size={24} /> Bot Examples</h2>
             
             <div className="example-card">
               <h3>Simple Material-Based Bot</h3>

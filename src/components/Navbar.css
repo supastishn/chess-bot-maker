@@ -32,7 +32,8 @@
 }
 
 .brand-icon {
-  font-size: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
@@ -63,7 +64,8 @@
 }
 
 .nav-icon {
-  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 .nav-link:hover {
@@ -101,8 +103,10 @@
 }
 
 .theme-icon {
-  font-size: 1.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
   transition: transform 0.3s ease;
+  color: var(--color-text-primary);
 }
 
 .theme-toggle:hover .theme-icon {
@@ -137,7 +141,8 @@
   }
   
   .nav-icon {
-    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
   }
   
   .theme-toggle {
@@ -146,7 +151,8 @@
   }
   
   .theme-icon {
-    font-size: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
   }
 }
 

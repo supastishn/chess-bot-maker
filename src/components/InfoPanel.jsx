@@ -1,4 +1,5 @@
 import React from 'react';
+import { RefreshCw } from 'lucide-react';
 
 const InfoPanel = ({ status, turn, onReset }) => {
   // More descriptive game states
@@ -19,7 +20,7 @@ const InfoPanel = ({ status, turn, onReset }) => {
       </div>
 
       <button className="btn reset-button" onClick={onReset}>
-        <span>🔄</span>
+        <RefreshCw size={16} />
         Reset Game
       </button>
     </div>

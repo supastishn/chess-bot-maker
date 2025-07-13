@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTheme } from '../context/useTheme';
+import { Crown, Gamepad2, Zap, FileText, Wrench, Sun, Moon } from 'lucide-react';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -11,35 +12,33 @@ const Navbar = () => {
       <div className="navbar-container">
         <div className="navbar-brand">
           <NavLink to="/" className="brand-link">
-            <span className="brand-icon">♛</span>
+            <Crown className="brand-icon" />
             Chess vs Bot
           </NavLink>
         </div>
         <div className="navbar-menu">
           <NavLink to="/" className="nav-link" end>
-            <span className="nav-icon">🎮</span>
-            Play
+            <Gamepad2 className="nav-icon" />
+            <span className="nav-text">Play</span>
           </NavLink>
           <NavLink to="/create-bot" className="nav-link">
-            <span className="nav-icon">⚡</span>
-            Create Bot
+            <Zap className="nav-icon" />
+            <span className="nav-text">Create Bot</span>
           </NavLink>
           <NavLink to="/docs" className="nav-link">
-            <span className="nav-icon">📝</span>
-            Docs
+            <FileText className="nav-icon" />
+            <span className="nav-text">Docs</span>
           </NavLink>
           <NavLink to="/visual-bot-builder" className="nav-link">
-            <span className="nav-icon">🔧</span>
-            Visual Builder
+            <Wrench className="nav-icon" />
+            <span className="nav-text">Visual Builder</span>
           </NavLink>
-          <button 
+          <button
             onClick={toggleTheme}
             className="theme-toggle"
             aria-label="Toggle theme"
           >
-            <span className="theme-icon">
-              {isDark ? '☀️' : '🌙'}
-            </span>
+            {isDark ? <Sun className="theme-icon" /> : <Moon className="theme-icon" />}
           </button>
         </div>
       </div>
