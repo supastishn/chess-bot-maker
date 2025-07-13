@@ -154,3 +154,25 @@ a:focus-visible {
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
+
+/* Click-to-move indicators */
+.move-dot {
+  position: relative;
+}
+
+.move-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 25%;
+  height: 25%;
+  background: #00ff0044;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.active-piece {
+  border: 3px solid #00ff00 !important;
+}
