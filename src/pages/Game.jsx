@@ -89,10 +89,10 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       styles[square] = { border: '3px solid #00ff00' };
       setCustomSquareStyles(styles);
     }
-    // If valid destination is clicked
+    // If valid destination is clicked - FIXED HERE
     else if (activeSquare && validMoves.includes(square)) {
-      console.debug(`Attempting move from ${activeSquare} to ${square}`); // Changed to debug
-      handleMove(activeSquare, square);       // This is the actual fix
+      console.debug(`Attempting move from ${activeSquare} to ${square}`);
+      handleMove(activeSquare, square, undefined);  // Added undefined for promotion
       clearValidMoves();
     }
     // Clear moves on any other click
@@ -176,7 +176,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Simplified onDrop
   const onDrop = (sourceSquare, targetSquare) => {
-    return handleMove(sourceSquare, targetSquare);
+    return handleMove(sourceSquare, targetSquare, undefined); // Added undefined
   };
 
   // Modified resetBoard to clear highlights
