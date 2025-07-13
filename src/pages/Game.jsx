@@ -22,37 +22,37 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     setCustomSquareStyles({});
   };
 
-  // Helper for pawn promotion detection
-  const handleMove = (from, to, promotion = 'q') => {
-    const moveResult = makeMove({
-      from,
-      to,
-      promotion
-    });
+  // Update handleMove to use object format and handle bot moves
+  const handleMove = (from, to, promotion = undefined) => {
+    const moveResult = makeMove({ from, to, promotion });
 
     // Only proceed with bot move if human move was successful
     if (moveResult) {
       setTimeout(() => {
         if (!gameRef.current.isGameOver()) {
           const botMove = getBot(selectedBot)(gameRef.current);
-          if (botMove) makeMove(botMove);
+          if (botMove) {
+            // Handle string moves correctly
+            if (typeof botMove === 'string') {
+              makeMove({
+                from: botMove.slice(0, 2),
+                to: botMove.slice(2, 4)
+              });
+            } else {
+              makeMove(botMove);
+            }
+          }
         }
       }, 200);
     }
 
-    return !!moveResult;  // Return boolean success status
+    return !!moveResult;
   };
 
-  // Click handler for squares
+  // Simplified handleSquareClick
   const handleSquareClick = (square) => {
     const game = gameRef.current;
     const piece = game.get(square);
-
-    // Proper pawn promotion detection
-    const isPawnPromotion = activeSquare &&
-      game.get(activeSquare)?.type === 'pawn' &&
-      ((game.turn() === 'w' && square[1] === '8') ||
-       (game.turn() === 'b' && square[1] === '1'));
 
     // If clicking a piece of current player's color
     if (piece && piece.color === game.turn()) {
@@ -76,11 +76,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     }
     // If valid destination is clicked
     else if (activeSquare && validMoves.includes(square)) {
-      handleMove(
-        activeSquare,
-        square,
-        isPawnPromotion ? 'q' : undefined
-      );
+      handleMove(activeSquare, square);
       clearValidMoves();
     }
     // Clear moves on any other click
@@ -89,58 +85,30 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     }
   };
 
-  // Modified makeMove to clear highlights
+  // Always use object format for moves
   const makeMove = (move) => {
     try {
-      // Check if move is a UCI string
-      if (typeof move === 'string' && move.length >= 4) {
-        // For UCI strings like "e2e4" or "e7e8q"
-        const moveObj = {
-          from: move.slice(0, 2),
-          to: move.slice(2, 4),
-          promotion: move.length > 4 ? move[4] : 'q'
-        };
-        const result = gameRef.current.move(moveObj);
-        setFen(gameRef.current.fen());
-        clearValidMoves();
-        return result;
-      } 
-      // Handle move object {from, to} format
-      else if (move && typeof move === 'object') {
-        const result = gameRef.current.move({
-          from: move.from, 
-          to: move.to,
-          promotion: move.promotion || 'q'
-        });
-        setFen(gameRef.current.fen());
-        clearValidMoves();
-        return result;
+      const moveObj = {
+        from: move.from,
+        to: move.to
+      };
+      // Only add promotion when explicitly specified
+      if (move.promotion) {
+        moveObj.promotion = move.promotion;
       }
-      // Move format is invalid
-      return null;
+      const result = gameRef.current.move(moveObj);
+      setFen(gameRef.current.fen());
+      clearValidMoves();
+      return result;
     } catch (e) {
       console.error("Move failed:", e);
       return null;
     }
   };
 
-  // Modified onDrop to use handleMove
+  // Simplified onDrop
   const onDrop = (sourceSquare, targetSquare) => {
-    const game = gameRef.current;
-    const piece = game.get(sourceSquare);
-
-    if (!piece) return false;
-
-    // Check for pawn promotion
-    const isPawnPromotion = piece.type === 'p' &&
-      ((piece.color === 'w' && targetSquare[1] === '8') ||
-       (piece.color === 'b' && targetSquare[1] === '1'));
-
-    return handleMove(
-      sourceSquare,
-      targetSquare,
-      isPawnPromotion ? 'q' : undefined
-    );
+    return handleMove(sourceSquare, targetSquare);
   };
 
   // Modified resetBoard to clear highlights
