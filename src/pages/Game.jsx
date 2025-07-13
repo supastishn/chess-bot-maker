@@ -30,22 +30,29 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       promotion
     });
 
-    if (moveResult === null) return false;
+    // Only proceed with bot move if human move was successful
+    if (moveResult) {
+      setTimeout(() => {
+        if (!gameRef.current.isGameOver()) {
+          const botMove = getBot(selectedBot)(gameRef.current);
+          if (botMove) makeMove(botMove);
+        }
+      }, 200);
+    }
 
-    setTimeout(() => {
-      if (!gameRef.current.isGameOver()) {
-        const botMove = getBot(selectedBot)(gameRef.current);
-        if (botMove) makeMove(botMove);
-      }
-    }, 200);
-
-    return true;
+    return !!moveResult;  // Return boolean success status
   };
 
   // Click handler for squares
   const handleSquareClick = (square) => {
     const game = gameRef.current;
     const piece = game.get(square);
+
+    // Proper pawn promotion detection
+    const isPawnPromotion = activeSquare &&
+      game.get(activeSquare)?.type === 'pawn' &&
+      ((game.turn() === 'w' && square[1] === '8') ||
+       (game.turn() === 'b' && square[1] === '1'));
 
     // If clicking a piece of current player's color
     if (piece && piece.color === game.turn()) {
@@ -72,7 +79,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       handleMove(
         activeSquare,
         square,
-        activeSquare[1] === '7' && square[1] === '8' ? 'q' : undefined
+        isPawnPromotion ? 'q' : undefined
       );
       clearValidMoves();
     }
@@ -85,25 +92,34 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   // Modified makeMove to clear highlights
   const makeMove = (move) => {
     try {
-      const result = gameRef.current.move({
-        from: move.from,
-        to: move.to,
-        promotion: move.promotion || 'q'
-      });
+      // Create move object with optional promotion
+      const moveObj = { from: move.from, to: move.to };
+      if (move.promotion) {
+        moveObj.promotion = move.promotion;
+      }
+
+      const result = gameRef.current.move(moveObj);
       setFen(gameRef.current.fen());
       clearValidMoves();
       return result;
-    } catch {
+    } catch (e) {
+      console.error("Move failed:", e);
       return null;
     }
   };
 
   // Modified onDrop to use handleMove
   const onDrop = (sourceSquare, targetSquare) => {
+    const game = gameRef.current;
+    const piece = game.get(sourceSquare);
+    const isPawnPromotion = piece?.type === 'pawn' &&
+      ((piece.color === 'w' && targetSquare[1] === '8') ||
+       (piece.color === 'b' && targetSquare[1] === '1'));
+
     return handleMove(
       sourceSquare,
       targetSquare,
-      sourceSquare[1] === '7' && targetSquare[1] === '8' ? 'q' : undefined
+      isPawnPromotion ? 'q' : undefined
     );
   };
 
