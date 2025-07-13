@@ -7,21 +7,21 @@ const errorBoundaryStyle = {
   justifyContent: 'center',
   height: '100vh',
   padding: '2rem',
-  backgroundColor: '#1a1a2e',
-  color: '#f0f0f0',
+  backgroundColor: '#111111',
+  color: '#eeeeee',
   fontFamily: 'monospace',
   textAlign: 'center',
   boxSizing: 'border-box'
 };
 
 const errorTitleStyle = {
-  color: '#e74c3c',
+  color: '#eeeeee',
   fontSize: '2rem',
   marginBottom: '1rem'
 };
 
 const errorMessageStyle = {
-  backgroundColor: '#2d2d2d',
+  backgroundColor: '#222222',
   padding: '1rem',
   borderRadius: '8px',
   maxWidth: '800px',
@@ -35,7 +35,7 @@ const resetButton = {
     marginTop: '2rem',
     padding: '0.8rem 1.5rem',
     fontSize: '1rem',
-    backgroundColor: '#27ae60',
+    backgroundColor: '#444444',
     color: 'white',
     border: 'none',
     borderRadius: '4px',
