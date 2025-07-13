@@ -3,6 +3,13 @@ import react from '@vitejs/plugin-react-swc'  // Updated React 19 compatible plu
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    minify: false, // Disable minification to preserve logs
+  },
+  esbuild: {
+    drop: [], // Ensure esbuild doesn't drop console calls
+    pure: [],
+  },
   optimizeDeps: {
     esbuildOptions: {
       // For browsers, we need to polyfill these
@@ -13,6 +20,9 @@ export default defineConfig({
       supported: { 
         bigint: true 
       },
+      legalComments: 'inline',
+      keepNames: true,
+      logOverride: { 'this-is-undefined-in-esm': 'silent' },
     }
   }
 })

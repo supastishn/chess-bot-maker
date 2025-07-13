@@ -27,13 +27,13 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Update handleMove to use object format and handle bot moves
   const handleMove = (from, to, promotion = undefined) => {
-    console.log(`[GamePage] Handling move: ${from}->${to}`);
+    console.debug(`[GamePage] Handling move: ${from}->${to}`);
 
     // Log game state before human move
     console.group("Pre-move game state");
-    console.log("FEN:", gameRef.current.fen());
-    console.log("Turn:", gameRef.current.turn());
-    console.log("Status:", gameRef.current.game_over() ? "game over" : "active");
+    console.debug("FEN:", gameRef.current.fen());
+    console.debug("Turn:", gameRef.current.turn());
+    console.debug("Status:", gameRef.current.game_over() ? "game over" : "active");
     console.groupEnd();
 
     const moveResult = makeMove({ from, to, promotion });
@@ -42,9 +42,9 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     if (moveResult) {
       setTimeout(() => {
         if (!gameRef.current.isGameOver()) {
-          console.log(`[GamePage] Calling bot: ${selectedBot}`);
+          console.debug(`[GamePage] Calling bot: ${selectedBot}`);
           const botMove = getBot(selectedBot)(gameRef.current);
-          console.log(`[GamePage] Bot responded with move: ${JSON.stringify(botMove)}`);
+          console.debug(`[GamePage] Bot responded with move: ${JSON.stringify(botMove)}`);
           if (botMove) {
             // Handle string moves correctly
             if (typeof botMove === 'string') {
@@ -65,7 +65,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Simplified handleSquareClick
   const handleSquareClick = (square) => {
-    console.log(`[SquareClick] ${square} ${gameRef.current.get(square) ? "has piece" : "empty"}`);
+    console.debug(`[SquareClick] ${square} ${gameRef.current.get(square) ? "has piece" : "empty"}`);
     const game = gameRef.current;
     const piece = game.get(square);
 
@@ -91,7 +91,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     }
     // If valid destination is clicked
     else if (activeSquare && validMoves.includes(square)) {
-      console.log(`Attempting move from ${activeSquare} to ${square}`); // Added
+      console.debug(`Attempting move from ${activeSquare} to ${square}`); // Changed to debug
       handleMove(activeSquare, square);       // This is the actual fix
       clearValidMoves();
     }
@@ -125,15 +125,15 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const makeMove = (move) => {
     // Log debug info for all moves
     console.group(`Move Debug: ${move.from} to ${move.to}`);
-    console.log('Move attempt:', move);
-    console.log('Game FEN before move:', gameRef.current.fen());
-    console.log('Active chess.js state:', gameRef.current.ascii());
-    console.log('Game over status:', gameRef.current.isGameOver());
-    console.log('Turn:', gameRef.current.turn());
-    console.log('Available moves for position:');
+    console.debug('Move attempt:', move);
+    console.debug('Game FEN before move:', gameRef.current.fen());
+    console.debug('Active chess.js state:', gameRef.current.ascii());
+    console.debug('Game over status:', gameRef.current.isGameOver());
+    console.debug('Turn:', gameRef.current.turn());
+    console.debug('Available moves for position:');
     try {
       const moves = gameRef.current.moves({ square: move.from, verbose: true });
-      console.log(moves.map(m => 
+      console.debug(moves.map(m => 
         `${m.from}${m.to}${m.promotion || ''} - ${m.san}`
       ));
     } catch (e) {
@@ -142,7 +142,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     console.groupEnd();
 
     try {
-      console.log(`Attempting move: ${move.from} to ${move.to}${move.promotion ? ` (promotion: ${move.promotion})` : ''}`);
+      console.debug(`Attempting move: ${move.from} to ${move.to}${move.promotion ? ` (promotion: ${move.promotion})` : ''}`);
       const moveObj = {
         from: move.from,
         to: move.to
@@ -153,8 +153,8 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       }
       const result = gameRef.current.move(moveObj);
       if (result) {
-        console.log('Move successful:', result.san);
-        console.log('New FEN:', gameRef.current.fen());
+        console.debug('Move successful:', result.san);
+        console.debug('New FEN:', gameRef.current.fen());
       } else {
         console.warn('Move returned null result');
       }
@@ -181,7 +181,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Modified resetBoard to clear highlights
   const resetBoard = () => {
-    console.log("[GamePage] Resetting board to start position");
+    console.debug("[GamePage] Resetting board to start position");
     gameRef.current = new Chess();
     setFen(gameRef.current.fen());
     clearValidMoves();
