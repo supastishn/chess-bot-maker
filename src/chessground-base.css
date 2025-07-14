@@ -5,6 +5,9 @@
 .cg-wrap {
   position: relative;
   display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 1/1;
 }
 
 cg-helper {
@@ -17,10 +20,10 @@ cg-helper {
 
 cg-container {
   position: absolute;
-  width: 800%;
-  height: 800%;
+  width: 100% !important;
+  height: 100% !important;
   display: block;
-  bottom: 0;
+  top: 0;
 }
 
 cg-board {
@@ -200,6 +203,14 @@ cg-board piece.fading {
 
 .cg-wrap coords coord {
   flex: 1 1 auto;
+  color: #212121 !important;
+}
+
+.orientation-white coords.files coord:nth-child(even),
+.orientation-white coords.ranks coord:nth-child(odd),
+.orientation-black coords.files coord:nth-child(odd),
+.orientation-black coords.ranks coord:nth-child(even) {
+  color: #f0f0f0 !important;
 }
 
 .cg-wrap coords.ranks coord {
