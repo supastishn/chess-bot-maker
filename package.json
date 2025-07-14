@@ -13,9 +13,9 @@
     "@vitejs/plugin-react-swc": "^3.10.2",
     "blockly": "^12.2.0",
     "chess.js": "^1.4.0",
+    "chessground": "^8.3.5",
     "lucide-react": "^0.525.0",
     "react": "^19.1.0",
-    "react-chessboard": "^5.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.3"
   },
