@@ -1,18 +1,25 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'  // Updated React 19 compatible plugin
+import react from '@vitejs/plugin-react-swc'
+import commonjs from 'vite-plugin-commonjs'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    commonjs()
+  ],
   build: {
-    minify: false, // Disable minification to preserve logs
+    minify: false,
+    commonjsOptions: {
+      transformMixedEsModules: true
+    }
   },
   esbuild: {
-    drop: [], // Ensure esbuild doesn't drop console calls
+    drop: [],
     pure: [],
   },
   optimizeDeps: {
+    include: ['chessground'],
     esbuildOptions: {
-      // For browsers, we need to polyfill these
       target: 'es2020',
       define: {
         global: 'globalThis'
