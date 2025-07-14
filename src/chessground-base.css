@@ -1,28 +1,546 @@
 /*
- * Core chessground structure
- * Container/board/piece positioning
- * Coordinate system + piece drag visuals
+ * Chessground base css properties.
+ *
+ * You need to include the css files in themes folder in order to have the
+ * board and pieces displayed!
  */
+
 .cg-wrap {
+  box-sizing: content-box;
   position: relative;
   display: block;
-  box-sizing: border-box;
-  width: 100%;
-  aspect-ratio: 1/1;
 }
 
 cg-container {
   position: absolute;
   width: 100%;
   height: 100%;
+  display: block;
   top: 0;
+}
+
+cg-board {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  line-height: 0;
+  background-size: cover;
+}
+
+.cg-wrap.manipulable cg-board {
+  cursor: pointer;
 }
 
 cg-board square {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 12.5%;
   height: 12.5%;
-  /* rest of chessground-base.css */
+  pointer-events: none;
+}
+
+cg-board square.move-dest {
+  pointer-events: auto;
+}
+
+cg-board square.last-move {
+  will-change: transform;
+}
+
+.cg-wrap piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12.5%;
+  height: 12.5%;
+  background-size: cover;
+  z-index: 2;
+  will-change: transform;
+  pointer-events: none;
+}
+
+cg-board piece.dragging {
+  cursor: move;
+  /* !important to override z-index from 3D piece inline style */
+  z-index: 11 !important;
+}
+
+piece.anim {
+  z-index: 8;
+}
+
+piece.fading {
+  z-index: 1;
+  opacity: 0.5;
+}
+
+.cg-wrap piece.ghost {
+  opacity: 0.3;
+}
+
+.cg-wrap piece svg {
+  overflow: hidden;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.6;
+}
+
+.cg-wrap cg-auto-pieces,
+.cg-wrap .cg-shapes,
+.cg-wrap .cg-custom-svgs {
+  overflow: visible;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cg-wrap cg-auto-pieces {
+  z-index: 2;
+}
+
+.cg-wrap cg-auto-pieces piece {
+  opacity: 0.3;
+}
+
+.cg-wrap .cg-shones;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+}
+
+.turn-indicator {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+}
+
+.game-status {
+  color: var(--color-success);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Modern Buttons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  box-shadow: var(--shadow-md);
+  font-family: inherit;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.reset-button {
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+}
+
+.reset-button:hover {
+  background: var(--color-danger-hover);
+}
+
+.primary-button {
+  background: var(--color-success);
+  color: var(--color-text-inverse);
+  width: 100%;
+  justify-content: center;
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+}
+
+.primary-button:hover {
+  background: var(--color-success-hover);
+}
+
+/* Bot Panel */
+.bot-panel {
+  width: min(70vmin, 600px);
+  padding: 1.5rem;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+}
+
+.bot-panel h3 {
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.bot-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.bot-selector label {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.bot-selector select {
+  padding: 0.75rem 1rem;
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-size: 1rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.bot-selector select:hover, .bot-selector select:focus {
+  background: var(--color-bg-card);
+  border-color: var(--color-border-hover);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Create Bot Page */
+.bot-creator-card {
+  width: 100%;
+  max-width: 700px;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: var(--shadow-xl);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 1.1rem;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 1rem;
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.form-textarea {
+  font-family: 'Fira Code', 'Monaco', 'Menlo', monospace;
+  min-height: 400px;
+  line-height: 1.5;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  background: var(--color-bg-card);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input::placeholder, .form-textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* Documentation Styles */
+.docs-content {
+  max-width: 800px;
+  padding: 2rem;
+  width: 100%;
+}
+
+.docs-card {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.docs-card h2 {
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.method-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.method-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.method-card h3 {
+  color: var(--color-accent);
+  margin-bottom: 0.5rem;
+}
+
+.method-card p {
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+}
+
+.method-summary {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+.method-summary li {
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+}
+
+.syntax-highlighting {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  padding: 1rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-family: 'Fira Code', monospace;
+  tab-size: 2;
+  margin: 1.5rem 0;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+code {
+  background: var(--color-bg-tertiary);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9em;
+  color: var(--color-accent);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .info-panel {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .game-status {
+    font-size: 1.1rem;
+  }
+  
+  .bot-selector {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  
+  .bot-creator-card, .docs-card {
+    padding: 1.5rem;
+  }
+  
+  .form-textarea {
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding-top: 60px;
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .board-container {
+    width: 90vmin;
+  }
+  
+  .info-panel, .bot-panel {
+    width: 90vmin;
+  }
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--color-border);
+  border-top: 2px solid var(--color-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Modernized Docs Page Styles */
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.docs-card {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.3s ease;
+}
+
+.docs-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+}
+
+.docs-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.8rem;
+}
+
+.method-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.method-item {
+  background: var(--color-bg-tertiary);
+  padding: 1.25rem;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+}
+
+.method-item h3 {
+  color: var(--color-accent);
+  margin-bottom: 0.5rem;
+}
+
+.method-item pre {
+  background: var(--color-bg-secondary);
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.example-card {
+  margin-top: 2rem;
+  background: var(--color-bg-tertiary);
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+}
+
+.example-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* (rest of your base structure, coordinates, piece drag, etc. can be appended here as needed) */

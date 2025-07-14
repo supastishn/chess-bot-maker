@@ -4,8 +4,9 @@ import { getBot } from '../bot/botInterface';
 import InfoPanel from '../components/InfoPanel';
 import BotSelectorPanel from '../components/BotSelectorPanel';
 import { Chessground } from 'chessground';
-import 'chessground/assets/chessground.cburnett.css';
 import '../chessground-base.css';
+import '../chessground.brown.css';
+import '../chessground.cburnett.css';
 
 console.log("[GamePage] Component initialized");
 
