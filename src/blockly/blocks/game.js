@@ -42,3 +42,34 @@ Blockly.Blocks['undo_move'] = {
     this.setColour('#888888');
   }
 };
+
+// --- Advanced Blocks ---
+
+Blockly.Blocks['is_in_check'] = {
+  init() {
+    this.appendDummyInput()
+        .appendField("is in check");
+    this.setOutput(true, "Boolean");
+    this.setColour('#A65C81');
+  }
+};
+
+Blockly.Blocks['look_ahead'] = {
+  init() {
+    this.appendValueInput("MOVE")
+        .appendField("look ahead for move");
+    this.appendValueInput("DEPTH")
+        .appendField("depth");
+    this.setOutput(true, "Number");
+    this.setColour('#A65C81');
+  }
+};
+
+Blockly.Blocks['get_game_phase'] = {
+  init() {
+    this.appendDummyInput()
+        .appendField("get game phase");
+    this.setOutput(true, "String");
+    this.setColour('#A65C81');
+  }
+};

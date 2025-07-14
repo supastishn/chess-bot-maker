@@ -18,6 +18,15 @@ const toolbox = `
     </block>
     <block type="evaluate_material"></block>
     <block type="undo_move"></block>
+    <block type="is_in_check"></block>
+    <block type="get_game_phase"></block>
+    <block type="look_ahead">
+      <value name="DEPTH">
+        <block type="math_number">
+          <field name="NUM">2</field>
+        </block>
+      </value>
+    </block>
   </category>
 </xml>
 `;

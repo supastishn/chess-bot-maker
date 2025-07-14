@@ -9,17 +9,20 @@ console.log("[BotInterface] Initializing bot interface");
 const registeredBots = new Map();
 const DEFAULT_BOT_NAME = 'starter-bot';
 
-const createBotHelper = (gameClient) => ({
+const createBotHelper = (gameClient) => {
+  // Helper context for 'this' in advanced methods
+  const helper = {};
+
   // Game state methods
-  getAvailableMoves: () => {
+  helper.getAvailableMoves = () => {
     const moves = gameClient.moves({ verbose: true });
     console.log(`[Bot] getAvailableMoves returned ${moves.length} moves`);
     return moves.map(move => 
       move.promotion ? move.from + move.to + move.promotion : move.from + move.to
     );
-  },
+  };
   
-  getBoardState: () => {
+  helper.getBoardState = () => {
     console.log("[Bot] getBoardState called");
     return gameClient.board().flatMap((row, rankIdx) => 
       row.map((piece, fileIdx) => ({
@@ -31,21 +34,21 @@ const createBotHelper = (gameClient) => ({
         } : null
       }))
     );
-  },
+  };
 
-  getTurn: () => {
+  helper.getTurn = () => {
     console.log("[Bot] getTurn called");
     return gameClient.turn();
-  },
+  };
   
-  getGameResult: () => {
+  helper.getGameResult = () => {
     if (gameClient.isCheckmate()) return 'checkmate';
     if (gameClient.isStalemate()) return 'stalemate';
     if (gameClient.isThreefoldRepetition()) return 'repetition';
     return 'ongoing';
-  },
+  };
   
-  evaluateMaterial: () => {
+  helper.evaluateMaterial = () => {
     const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9 };
     let score = 0;
     gameClient.board().flat().forEach(piece => {
@@ -54,11 +57,11 @@ const createBotHelper = (gameClient) => ({
       score += piece.color === 'w' ? value : -value;
     });
     return score;
-  },
+  };
   
-  undoMove: () => gameClient.undo(),
+  helper.undoMove = () => gameClient.undo();
   
-  move: (move) => {
+  helper.move = (move) => {
     console.log(`[Bot] Attempting move: ${JSON.stringify(move)}`);
     try {
       let result;
@@ -77,8 +80,61 @@ const createBotHelper = (gameClient) => ({
       console.error("[Bot] Move error:", e.message);
       return null;
     }
-  }
-});
+  };
+
+  // --- Advanced Methods ---
+
+  // Check detection
+  helper.isInCheck = () => gameClient.inCheck ? gameClient.inCheck() : gameClient.isCheck();
+
+  // Checkmate detection
+  helper.isCheckmate = () => gameClient.isCheckmate();
+
+  // Game phase detection
+  helper.getGamePhase = () => {
+    const pieceCount = gameClient.board().flat().filter(Boolean).length;
+    return pieceCount > 32 ? 'opening' : pieceCount > 16 ? 'middlegame' : 'endgame';
+  };
+
+  // Threat detection
+  helper.getThreatenedSquares = (color) => {
+    const moves = gameClient.moves({verbose: true});
+    return [...new Set(moves.filter(m => m.color !== color).map(m => m.to))];
+  };
+
+  // Position evaluation (material + center control)
+  helper.getPositionScore = () => {
+    let score = helper.evaluateMaterial();
+    const color = helper.getTurn();
+    ['e4', 'd4', 'e5', 'd5'].forEach(center => {
+      const piece = gameClient.get(center);
+      if (piece && piece.color === color) score += 0.1;
+    });
+    return score;
+  };
+
+  // Future move simulation (basic minimax)
+  helper.lookAhead = (move, depth = 2) => {
+    gameClient.move(move);
+    let result;
+    if (depth <= 0) {
+      result = { score: helper.getPositionScore() };
+    } else {
+      const nextMoves = helper.getAvailableMoves();
+      if (nextMoves.length === 0) {
+        result = { score: helper.getPositionScore() };
+      } else {
+        // Opponent tries to minimize our score
+        const scores = nextMoves.map(m => helper.lookAhead(m, depth - 1).score);
+        result = { score: helper.getPositionScore() - Math.max(...scores) };
+      }
+    }
+    gameClient.undo();
+    return result;
+  };
+
+  return helper;
+};
 
 export const registerBot = (name, botFunction) => {
   console.log(`[Bot] Registering bot: ${name}`);
