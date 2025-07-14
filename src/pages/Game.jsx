@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Chess } from 'chess.js';
-import { Chessboard } from 'react-chessboard';
 import { getBot } from '../bot/botInterface';
 import InfoPanel from '../components/InfoPanel';
 import BotSelectorPanel from '../components/BotSelectorPanel';
+import * as cg from 'chessground';
 
 console.log("[GamePage] Component initialized");
 
@@ -12,33 +12,78 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const gameRef = useRef(new Chess());
   const [fen, setFen] = useState(gameRef.current.fen());
   const [boardOrientation] = useState('white');
+  const boardRef = useRef(null);
+  const cgRef = useRef(null);
 
-  // --- Click-to-move state ---
-  const [activeSquare, setActiveSquare] = useState(null);
-  const [validMoves, setValidMoves] = useState([]);
-  const [customSquareStyles, setCustomSquareStyles] = useState({});
+  // Update chessground board when FEN changes
+  useEffect(() => {
+    if (cgRef.current) {
+      cgRef.current.set({
+        fen,
+        orientation: boardOrientation,
+        turnColor: gameRef.current.turn() === 'w' ? 'white' : 'black',
+        movable: {
+          color: boardOrientation,
+          free: false,
+          events: {
+            after: onBoardMove
+          }
+        }
+      });
+    }
+  }, [fen, boardOrientation]);
 
-  // Helper to clear move highlights
-  const clearValidMoves = () => {
-    setActiveSquare(null);
-    setValidMoves([]);
-    setCustomSquareStyles({});
+  // Initialize chessground
+  useEffect(() => {
+    if (boardRef.current && !cgRef.current) {
+      cgRef.current = cg(boardRef.current, {
+        fen: fen,
+        orientation: boardOrientation,
+        turnColor: gameRef.current.turn() === 'w' ? 'white' : 'black',
+        movable: {
+          color: boardOrientation,
+          free: false,
+          events: {
+            after: onBoardMove
+          }
+        },
+        animation: {
+          enabled: true,
+          duration: 200
+        },
+        highlight: {
+          lastMove: true,
+          check: true
+        }
+      });
+    }
+    return () => {
+      if (cgRef.current) {
+        cgRef.current.destroy();
+        cgRef.current = null;
+      }
+    };
+  }, []);
+
+  const onBoardMove = (from, to) => {
+    handleMove({ from, to, promotion: 'q' });
   };
 
-  // Update handleMove to use object format and handle bot moves
-  const handleMove = (from, to, promotion = undefined) => {
-    console.log(`[GamePage] Handling move: ${from}->${to}`);
+  const handleMove = (move) => {
+    const currentTurn = gameRef.current.turn();
+    const isHumanTurn = (boardOrientation === 'white' && currentTurn === 'w') ||
+                        (boardOrientation === 'black' && currentTurn === 'b');
+    if (!isHumanTurn) return false;
 
-    // Log game state before human move
+    console.log(`[GamePage] Handling move: ${move.from}->${move.to}`);
     console.group("Pre-move game state");
     console.log("FEN:", gameRef.current.fen());
-    console.log("Turn:", gameRef.current.turn());
+    console.log("Turn:", currentTurn);
     console.log("Status:", gameRef.current.game_over() ? "game over" : "active");
     console.groupEnd();
 
-    const moveResult = makeMove({ from, to, promotion });
+    const moveResult = makeMove({ from: move.from, to: move.to, promotion: move.promotion || 'q' });
 
-    // Only proceed with bot move if human move was successful
     if (moveResult) {
       setTimeout(() => {
         if (!gameRef.current.isGameOver()) {
@@ -46,11 +91,11 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
           const botMove = getBot(selectedBot)(gameRef.current);
           console.log(`[GamePage] Bot responded with move: ${JSON.stringify(botMove)}`);
           if (botMove) {
-            // Handle string moves correctly
             if (typeof botMove === 'string') {
               makeMove({
                 from: botMove.slice(0, 2),
-                to: botMove.slice(2, 4)
+                to: botMove.slice(2, 4),
+                promotion: botMove[4] || 'q'
               });
             } else {
               makeMove(botMove);
@@ -63,48 +108,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     return !!moveResult;
   };
 
-  // Simplified handleSquareClick
-  const handleSquareClick = (square) => {
-    console.log(`[SquareClick] ${square} ${gameRef.current.get(square) ? "has piece" : "empty"}`);
-    const game = gameRef.current;
-    const piece = game.get(square);
-
-    // If clicking a piece of current player's color
-    if (piece && piece.color === game.turn()) {
-      const movesForPiece = game.moves({ square, verbose: true });
-      const moveTargets = movesForPiece.map(m => m.to);
-      setValidMoves(moveTargets);
-      setActiveSquare(square);
-
-      // Create circle styles for valid moves
-      const styles = moveTargets.reduce((obj, move) => {
-        obj[move] = {
-          background: 'radial-gradient(circle, #00ff0044 25%, transparent 26%)',
-          borderRadius: '50%'
-        };
-        return obj;
-      }, {});
-
-      // Add border for active piece
-      styles[square] = { border: '3px solid #00ff00' };
-      setCustomSquareStyles(styles);
-    }
-    // If valid destination is clicked - FIXED HERE
-    else if (activeSquare && validMoves.includes(square)) {
-      console.log(`Attempting move from ${activeSquare} to ${square}`);
-      handleMove(activeSquare, square, undefined);  // Added undefined for promotion
-      clearValidMoves();
-    }
-    // Clear moves on any other click
-    else {
-      clearValidMoves();
-    }
-  };
-
-
-  // Always use object format for moves
   const makeMove = (move) => {
-    // Log debug info for all moves
     console.group(`Move Debug: ${move.from} to ${move.to}`);
     console.log('Move attempt:', move);
     console.log('Game FEN before move:', gameRef.current.fen());
@@ -114,7 +118,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     console.log('Available moves for position:');
     try {
       const moves = gameRef.current.moves({ square: move.from, verbose: true });
-      console.log(moves.map(m => 
+      console.log(moves.map(m =>
         `${m.from}${m.to}${m.promotion || ''} - ${m.san}`
       ));
     } catch (e) {
@@ -128,7 +132,6 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
         from: move.from,
         to: move.to
       };
-      // Only add promotion when explicitly specified
       if (move.promotion) {
         moveObj.promotion = move.promotion;
       }
@@ -136,12 +139,12 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       if (result) {
         console.log('Move successful:', result.san);
         console.log('New FEN:', gameRef.current.fen());
+        setFen(gameRef.current.fen());
+        return result;
       } else {
         console.warn('Move returned null result');
+        return null;
       }
-      setFen(gameRef.current.fen());
-      clearValidMoves();
-      return result;
     } catch (e) {
       console.error(`Move failed: ${e.message}`);
       console.error('Attempted move:', move);
@@ -155,17 +158,10 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     }
   };
 
-  // Simplified onDrop
-  const onDrop = (sourceSquare, targetSquare) => {
-    return handleMove(sourceSquare, targetSquare, undefined); // Added undefined
-  };
-
-  // Modified resetBoard to clear highlights
   const resetBoard = () => {
     console.log("[GamePage] Resetting board to start position");
     gameRef.current = new Chess();
     setFen(gameRef.current.fen());
-    clearValidMoves();
   };
 
   const turn = gameRef.current.turn() === 'w' ? 'white' : 'black';
@@ -184,17 +180,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
           maxWidth: '500px',
           aspectRatio: '1/1'
         }}>
-          <Chessboard
-            position={fen}
-            onPieceDrop={onDrop}
-            onSquareClick={handleSquareClick}
-            boardOrientation={boardOrientation}
-            customBoardStyle={{
-              borderRadius: '12px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
-            }}
-            customSquareStyles={customSquareStyles}
-          />
+          <div ref={boardRef} style={{ height: '100%', width: '100%' }} />
         </div>
         <InfoPanel status={status} turn={turn} onReset={resetBoard} />
         <BotSelectorPanel
