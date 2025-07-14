@@ -18,7 +18,10 @@ export default defineConfig({
     pure: [],
   },
   optimizeDeps: {
-    include: ['chessground'],
+    include: [
+      'chessground',
+      // ... other dependencies ...
+    ],
     esbuildOptions: {
       target: 'es2020',
       define: {

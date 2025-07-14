@@ -36,32 +36,39 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   // Initialize chessground
   useEffect(() => {
     if (boardRef.current && !cgRef.current) {
-      cgRef.current = Chessground(boardRef.current, {
-        fen: fen,
-        orientation: boardOrientation,
-        turnColor: gameRef.current.turn() === 'w' ? 'white' : 'black',
-        movable: {
-          color: boardOrientation,
-          free: false,
-          events: {
-            after: onBoardMove
-          }
-        },
-        animation: {
-          enabled: true,
-          duration: 200
-        },
-        highlight: {
-          lastMove: true,
-          check: true
+      try {
+        if (!Chessground || typeof Chessground !== 'function') {
+          throw new TypeError('Chessground is not a function!');
         }
-      });
+        cgRef.current = Chessground(boardRef.current, {
+          fen: fen,
+          orientation: boardOrientation,
+          turnColor: gameRef.current.turn() === 'w' ? 'white' : 'black',
+          movable: {
+            color: boardOrientation,
+            free: false,
+            events: {
+              after: onBoardMove
+            }
+          },
+          animation: {
+            enabled: true,
+            duration: 200
+          },
+          highlight: {
+            lastMove: true,
+            check: true
+          }
+        });
+      } catch (error) {
+        console.error('Chessground initialization error:', error);
+      }
     }
     return () => {
-      if (cgRef.current) {
+      if (cgRef.current?.destroy) {
         cgRef.current.destroy();
-        cgRef.current = null;
       }
+      cgRef.current = null;
     };
   }, []);
 
