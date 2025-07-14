@@ -3,7 +3,7 @@ import { Chess } from 'chess.js';
 import { getBot } from '../bot/botInterface';
 import InfoPanel from '../components/InfoPanel';
 import BotSelectorPanel from '../components/BotSelectorPanel';
-import * as cg from 'chessground';
+import { Chessground } from 'chessground';
 
 console.log("[GamePage] Component initialized");
 
@@ -36,7 +36,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   // Initialize chessground
   useEffect(() => {
     if (boardRef.current && !cgRef.current) {
-      cgRef.current = cg(boardRef.current, {
+      cgRef.current = Chessground(boardRef.current, {
         fen: fen,
         orientation: boardOrientation,
         turnColor: gameRef.current.turn() === 'w' ? 'white' : 'black',
