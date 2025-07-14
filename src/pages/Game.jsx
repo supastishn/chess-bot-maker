@@ -4,6 +4,7 @@ import { getBot } from '../bot/botInterface';
 import InfoPanel from '../components/InfoPanel';
 import BotSelectorPanel from '../components/BotSelectorPanel';
 import { Chessground } from 'chessground';
+import 'chessground/assets/chessground.cburnett.css';
 import '../chessground-base.css';
 
 console.log("[GamePage] Component initialized");
@@ -188,7 +189,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
           maxWidth: '500px',
           aspectRatio: '1/1'
         }}>
-          <div ref={boardRef} style={{ height: '100%', width: '100%' }} />
+          <div ref={boardRef} className="cg-wrap" style={{ height: '100%', width: '100%' }} />
         </div>
         <InfoPanel status={status} turn={turn} onReset={resetBoard} />
         <BotSelectorPanel
