@@ -256,6 +256,29 @@ registerBot('starter-bot', (game) => {
     : null;
 });
 
+// ToggleBot: Switches strategy every 3 moves
+registerBot('toggle-bot', (game) => {
+  const moveCount = game.getBoardState().length;
+  const aiMode = Math.floor(moveCount / 3) % 3;
+
+  if (aiMode === 0) return getBot('material-bot')(game);
+  if (aiMode === 1) return getBot('aggressive-bot')(game);
+  return getBot('positional-bot')(game);
+});
+
+// GuruBot: Expert-level positional play
+registerBot('guru-bot', (game) => {
+  const moves = game.getAvailableMoves();
+  if (moves.length === 0) return null;
+
+  return game.prioritizeStrategy({
+    development: 0.3,
+    kingSafety: 0.3,
+    centerControl: 0.2,
+    material: 0.2
+  });
+});
+
 // Test bots for performance testing
 registerBot('aggressive-bot', (game) => {
   const moves = game.getAvailableMoves();
