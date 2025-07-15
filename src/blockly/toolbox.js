@@ -28,6 +28,15 @@ const toolbox = `
       </value>
     </block>
   </category>
+  <category name="Stockfish" colour="#3388DD">
+    <block type="stockfish_move">
+      <value name="DEPTH">
+        <block type="math_number">
+          <field name="NUM">15</field>
+        </block>
+      </value>
+    </block>
+  </category>
 </xml>
 `;
 export default toolbox;

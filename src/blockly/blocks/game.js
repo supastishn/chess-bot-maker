@@ -73,3 +73,13 @@ Blockly.Blocks['get_game_phase'] = {
     this.setColour('#A65C81');
   }
 };
+
+// --- Stockfish Block ---
+Blockly.Blocks['stockfish_move'] = {
+  init() {
+    this.appendValueInput("DEPTH")
+        .appendField("get Stockfish move depth");
+    this.setOutput(true, "Object");
+    this.setColour('#3388DD');
+  }
+};

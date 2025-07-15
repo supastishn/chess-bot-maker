@@ -79,7 +79,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     handleMove({ from, to, promotion: 'q' });
   };
 
-  const handleMove = (move) => {
+  const handleMove = async (move) => {
     const currentTurn = gameRef.current.turn();
     const isHumanTurn = (boardOrientation === 'white' && currentTurn === 'w') ||
                         (boardOrientation === 'black' && currentTurn === 'b');
@@ -95,10 +95,11 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     const moveResult = makeMove({ from: move.from, to: move.to, promotion: move.promotion || 'q' });
 
     if (moveResult) {
-      setTimeout(() => {
+      setTimeout(async () => {
         if (!gameRef.current.isGameOver()) {
           console.log(`[GamePage] Calling bot: ${selectedBot}`);
-          const botMove = getBot(selectedBot)(gameRef.current);
+          const movePromise = getBot(selectedBot)(gameRef.current);
+          const botMove = movePromise instanceof Promise ? await movePromise : movePromise;
           console.log(`[GamePage] Bot responded with move: ${JSON.stringify(botMove)}`);
           if (botMove) {
             if (typeof botMove === 'string') {

@@ -6,6 +6,8 @@
 
 console.log("[BotInterface] Initializing bot interface");
 
+import StockfishEngine from './stockfishEngine';
+
 const registeredBots = new Map();
 const DEFAULT_BOT_NAME = 'starter-bot';
 
@@ -137,6 +139,31 @@ const createBotHelper = (gameClient) => {
     return result;
   };
 
+  // FEN helper
+  helper.getFEN = () => {
+    try {
+      return gameClient.fen();
+    } catch {
+      const status = gameClient.getStatus?.();
+      if (status && status.board) {
+        // Could generate FEN from board, but fallback for now
+      }
+      return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+    }
+  };
+
+  // Stockfish engine helper
+  helper.stockfish = {
+    engine: null,
+    async getBestMove(fen, depth = 15) {
+      if (!this.engine) {
+        this.engine = new StockfishEngine(depth);
+        await this.engine.init();
+      }
+      return this.engine.evaluatePosition(fen);
+    }
+  };
+
   return helper;
 };
 
@@ -150,6 +177,12 @@ export const registerBot = (name, botFunction) => {
     botFunction(createBotHelper(gameClient))
   );
 };
+
+// Register Stockfish bot
+registerBot('stockfish-bot', async (game) => {
+  const fen = game.getFEN ? game.getFEN() : game.fen();
+  return game.stockfish.getBestMove(fen);
+});
 
 export const getBot = (name) => {
   const bot = registeredBots.get(name);
