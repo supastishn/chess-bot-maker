@@ -1,3 +1,4 @@
+import { describe, test, expect, vi } from 'vitest';
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import GamePage from '../../src/pages/Game';

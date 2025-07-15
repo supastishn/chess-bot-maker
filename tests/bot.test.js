@@ -1,3 +1,4 @@
+import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { materialBot } from '../src/bot/materialBot';
 import { mockGameClient } from '../utils';
 
@@ -32,7 +33,7 @@ describe('materialBot', () => {
 
   test('prioritizes piece development', () => {
     mockGame.getAvailableMoves.mockReturnValue(['b1c3', 'f1d3', 'e2e4']);
-    jest.spyOn(console, 'log').mockImplementation();
+    vi.spyOn(console, 'log').mockImplementation(() => {});
     const move = materialBot(mockGame);
     expect(['b1c3', 'f1d3', 'e2e4']).toContain(move);
     expect(console.log).toHaveBeenCalledWith(
