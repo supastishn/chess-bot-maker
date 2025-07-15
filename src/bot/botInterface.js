@@ -38,6 +38,50 @@ const createBotHelper = (gameClient) => {
     );
   };
 
+  // --- Strategy prioritization ---
+  helper.prioritizeStrategy = (weights, depth = 4) => {
+    const moves = helper.getAvailableMoves();
+    let bestMove = null;
+    let bestScore = -Number.MAX_VALUE;
+    
+    for (const move of moves) {
+      let score = 0;
+      
+      // Material factor
+      const materialBase = helper.evaluateMaterial();
+      helper.move(move);
+      const materialAfter = helper.evaluateMaterial();
+      score += (materialAfter - materialBase) * 100 * (weights.material || 0);
+      helper.undoMove();
+      
+      // Development factor
+      const piece = move.includes('n') || move.includes('b') ? 1 : 0;
+      score += piece * 20 * (weights.development || 0);
+      
+      // Center control factor
+      const center = ['d4','d5','e4','e5'];
+      const isCenter = center.includes(helper.getPositionAfterMove(move).piecePosition);
+      score += isCenter ? 30 * (weights.centerControl || 0) : 0;
+      
+      // King safety factor
+      helper.move(move);
+      const threats = helper.getThreatenedSquares(move[0] === 'w' ? 'b' : 'w');
+      const kingSafe = threats.find(t => t.endsWith('king'));
+      score -= kingSafe ? 50 * (weights.kingSafety || 0) : 0;
+      helper.undoMove();
+      
+      // Lookahead bonus
+      const lookAheadScore = helper.lookAhead(move, depth).score;
+      score += lookAheadScore * 0.5;
+      
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = move;
+      }
+    }
+    return bestMove;
+  };
+
   helper.getTurn = () => {
     console.log("[Bot] getTurn called");
     return gameClient.turn();
@@ -82,6 +126,16 @@ const createBotHelper = (gameClient) => {
       console.error("[Bot] Move error:", e.message);
       return null;
     }
+  };
+
+  helper.getPositionAfterMove = (move) => {
+    gameClient.move(move);
+    const position = {
+      piecePosition: move.slice(2,4),
+      allPositions: gameClient.board()
+    };
+    gameClient.undo();
+    return position;
   };
 
   // --- Advanced Methods ---
