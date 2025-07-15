@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap } from 'lucide-react';
+import { useBotTester } from '../hooks/useBotTester';
+import BotPerformanceWidget from '../components/BotPerformanceWidget';
 
 const CUSTOM_BOT_PLACEHOLDER = `(game) => {
   // Returns UCI string: 'e2e4' or 'e7e8q'
@@ -11,6 +13,9 @@ const CUSTOM_BOT_PLACEHOLDER = `(game) => {
 const CreateBot = ({ onRegisterBot }) => {
   const [customBotName, setCustomBotName] = useState('');
   const [customBotCode, setCustomBotCode] = useState('');
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResults, setTestResults] = useState(null);
+  const { runBotTests } = useBotTester();
   const navigate = useNavigate();
 
   const handleRegisterClick = () => {
@@ -22,6 +27,14 @@ const CreateBot = ({ onRegisterBot }) => {
     if (success) {
       navigate('/');
     }
+  };
+
+  const testBot = async () => {
+    if (!customBotName || !customBotCode) return;
+    setIsTesting(true);
+    const results = await runBotTests(customBotName, customBotCode);
+    setTestResults(results);
+    setIsTesting(false);
   };
 
   return (
@@ -51,10 +64,21 @@ const CreateBot = ({ onRegisterBot }) => {
               className="form-textarea mobile-optimized-textarea"
             />
           </div>
-          <button onClick={handleRegisterClick} className="btn primary-button">
-            <Zap size={20} />
-            Register Bot and Play
-          </button>
+          <div className="bot-performance-container">
+            <BotPerformanceWidget results={testResults} isTesting={isTesting} />
+          </div>
+          <div className="action-buttons" style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+            <button onClick={testBot}
+                    className="btn test-button"
+                    disabled={isTesting || !customBotName || !customBotCode}>
+              <Zap size={20} />
+              {isTesting ? 'Testing...' : 'Test Performance'}
+            </button>
+            <button onClick={handleRegisterClick} className="btn primary-button">
+              <Zap size={20} />
+              Register Bot and Play
+            </button>
+          </div>
         </div>
       </div>
     </div>

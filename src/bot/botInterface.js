@@ -158,11 +158,55 @@ export const getBot = (name) => {
 
 export const getBotNames = () => Array.from(registeredBots.keys());
 
-// Register built-in bots
+ // Register built-in bots
 import { materialBot } from './materialBot';
 
 registerBot('material-bot', materialBot);
 registerBot('starter-bot', (game) => {
+  const moves = game.getAvailableMoves();
+  return moves.length > 0
+    ? moves[Math.floor(Math.random() * moves.length)]
+    : null;
+});
+
+// Test bots for performance testing
+registerBot('aggressive-bot', (game) => {
+  const moves = game.getAvailableMoves();
+  const captureMoves = moves.filter(move =>
+    game.lookAhead(move, 1).capturedPiece
+  );
+  return captureMoves.length > 0
+    ? captureMoves[0]
+    : moves[Math.floor(Math.random() * moves.length)];
+});
+
+registerBot('defensive-bot', (game) => {
+  const moves = game.getAvailableMoves();
+  const safeMoves = moves.filter(move =>
+    !game.lookAhead(move, 1).inCheckAfter
+  );
+  return safeMoves.length > 0
+    ? safeMoves[0]
+    : moves[Math.floor(Math.random() * moves.length)];
+});
+
+registerBot('positional-bot', (game) => {
+  const moves = game.getAvailableMoves();
+  let bestScore = -Infinity;
+  let bestMove = moves[0];
+
+  for (const move of moves) {
+    const result = game.lookAhead(move, 2);
+    if (result.score > bestScore) {
+      bestScore = result.score;
+      bestMove = move;
+    }
+  }
+
+  return bestMove;
+});
+
+registerBot('random-bot', (game) => {
   const moves = game.getAvailableMoves();
   return moves.length > 0
     ? moves[Math.floor(Math.random() * moves.length)]
