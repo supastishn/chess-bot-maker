@@ -15,19 +15,33 @@ export default class StockfishEngine {
     if (this.engine) return true;
     
     if (typeof Worker !== 'undefined') {
-      this.engine = new Worker(STOCKFISH_PATHS.js);
+      // Create worker with options to bypass CORS issues in Chrome
+      try {
+        const workerURL = new URL(STOCKFISH_PATHS.js, window.location.origin);
+        this.engine = new Worker(workerURL, { type: 'module' });
+      } catch (e) {
+        console.error('[Stockfish] Failed to create worker with options:', e);
+        this.engine = new Worker(STOCKFISH_PATHS.js);
+      }
       
       return new Promise(resolve => {
         const startupListener = event => {
           if (event.data === 'uciok') {
+            this.engine.removeEventListener('error', errorHandler);
             this.engine.removeEventListener('message', startupListener);
             resolve(true);
-          } else if (event.data.startsWith('Error')) {
+          } else if (event.data?.startsWith?.('Error') || event.data?.includes?.('Initialization failed')) {
             resolve(false);
           }
         };
         
+        const errorHandler = (event) => {
+          console.error('[Stockfish] Worker error:', event);
+          resolve(false);
+        };
+        
         this.engine.addEventListener('message', startupListener);
+        this.engine.addEventListener('error', errorHandler);
         this.engine.postMessage('uci');
       });
     }
@@ -36,8 +50,8 @@ export default class StockfishEngine {
 
   evaluatePosition(fen) {
     return new Promise((resolve, reject) => {
-      if (!this.engine) reject("Engine not initialized");
-      if (this.evalInProgress) reject("Evaluation already in progress");
+      if (!this.engine) return reject("Engine not initialized - call init() first");
+      if (this.evalInProgress) return reject("Evaluation already in progress - only one evaluation at a time");
       
       this.evalInProgress = true;
       this.resolveEval = resolve;
@@ -52,11 +66,18 @@ export default class StockfishEngine {
           resolve({ from: move.slice(0, 2), to: move.slice(2, 4) });
         } else if (line.includes('error')) {
           this.cleanupEventListeners(messageHandler);
-          reject(line);
+          reject(`Stockfish error: ${line}`);
         }
       };
       
+      const errorHandler = (event) => {
+        console.error('[Stockfish] Evaluation error:', event);
+        this.cleanupEventListeners(messageHandler);
+        reject(`Worker error during evaluation: ${event.message}`);
+      };
+      
       this.engine.addEventListener('message', messageHandler);
+      this.engine.addEventListener('error', errorHandler);
       
       console.log(`[Stockfish] Setting position: ${fen}`);
       this.engine.postMessage(`position fen ${fen}`);
@@ -66,6 +87,9 @@ export default class StockfishEngine {
 
   cleanupEventListeners(handler) {
     this.evalInProgress = false;
-    if (handler) this.engine.removeEventListener('message', handler);
+    if (handler) {
+      this.engine.removeEventListener('message', handler);
+    }
+    this.engine.removeEventListener('error', this.errorHandler);
   }
 }
