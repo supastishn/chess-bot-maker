@@ -206,9 +206,61 @@ const createBotHelper = (gameClient) => {
     }
   };
 
+  // --- Advanced Stockfish API methods ---
+  helper.setSkillLevel = (level) => {
+    if (gameClient.stockfish?.engine) {
+      gameClient.stockfish.setOption("Skill Level", level);
+    }
+  };
+
+  helper.setHashSize = (size) => {
+    if (gameClient.stockfish?.engine) {
+      gameClient.stockfish.setOption("Hash", size);
+    }
+  };
+
+  helper.setContempt = (value) => {
+    if (gameClient.stockfish?.engine) {
+      gameClient.stockfish.setOption("Contempt", value);
+    }
+  };
+
+  helper.getPositionEvaluation = (fen = gameClient.fen()) => {
+    if (!gameClient.stockfish?.engine) {
+      return Promise.reject("Stockfish engine not initialized");
+    }
+    return gameClient.stockfish.getEvaluation(fen);
+  };
+
+  helper.analyzeGame = (pgn) => {
+    if (!gameClient.stockfish?.engine) {
+      return Promise.reject("Stockfish engine not initialized");
+    }
+    return gameClient.stockfish.analyzeGame(pgn);
+  };
+
+  helper.benchmark = (depth = 16) => {
+    if (!gameClient.stockfish?.engine) {
+      return Promise.reject("Stockfish engine not initialized");
+    }
+    return gameClient.stockfish.runBenchmark(depth);
+  };
+
   // Stockfish engine helper
   helper.stockfish = {
     engine: null,
+    skillLevel: 20,
+    hashSize: 256,
+    contempt: 0,
+    async init(depth = 15) {
+      if (!this.engine) {
+        this.engine = new StockfishEngine(depth);
+        await this.engine.init();
+        this.setOption("Skill Level", this.skillLevel);
+        this.setOption("Hash", this.hashSize);
+        this.setOption("Contempt", this.contempt);
+      }
+    },
     async getBestMove(fen, depth = 15) {
       if (!this.engine) {
         this.engine = new StockfishEngine(depth);

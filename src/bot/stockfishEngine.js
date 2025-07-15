@@ -126,6 +126,55 @@ export default class StockfishEngine {
     });
   }
 
+  // --- Advanced API methods ---
+
+  async getEvaluation(fen, options = {}) {
+    // This is a stub implementation. Actual parsing of Stockfish output needed.
+    return new Promise((resolve, reject) => {
+      if (!this.engine) return reject("Engine not initialized");
+      this.setPosition(fen);
+      this.sendCommand('eval');
+      // Listen for eval output and parse it
+      // TODO: Implement parsing of Stockfish 'eval' output
+      // For now, resolve with a placeholder
+      setTimeout(() => resolve({ eval: 'Not implemented' }), 500);
+    });
+  }
+
+  async analyzeGame(pgn) {
+    // Requires chess.js for PGN parsing
+    try {
+      const { Chess } = await import('chess.js');
+      const game = new Chess();
+      game.loadPgn(pgn);
+
+      const analysis = [];
+      let fen = game.fen();
+
+      while (true) {
+        const evalResult = await this.getEvaluation(fen);
+        analysis.push({ fen, evaluation: evalResult });
+
+        if (game.history().length === 0) break;
+        game.undo();
+        fen = game.fen();
+      }
+
+      return analysis;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  async runBenchmark(depth = 16) {
+    // This is a stub implementation. Actual parsing of Stockfish output needed.
+    return new Promise((resolve) => {
+      this.sendCommand(`bench ${depth}`);
+      // TODO: Capture bench results from stdout
+      setTimeout(() => resolve({ bench: 'Not implemented' }), 500);
+    });
+  }
+
   addInfoHandler(handler) {
     this.infoHandlers.add(handler);
     if (!this.infoListener) {
