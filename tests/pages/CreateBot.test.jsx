@@ -1,11 +1,21 @@
-import { describe, test, expect, vi } from 'vitest';
+import { describe, test, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import CreateBot from '../../src/pages/CreateBot';
+import useBotTester from '../../src/hooks/useBotTester.js';
+
+vi.mock('../../src/hooks/useBotTester.js');
 
 describe('CreateBot', () => {
   const mockRegister = vi.fn();
+
+  beforeEach(() => {
+    useBotTester.mockReturnValue({
+      isTesting: false,
+      runBotTests: vi.fn().mockResolvedValue({}),
+    });
+  });
   
   test('renders bot creation form', () => {
     render(

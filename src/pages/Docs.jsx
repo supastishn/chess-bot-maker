@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { Puzzle, Library, Zap, Wrench } from 'lucide-react';
+import './DocLayout.css';
 
 const DocLayout = () => {
   const navItems = [

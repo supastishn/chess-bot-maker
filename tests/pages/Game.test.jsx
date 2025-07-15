@@ -11,7 +11,9 @@ vi.mock('chessground', () => ({
   }))
 }));
 
-vi.mock('chess.js');
+vi.mock('chess.js', () => ({
+  Chess: vi.fn(),
+}));
 
 describe('GamePage', () => {
   beforeEach(() => {
@@ -26,7 +28,7 @@ describe('GamePage', () => {
       moves: vi.fn().mockReturnValue(['e2e4']),
       move: vi.fn((m) => ({ san: 'e4', ...m })),
     };
-    Chess.mockReturnValue(mockInstance);
+    Chess.mockImplementation(() => mockInstance);
   });
 
   test('renders chess board and controls', () => {
@@ -39,14 +41,14 @@ describe('GamePage', () => {
 
   test('shows checkmate status message', () => {
     // Configure the mock for this specific test
-    Chess.mockReturnValue({
+    Chess.mockImplementation(() => ({
       fen: vi.fn().mockReturnValue('r1bqkbnr/pppp1Qpp/2n5/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 3'),
       turn: vi.fn().mockReturnValue('b'),
       isCheckmate: vi.fn().mockReturnValue(true),
       isStalemate: vi.fn().mockReturnValue(false),
       isThreefoldRepetition: vi.fn().mockReturnValue(false),
       isGameOver: vi.fn().mockReturnValue(true),
-    });
+    }));
 
     render(<GamePage selectedBot="random-bot" botNames={[]} />);
     expect(screen.getByText('White wins by Checkmate')).toBeInTheDocument();
