@@ -1,4 +1,4 @@
-import { materialBot } from '../../src/bot/materialBot';
+import { materialBot } from '../src/bot/materialBot';
 import { mockGameClient } from '../utils';
 
 describe('materialBot', () => {

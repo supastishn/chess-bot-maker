@@ -1,5 +1,13 @@
+import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import GamePage from '../../src/pages/Game';
+
+vi.mock('chessground', () => ({
+  default: vi.fn(() => ({
+    set: vi.fn(),
+    destroy: vi.fn()
+  }))
+}));
 
 describe('GamePage', () => {
   test('renders chess board and controls', () => {

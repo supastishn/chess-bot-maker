@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import BlocklyGuide from '../../../../src/pages/docs/BlocklyGuide';
 

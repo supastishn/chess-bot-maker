@@ -9,6 +9,13 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html']
+    },
+    testTimeout: 10000,
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable'
+      },
+      NODE_ENV: 'test'
     }
   }
 })

@@ -31,78 +31,74 @@ function squareToFen(piece) {
 // --- Adapter API ---
 
 export const getFen = (gameClient) => {
-    console.log("[Adapter] Generating FEN");
-    try {
-        const status = gameClient.getStatus();
-        const { board } = status;
+  try {
+    const status = gameClient.getStatus();
+    const { board } = status;
 
-        // 1. Piece placement
-        const ranks = {};
-        for (let i = 1; i <= 8; i++) ranks[i] = new Array(8).fill(null);
-        board.squares.forEach(s => {
-            if (s.piece) {
-                const fileIndex = s.file.charCodeAt(0) - 'a'.charCodeAt(0);
-                ranks[s.rank][fileIndex] = s.piece;
-            }
-        });
-
-        let fen = '';
-        for (let i = 8; i >= 1; i--) {
-            let emptyCount = 0;
-            for (let j = 0; j < 8; j++) {
-                const piece = ranks[i][j];
-                const fenChar = piece ? squareToFen(piece) : '';
-
-                if (fenChar) {
-                    if (emptyCount > 0) {
-                        fen += emptyCount;
-                        emptyCount = 0;
-                    }
-                    fen += fenChar;
-                } else {
-                    emptyCount++;
-                }
-            }
-            if (emptyCount > 0) {
-                fen += emptyCount;
-            }
-            if (i > 1) {
-                fen += '/';
-            }
+    // Piece placement
+    const ranks = Array.from({ length: 8 }, () => Array(8).fill(null));
+    // Map squares to ranks/files
+    ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].forEach((file, fileIdx) => {
+      for (let rank = 1; rank <= 8; rank++) {
+        const square = board.squares.find(s =>
+          s.file === file && s.rank === rank
+        );
+        if (square?.piece) {
+          ranks[8 - rank][fileIdx] = squareToFen(square.piece);
         }
+      }
+    });
 
-        // 2. Active color
-        fen += ` ${getTurnFromStatus(status)}`;
-
-        // 3. Castling availability
-        let castle = '';
-        const whiteKing = board.squares.find(s => s.piece?.type === 'king' && s.piece.side.name === 'white')?.piece;
-        const blackKing = board.squares.find(s => s.piece?.type === 'king' && s.piece.side.name === 'black')?.piece;
-        const a1Rook = board.squares.find(s => s.file === 'a' && s.rank === 1 && s.piece?.type === 'rook')?.piece;
-        const h1Rook = board.squares.find(s => s.file === 'h' && s.rank === 1 && s.piece?.type === 'rook')?.piece;
-        const a8Rook = board.squares.find(s => s.file === 'a' && s.rank === 8 && s.piece?.type === 'rook')?.piece;
-        const h8Rook = board.squares.find(s => s.file === 'h' && s.rank === 8 && s.piece?.type === 'rook')?.piece;
-
-        if (whiteKing?.moveCount === 0) {
-            if (h1Rook?.moveCount === 0) castle += 'K';
-            if (a1Rook?.moveCount === 0) castle += 'Q';
+    let fen = '';
+    ranks.forEach(rank => {
+      let empties = 0;
+      rank.forEach(sq => {
+        if (!sq) {
+          empties++;
+        } else {
+          if (empties > 0) {
+            fen += empties;
+            empties = 0;
+          }
+          fen += sq;
         }
-        if (blackKing?.moveCount === 0) {
-            if (h8Rook?.moveCount === 0) castle += 'k';
-            if (a8Rook?.moveCount === 0) castle += 'q';
-        }
-        fen += ` ${castle || '-'}`;
-        
-        // 4, 5, & 6. Other FEN parts
-        fen += ' - 0 1';
+      });
+      if (empties > 0) fen += empties;
+      fen += '/';
+    });
+    fen = fen.slice(0, -1); // Remove trailing slash
 
-        return fen;
+    // Active color
+    fen += ` ${getTurnFromStatus(status)}`;
 
-    } catch (error) {
-        console.error("[Adapter] Critical FEN generation error:", error);
-        // Fallback to the starting position to prevent a crash
-        return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+    // 3. Castling availability
+    let castle = '';
+    const whiteKing = board.squares.find(s => s.piece?.type === 'king' && s.piece.side.name === 'white')?.piece;
+    const blackKing = board.squares.find(s => s.piece?.type === 'king' && s.piece.side.name === 'black')?.piece;
+    const a1Rook = board.squares.find(s => s.file === 'a' && s.rank === 1 && s.piece?.type === 'rook')?.piece;
+    const h1Rook = board.squares.find(s => s.file === 'h' && s.rank === 1 && s.piece?.type === 'rook')?.piece;
+    const a8Rook = board.squares.find(s => s.file === 'a' && s.rank === 8 && s.piece?.type === 'rook')?.piece;
+    const h8Rook = board.squares.find(s => s.file === 'h' && s.rank === 8 && s.piece?.type === 'rook')?.piece;
+
+    if (whiteKing?.moveCount === 0) {
+      if (h1Rook?.moveCount === 0) castle += 'K';
+      if (a1Rook?.moveCount === 0) castle += 'Q';
     }
+    if (blackKing?.moveCount === 0) {
+      if (h8Rook?.moveCount === 0) castle += 'k';
+      if (a8Rook?.moveCount === 0) castle += 'q';
+    }
+    fen += ` ${castle || '-'}`;
+
+    // 4, 5, & 6. Other FEN parts
+    fen += ' - 0 1';
+
+    return fen;
+  } catch (error) {
+    console.error("[Adapter] Critical FEN generation error:", error);
+    // Fallback to the starting position to prevent a crash
+    return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  }
 };
 
 export const findMoveNotation = (gameClient, moveObj) => {
