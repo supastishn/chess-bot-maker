@@ -5,7 +5,7 @@ import { getBotNames, registerBot } from './bot/botInterface';
 import Navbar from './components/Navbar';
 import GamePage from './pages/Game';
 import CreateBotPage from './pages/CreateBot';
-import DocLayout from './pages/DocLayout';
+import DocLayout from './pages/Docs';
 import Introduction from './pages/docs/Introduction';
 import APIReference from './pages/docs/APIReference';
 import Examples from './pages/docs/Examples';
