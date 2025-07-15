@@ -3,23 +3,28 @@ import { Outlet, NavLink } from 'react-router-dom';
 import { Puzzle, Library, Zap, Wrench } from 'lucide-react';
 
 const DocLayout = () => {
+  const navItems = [
+    { path: 'introduction', icon: Puzzle, label: 'Introduction' },
+    { path: 'api', icon: Library, label: 'API Reference' },
+    { path: 'examples', icon: Zap, label: 'Examples' },
+    { path: 'blockly', icon: Wrench, label: 'Blockly Guide' }
+  ];
+
   return (
     <div className="page-container">
       <div className="docs-layout">
         <aside className="docs-sidebar glass-card">
           <nav className="docs-nav">
-            <NavLink to="introduction" className={({isActive}) => isActive ? 'active' : ''}>
-              <Puzzle size={18} /> Introduction
-            </NavLink>
-            <NavLink to="api" className={({isActive}) => isActive ? 'active' : ''}>
-              <Library size={18} /> API Reference
-            </NavLink>
-            <NavLink to="examples" className={({isActive}) => isActive ? 'active' : ''}>
-              <Zap size={18} /> Examples
-            </NavLink>
-            <NavLink to="blockly" className={({isActive}) => isActive ? 'active' : ''}>
-              <Wrench size={18} /> Blockly Guide
-            </NavLink>
+            {navItems.map((item) => (
+              <NavLink 
+                key={item.path}
+                to={item.path}
+                className={({isActive}) => isActive ? 'active' : ''}
+              >
+                <item.icon size={18} /> 
+                {item.label}
+              </NavLink>
+            ))}
           </nav>
         </aside>
         <main className="docs-content">
