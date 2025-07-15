@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, Puzzle, Library } from 'lucide-react';
+import { Bot, Puzzle, Library, Zap, Wrench } from 'lucide-react';
 
 const DocsPage = () => {
   return (
