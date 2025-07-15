@@ -35,7 +35,7 @@ const DocsPage = () => {
               {/* Advanced API Methods */}
               <div className="method-item">
                 <h3><code>lookAhead(move: string, depth: number): {"{ score: number }"}</code></h3>
-                <p>Simulates a move and evaluates position {depth} plies ahead</p>
+                <p>Simulates a move and evaluates position up to 'depth' plies ahead</p>
                 <pre>const score = game.lookAhead('e2e4', 3).score;</pre>
               </div>
 
