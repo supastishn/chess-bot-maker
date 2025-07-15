@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Examples from '../../../../src/pages/docs/Examples';
+import { describe, test, expect } from 'vitest';
+import Examples from '../../../src/pages/docs/Examples.jsx';
 
 describe('Examples', () => {
   test('renders bot examples', () => {

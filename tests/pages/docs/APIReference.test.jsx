@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import APIReference from '../../../../src/pages/docs/APIReference';
+import { describe, test, expect } from 'vitest';
+import APIReference from '../../../src/pages/docs/APIReference.jsx';
 
 describe('APIReference', () => {
   test('renders API documentation', () => {

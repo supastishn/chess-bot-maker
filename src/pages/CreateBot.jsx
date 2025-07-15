@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap } from 'lucide-react';
-import { useBotTester } from '../hooks/useBotTester';
+import useBotTester from '../hooks/useBotTester.js';
 import BotPerformanceWidget from '../components/BotPerformanceWidget';
 
 const CUSTOM_BOT_PLACEHOLDER = `(game) => {
