@@ -124,9 +124,13 @@ const createBotHelper = (gameClient) => {
       if (nextMoves.length === 0) {
         result = { score: helper.getPositionScore() };
       } else {
-        // Opponent tries to minimize our score
-        const scores = nextMoves.map(m => helper.lookAhead(m, depth - 1).score);
-        result = { score: helper.getPositionScore() - Math.max(...scores) };
+        // Calculate maximum opponent score at reduced depth
+        const opponentScores = nextMoves.map(m => {
+          const outcome = helper.lookAhead(m, depth - 1);
+          return outcome.score;
+        });
+        const maxScore = Math.max(...opponentScores);
+        result = { score: helper.getPositionScore() - maxScore };
       }
     }
     gameClient.undo();
