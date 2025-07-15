@@ -1,6 +1,7 @@
+import { describe, test, expect } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import BlocklyGuide from '../../../../src/pages/docs/BlocklyGuide';
+import BlocklyGuide from '../../../src/pages/docs/BlocklyGuide.jsx';
 
 describe('BlocklyGuide', () => {
   test('renders Blockly documentation', () => {

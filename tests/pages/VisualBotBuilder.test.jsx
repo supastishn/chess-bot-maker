@@ -1,8 +1,9 @@
+import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import VisualBotBuilder from '../../src/pages/VisualBotBuilder';
 
 describe('VisualBotBuilder', () => {
-  const mockRegister = jest.fn();
+  const mockRegister = vi.fn();
   
   test('renders visual builder interface', () => {
     render(<VisualBotBuilder onRegisterBot={mockRegister} />);

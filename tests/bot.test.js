@@ -1,6 +1,6 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { materialBot } from '../src/bot/materialBot';
-import { mockGameClient } from '../utils.js';
+import { mockGameClient } from './utils.js';
 
 describe('materialBot', () => {
   let mockGame;
