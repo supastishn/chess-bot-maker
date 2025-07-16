@@ -13,7 +13,7 @@ const VisualBotBuilder = ({ onRegisterBot }) => {
 
   const handleRegister = () => {
     const wrapped = `(game) => {\n${code}\n}`;
-    if (onRegisterBot(botName, wrapped)) {
+    if (onRegisterBot(botName, wrapped, code)) {
       // clear name/code if desired
       setBotName('');
       setCode('');

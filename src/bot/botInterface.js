@@ -9,7 +9,12 @@ console.log("[BotInterface] Initializing bot interface");
 import StockfishEngine from './stockfishEngine';
 
 const registeredBots = new Map();
+const botSources = new Map();
 const DEFAULT_BOT_NAME = 'starter-bot';
+
+export const getBotSource = (name) => {
+  return botSources.get(name) || "// No source code available";
+};
 
 const createBotHelper = (gameClient) => {
   // Helper context for 'this' in advanced methods
@@ -273,10 +278,13 @@ const createBotHelper = (gameClient) => {
   return helper;
 };
 
-export const registerBot = (name, botFunction) => {
+export const registerBot = (name, botFunction, source) => {
   console.log(`[Bot] Registering bot: ${name}`);
   if (typeof botFunction !== 'function') {
     throw new Error('Bot must be a function');
+  }
+  if (source) {
+    botSources.set(name, source);
   }
   // Wrap the botFunction to provide the helper API
   registeredBots.set(name, (gameClient) =>

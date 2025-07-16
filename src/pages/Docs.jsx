@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { Puzzle, Library, Zap, Wrench } from 'lucide-react';
+import { Puzzle, Library, Zap, Wrench, Bot } from 'lucide-react';
 import './DocLayout.css';
 
 const DocLayout = () => {
@@ -8,7 +8,8 @@ const DocLayout = () => {
     { path: 'introduction', icon: Puzzle, label: 'Introduction' },
     { path: 'api', icon: Library, label: 'API Reference' },
     { path: 'examples', icon: Zap, label: 'Examples' },
-    { path: 'blockly', icon: Wrench, label: 'Blockly Guide' }
+    { path: 'blockly', icon: Wrench, label: 'Blockly Guide' },
+    { path: 'bot-library', icon: Bot, label: 'Bot Library' }
   ];
 
   return (

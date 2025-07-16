@@ -23,7 +23,11 @@ const CreateBot = ({ onRegisterBot }) => {
       alert('Please provide a name and code for the bot.');
       return;
     }
-    const success = onRegisterBot(customBotName, customBotCode);
+    const success = onRegisterBot(
+      customBotName,
+      `(gameClient) => {\n${customBotCode}\n}`,
+      customBotCode
+    );
     if (success) {
       navigate('/');
     }
