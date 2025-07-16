@@ -14,6 +14,16 @@ Blockly.Blocks['evaluate_material'] = createBlock('evaluateMaterial', 'Number', 
 Blockly.Blocks['is_in_check'] = createBlock('isInCheck', 'Boolean', '#A65C81');
 Blockly.Blocks['get_game_phase'] = createBlock('get game phase', 'String', '#A65C81');
 
+// Opening book blocks
+Blockly.Blocks['get_book_moves'] = createBlock('getBookMoves', 'Array', '#5C81A6');
+Blockly.Blocks['play_book_move'] = {
+  init() {
+    this.appendDummyInput().appendField("playBookMove");
+    this.setOutput(true, "String");
+    this.setColour('#5C81A6');
+  }
+};
+
 // Statement blocks
 Blockly.Blocks['move_action'] = {
   init() {

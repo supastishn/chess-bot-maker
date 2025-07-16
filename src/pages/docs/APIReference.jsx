@@ -15,6 +15,16 @@ const APIReference = () => {
             <pre>const moves = game.getAvailableMoves();</pre>
           </div>
           <div className="method-item">
+            <h3><code>getBookMoves(): string[]</code></h3>
+            <p>Returns opening book moves for current position</p>
+            <pre>const bookMoves = game.getBookMoves();</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>playBookMove(): string|null</code></h3>
+            <p>Plays a random move from opening book</p>
+            <pre>const move = game.playBookMove();</pre>
+          </div>
+          <div className="method-item">
             <h3><code>lookAhead(move: string, depth: number): {"{ score: number }"}</code></h3>
             <p>Simulates a move and evaluates position up to 'depth' plies ahead</p>
             <pre>const score = game.lookAhead('e2e4', 3).score;</pre>

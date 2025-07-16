@@ -1,6 +1,9 @@
 
 
 import StockfishEngine from './stockfishEngine';
+import getOpeningBook, { getPositionKey } from '../services/openingService';
+
+const openingDB = getOpeningBook();
 
 const registeredBots = new Map();
 const botSources = new Map();
@@ -22,7 +25,19 @@ const createBotHelper = (gameClient) => {
       move.promotion ? move.from + move.to + move.promotion : move.from + move.to
     );
   };
-  
+
+  // Opening book API
+  helper.getPositionKey = () => getPositionKey(gameClient.fen());
+  helper.getBookMoves = () => {
+    const fen = helper.getPositionKey();
+    return openingDB[fen] || [];
+  };
+  helper.playBookMove = () => {
+    const moves = helper.getBookMoves();
+    if (moves.length === 0) return null;
+    return moves[Math.floor(Math.random() * moves.length)];
+  };
+
   helper.getBoardState = () => {
     console.log("[Bot] getBoardState called");
     return gameClient.board().flatMap((row, rankIdx) => 

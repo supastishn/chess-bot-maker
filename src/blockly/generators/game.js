@@ -6,6 +6,14 @@ javascriptGenerator['get_available_moves'] = function() {
   return ['game.getAvailableMoves()', javascriptGenerator.ORDER_FUNCTION_CALL];
 };
 
+javascriptGenerator['get_book_moves'] = function() {
+  return ['game.getBookMoves()', javascriptGenerator.ORDER_FUNCTION_CALL];
+};
+
+javascriptGenerator['play_book_move'] = function() {
+  return ['game.playBookMove()', javascriptGenerator.ORDER_FUNCTION_CALL];
+};
+
 javascriptGenerator['get_turn'] = function() {
   return ['game.getTurn()', javascriptGenerator.ORDER_FUNCTION_CALL];
 };
