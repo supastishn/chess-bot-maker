@@ -10,12 +10,11 @@ const BotLibrary = () => {
   return (
     <div className="bot-library glass-card">
       <h3>Bot Library</h3>
-      <div className="selector-card glass-card">
+      <div className="bot-selector">
         <label>Select Bot:</label>
         <select
           value={selectedBot}
           onChange={e => setSelectedBot(e.target.value)}
-          className="form-input"
         >
           {botNames.map(name => (
             <option key={name} value={name}>{name}</option>

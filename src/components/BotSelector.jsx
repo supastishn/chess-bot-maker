@@ -1,7 +1,7 @@
 import React from 'react';
 
 const BotSelector = ({ selectedBot, onChange, bots, label = "Active Bot:", disabled = false }) => (
-  <div className="selector-card glass-card">
+  <div className="bot-selector">
     <label>{label}</label>
     <select
       value={selectedBot}

@@ -15,12 +15,11 @@ const BotLibrary = () => {
     <div className="docs-section">
       <h1 className="page-title">🤖 Bot Library</h1>
       <div className="docs-card glass-card">
-        <div className="selector-card glass-card">
+        <div className="bot-selector">
           <label>Select Bot:</label>
           <select
             value={selectedBot}
             onChange={e => setSelectedBot(e.target.value)}
-            className="form-input"
           >
             {botNames.map(name => (
               <option key={name} value={name}>{name}</option>
