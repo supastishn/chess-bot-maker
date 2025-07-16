@@ -25,7 +25,7 @@ if (import.meta.env.DEV) {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/chess-bot-maker">
       <ErrorBoundary>
         <ThemeProvider>
           <App />

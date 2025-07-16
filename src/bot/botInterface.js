@@ -252,28 +252,27 @@ const createBotHelper = (gameClient) => {
   };
 
   // Stockfish engine helper
-  helper.stockfish = {
-    engine: null,
+  helper.stockfish = (status) => ({
     skillLevel: 20,
     hashSize: 256,
     contempt: 0,
     async init(depth = 15) {
-      if (!this.engine) {
-        this.engine = new StockfishEngine(depth);
-        await this.engine.init();
+      if (!status.stockfishEngine) {
+        status.stockfishEngine = new StockfishEngine(depth);
+        await status.stockfishEngine.init();
         this.setOption("Skill Level", this.skillLevel);
         this.setOption("Hash", this.hashSize);
         this.setOption("Contempt", this.contempt);
       }
     },
     async getBestMove(fen, depth = 15) {
-      if (!this.engine) {
-        this.engine = new StockfishEngine(depth);
-        await this.engine.init();
+      await this.init(depth);
+      if (status.stockfishEngine) {
+        return status.stockfishEngine.evaluatePosition(fen, depth);
       }
-      return this.engine.evaluatePosition(fen);
+      throw new Error("Stockfish engine initialization failed");
     }
-  };
+  });
 
   return helper;
 };

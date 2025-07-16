@@ -15,16 +15,22 @@ export default class StockfishEngine {
 
   async init() {
     if (this.engine) return true;
-    
+
+    // Compute the absolute URL for stockfish.js
+    const base = import.meta.env.BASE_URL || '/';
+    const stockfishJsPath = `${base}stockfish.js`;
+    const stockfishWasmPath = `${base}stockfish.wasm`;
+
     if (typeof Worker !== 'undefined') {
       try {
-        const workerURL = new URL(STOCKFISH_PATHS.js, window.location.origin);
+        // Use the new path
+        const workerURL = new URL(stockfishJsPath, window.location.origin);
         this.engine = new Worker(workerURL, { type: 'module' });
       } catch (e) {
         console.error('[Stockfish] Failed to create worker with options:', e);
-        this.engine = new Worker(STOCKFISH_PATHS.js);
+        this.engine = new Worker(stockfishJsPath);
       }
-      
+
       return new Promise(resolve => {
         const startupListener = event => {
           const line = event.data;
