@@ -9,12 +9,18 @@ import '../chessground-base.css';
 import '../chessground-brown.css';
 import '../chessground-cburnett.css';
 
-
 const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const gameRef = useRef(new Chess());
   const [boardOrientation] = useState('white');
   const boardRef = useRef(null);
   const cgRef = useRef(null);
+
+  // 1. Add FEN state for re-rendering
+  const [fen, setFen] = useState(gameRef.current.fen());
+
+  // 2. Add refs for stable callback references
+  const updateBoardRef = useRef();
+  const startBotMoveRef = useRef();
 
   const [gameMode, setGameMode] = useState('bot-human');
   const [blackBot, setBlackBot] = useState('random-bot');
@@ -23,12 +29,13 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     return toDests(gameRef.current);
   }, []);
 
-  // Update board
+  // 3. Replace updateBoard to use setFen and stable dependencies
   const updateBoard = useCallback(() => {
     if (cgRef.current) {
+      const newFen = gameRef.current.fen();
       const turnColor = gameRef.current.turn() === 'w' ? 'white' : 'black';
       cgRef.current.set({
-        fen: gameRef.current.fen(),
+        fen: newFen,
         turnColor,
         movable: {
           color: boardOrientation,
@@ -37,10 +44,68 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
           events: { after: onBoardMove }
         }
       });
+      setFen(newFen);
     }
-  }, [boardOrientation, getDests]);
+  }, [boardOrientation, getDests, onBoardMove]);
 
-  updateBoard();
+  // 4. REMOVE erroneous direct call to updateBoard()
+  // (No call to updateBoard() here)
+
+  // 6. Replace startBotMove to use refs and break dependency cycle
+  const startBotMove = useCallback(() => {
+    if (gameRef.current.isGameOver()) return;
+
+    const makeBotMove = async () => {
+      const turn = gameRef.current.turn();
+      const isBotTurn = (gameMode === 'bot-human' && turn === 'b') || gameMode === 'bot-bot';
+
+      if (isBotTurn) {
+        const bot = turn === 'w' ? getBot(selectedBot) : getBot(blackBot);
+        if (!bot) return;
+
+        try {
+          const move = await bot(gameRef.current);
+
+          if (move) {
+            gameRef.current.move(move);
+            updateBoardRef.current(); // Use the ref here
+
+            // Continue bot vs bot sequence
+            if (gameMode === 'bot-bot' && !gameRef.current.isGameOver()) {
+              setTimeout(makeBotMove, 200);
+            }
+          }
+        } catch (e) {
+          console.error("Bot execution error:", e);
+        }
+      }
+    };
+
+    setTimeout(makeBotMove, 200);
+  }, [gameMode, selectedBot, blackBot]);
+
+  // 7. Replace onBoardMove to use refs and be stable
+  const onBoardMove = useCallback((from, to) => {
+    try {
+      const result = gameRef.current.move({ from, to, promotion: 'q' });
+      if (result) {
+        updateBoardRef.current();
+        startBotMoveRef.current();
+      }
+    } catch (e) {
+      console.error('Invalid move', { from, to }, e);
+    }
+  }, []);
+
+  // 8. Replace resetBoard to be stable
+  const resetBoard = useCallback(() => {
+    gameRef.current = new Chess();
+    updateBoard();
+  }, [updateBoard]);
+
+  // 5. Assign callbacks to refs after all useCallback hooks
+  updateBoardRef.current = updateBoard;
+  startBotMoveRef.current = startBotMove;
 
   useEffect(() => {
     if (boardRef.current && !cgRef.current) {
@@ -79,59 +144,6 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     };
     // eslint-disable-next-line
   }, []);
-
-
-  // Start bot move depending on mode
-  const startBotMove = useCallback(() => {
-    if (gameRef.current.isGameOver()) return;
-
-    const makeBotMove = async () => {
-      const turn = gameRef.current.turn();
-      const isBotTurn = (gameMode === 'bot-human' && turn === 'b') || gameMode === 'bot-bot';
-
-      if (isBotTurn) {
-        const bot = turn === 'w' ? getBot(selectedBot) : getBot(blackBot);
-        if (!bot) return;
-
-        try {
-          const move = await bot(gameRef.current);
-
-          if (move) {
-            gameRef.current.move(move); // chess.js handles both string and object moves
-            updateBoard();
-
-            // Continue bot vs bot sequence
-            if (gameMode === 'bot-bot' && !gameRef.current.isGameOver()) {
-              setTimeout(makeBotMove, 200);
-            }
-          }
-        } catch (e) {
-          console.error("Bot execution error:", e);
-        }
-      }
-    };
-
-    setTimeout(makeBotMove, 200);
-  }, [gameMode, selectedBot, blackBot, updateBoard]);
-
-  // Board move handler
-  const onBoardMove = useCallback((from, to) => {
-    try {
-      const result = gameRef.current.move({ from, to, promotion: 'q' });
-      if (result) {
-        updateBoard();
-        startBotMove();
-      }
-    } catch (e) {
-      console.error('Invalid move', { from, to }, e);
-    }
-  }, [updateBoard, startBotMove]);
-
-  // Reset board
-  const resetBoard = useCallback(() => {
-    gameRef.current = new Chess();
-    updateBoard();
-  }, [updateBoard]);
 
   // Reset when mode or bots change
   useEffect(() => {
