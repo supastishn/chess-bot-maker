@@ -18,6 +18,16 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const boardRef = useRef(null);
   const cgRef = useRef(null);
 
+  const getDests = () => {
+    const dests = new Map();
+    gameRef.current.moves({ verbose: true }).forEach(m => {
+      const targets = dests.get(m.from) || [];
+      targets.push(m.to);
+      dests.set(m.from, targets);
+    });
+    return dests;
+  };
+
   // Update chessground board when FEN changes
   useEffect(() => {
     if (cgRef.current) {
@@ -27,6 +37,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
         turnColor: gameRef.current.turn() === 'w' ? 'white' : 'black',
         movable: {
           color: boardOrientation,
+          dests: getDests(),
           free: false,
           events: {
             after: onBoardMove
