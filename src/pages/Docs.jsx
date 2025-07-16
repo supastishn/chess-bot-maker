@@ -8,8 +8,7 @@ const DocLayout = () => {
     { path: 'introduction', icon: Puzzle, label: 'Introduction' },
     { path: 'api', icon: Library, label: 'API Reference' },
     { path: 'examples', icon: Zap, label: 'Examples' },
-    { path: 'blockly', icon: Wrench, label: 'Blockly Guide' },
-    { path: 'bot-library', icon: Bot, label: 'Bot Library' }
+    { path: 'blockly', icon: Wrench, label: 'Blockly Guide' }
   ];
 
   return (

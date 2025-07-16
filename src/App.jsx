@@ -11,7 +11,6 @@ import APIReference from './pages/docs/APIReference';
 import Examples from './pages/docs/Examples';
 import BlocklyGuide from './pages/docs/BlocklyGuide';
 import VisualBotBuilder from './pages/VisualBotBuilder';
-// Removed BotLibrary import from docs
 
 function App() {
   const [selectedBot, setSelectedBot] = useState('material-bot');
@@ -64,7 +63,6 @@ function App() {
             <Route path="api" element={<APIReference />} />
             <Route path="examples" element={<Examples />} />
             <Route path="blockly" element={<BlocklyGuide />} />
-            {/* BotLibrary route removed from docs */}
           </Route>
         </Routes>
       </main>
