@@ -22,10 +22,9 @@ describe('materialBot', () => {
   });
 
   test('avoids blunders that hang material', () => {
-    mockGame.lookAhead.mockImplementation(move => {
-      if (move === 'e2e4') return { score: -5 };
-      return { score: 0 };
-    });
+    mockGame.evaluateMaterial
+      .mockReturnValueOnce(-5) // for e2e4
+      .mockReturnValueOnce(0);  // for d2d4
 
     const move = materialBot(mockGame);
     expect(move).toBe('d2d4');

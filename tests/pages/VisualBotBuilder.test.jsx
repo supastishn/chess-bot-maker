@@ -27,7 +27,7 @@ describe('VisualBotBuilder', () => {
     render(<VisualBotBuilder onRegisterBot={mockRegister} />);
     
     fireEvent.click(screen.getByRole('button', { name: /Generate Code/i }));
-    expect(await screen.findByRole('textbox')).toBeInTheDocument();
+    expect(await screen.findByDisplayValue(/mock code/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Register Bot/i })).toBeInTheDocument();
   });
 });
