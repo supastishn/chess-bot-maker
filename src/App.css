@@ -205,6 +205,19 @@
   box-shadow: var(--shadow-xl);
 }
 
+/* Tabs for Create Bot / Bot Library */
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.tabs button {
+  padding: 12px 24px;
+  min-width: 180px;
+}
+
 .form-group {
   margin-bottom: 1.5rem;
 }
