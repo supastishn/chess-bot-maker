@@ -3,6 +3,15 @@ import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import VisualBotBuilder from '../../src/pages/VisualBotBuilder';
 
+vi.mock('../../src/components/BlocklyComponent', () => ({
+  default: React.forwardRef((props, ref) => {
+    React.useImperativeHandle(ref, () => ({
+      workspaceToCode: () => 'console.log("mock code");'
+    }));
+    return <div data-testid="mock-blockly" />;
+  })
+}));
+
 describe('VisualBotBuilder', () => {
   const mockRegister = vi.fn();
   

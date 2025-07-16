@@ -5,7 +5,7 @@ import GamePage from '../../src/pages/Game';
 import { Chess } from 'chess.js';
 
 vi.mock('chessground', () => ({
-  default: vi.fn(() => ({
+  Chessground: vi.fn(() => ({
     set: vi.fn(),
     destroy: vi.fn()
   }))

@@ -8,7 +8,7 @@ describe('APIReference', () => {
     render(<APIReference />);
     
     expect(screen.getByText(/Game Helper API v2.1/i)).toBeInTheDocument();
-    expect(screen.getByText(/getAvailableMoves/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /getAvailableMoves/i })).toBeInTheDocument();
     expect(screen.getByText(/Position Evaluation Formula/i)).toBeInTheDocument();
   });
 });
