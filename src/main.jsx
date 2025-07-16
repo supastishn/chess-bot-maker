@@ -7,16 +7,20 @@ import App from './App.jsx'
 import ErrorBoundary from './ErrorBoundary.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 
-// Force console logging in production
-if (import.meta.env.PROD) {
-  window.console.log = (...args) => {
-    const log = Function.prototype.bind.call(console.log, console);
-    log.apply(console, args);
-  };
+let initStart;
+
+// Initialize Eruda only in development mode
+if (import.meta.env.DEV) {
+  eruda.init();
+  initStart = performance.now();
 }
 
+// Log when development tools are initialized
 if (import.meta.env.DEV) {
-  eruda.init()
+  requestAnimationFrame(() => {
+    const initTime = performance.now() - initStart;
+    console.log(`🚀 Development tools initialized in ${initTime.toFixed(1)}ms`);
+  });
 }
 
 createRoot(document.getElementById('root')).render(
@@ -28,5 +32,5 @@ createRoot(document.getElementById('root')).render(
         </ThemeProvider>
       </ErrorBoundary>
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 )
