@@ -37,6 +37,11 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       if (destsRef.current) {
         console.log('Current destination squares (dests):',
           Object.fromEntries(destsRef.current));
+        console.log('Board state (fen):', gameRef.current.fen());
+        console.log('Board position:');
+        console.group();
+        console.log(gameRef.current.ascii());
+        console.groupEnd();
       }
     }, 5000);
 
