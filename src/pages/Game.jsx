@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { Chess } from 'chess.js';
 import { getBot } from '../bot/botInterface';
 import InfoPanel from '../components/InfoPanel';
-import BotSelectorPanel from '../components/BotSelectorPanel';
 import BotSelector from '../components/BotSelector';
 import { Chessground } from 'chessground';
 import { toDests } from './util';

@@ -2,18 +2,18 @@ import React from 'react';
 import { getBotNames, getBotSource } from '../bot/botInterface';
 
 const BotLibrary = () => {
-  const botNames = getBotNames().filter(name => 
-    !name.startsWith('__temp') && !name.endsWith('-bot')
+  const botNames = getBotNames().filter(name =>
+    !name.startsWith('__temp')
   );
   const [selectedBot, setSelectedBot] = React.useState(botNames[0]);
 
   return (
     <div className="bot-library glass-card">
       <h3>Bot Library</h3>
-      <div className="bot-selector">
+      <div className="selector-card glass-card">
         <label>Select Bot:</label>
-        <select 
-          value={selectedBot} 
+        <select
+          value={selectedBot}
           onChange={e => setSelectedBot(e.target.value)}
           className="form-input"
         >
@@ -22,7 +22,7 @@ const BotLibrary = () => {
           ))}
         </select>
       </div>
-      
+
       {selectedBot && (
         <div className="bot-code-viewer">
           <pre className="form-textarea">

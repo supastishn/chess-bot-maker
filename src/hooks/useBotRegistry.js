@@ -3,7 +3,7 @@ import { getBotNames as getBotNamesFromInterface, registerBot as registerBotInIn
 
 export const useBotRegistry = () => {
   const [botNames, setBotNames] = useState(getBotNamesFromInterface());
-  
+
   const registerBot = (name, code) => {
     if (!name || !code) {
       alert('Please provide bot name and code');
