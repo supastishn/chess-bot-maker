@@ -101,20 +101,34 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Start bot move depending on mode
   const startBotMove = useCallback(() => {
-    if (!gameRef.current.isGameOver()) {
-      if (gameMode === 'bot-human' && gameRef.current.turn() === 'b') {
-        setTimeout(() => {
-          const move = getBot(selectedBot)(gameRef.current);
-          if (move) {
-            gameRef.current.move(move);
-            updateBoard();
+    if (gameRef.current.isGameOver()) return;
+
+    const makeBotMove = () => {
+      const turn = gameRef.current.turn();
+      const isBotTurn = (gameMode === 'bot-human' && turn === 'b') || gameMode === 'bot-bot';
+
+      if (isBotTurn) {
+        const bot = turn === 'w' ? getBot(selectedBot) : getBot(blackBot);
+        const move = bot(gameRef.current);
+
+        if (move) {
+          const moveObj = typeof move === 'string'
+            ? { from: move.slice(0, 2), to: move.slice(2, 4) }
+            : move;
+
+          gameRef.current.move(moveObj);
+          updateBoard();
+
+          // Continue bot vs bot sequence
+          if (gameMode === 'bot-bot' && !gameRef.current.isGameOver()) {
+            setTimeout(makeBotMove, 200);
           }
-        }, 200);
-      } else if (gameMode === 'bot-bot') {
-        setTimeout(handleBotBotMove, 200);
+        }
       }
-    }
-  }, [gameMode, selectedBot, updateBoard, handleBotBotMove]);
+    };
+
+    setTimeout(makeBotMove, 200);
+  }, [gameMode, selectedBot, blackBot, updateBoard]);
 
   // Board move handler
   const onBoardMove = useCallback((from, to) => {
@@ -138,14 +152,8 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   // Reset when mode or bots change
   useEffect(() => {
     resetBoard();
-  }, [gameMode, selectedBot, blackBot, resetBoard]);
-
-  // Start bot vs bot sequence
-  useEffect(() => {
-    if (gameMode === 'bot-bot' && !gameRef.current.isGameOver()) {
-      startBotMove();
-    }
-  }, [gameMode, startBotMove]);
+    if (gameMode === 'bot-bot') startBotMove();
+  }, [gameMode, selectedBot, blackBot, resetBoard, startBotMove]);
 
   const turn = gameRef.current.turn() === 'w' ? 'white' : 'black';
   const status = {
