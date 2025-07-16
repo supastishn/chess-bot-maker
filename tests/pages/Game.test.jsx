@@ -44,6 +44,7 @@ describe('GamePage', () => {
     Chess.mockImplementation(() => ({
       fen: vi.fn().mockReturnValue('r1bqkbnr/pppp1Qpp/2n5/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 3'),
       turn: vi.fn().mockReturnValue('b'),
+      moves: vi.fn().mockReturnValue([]), // Added moves method
       isCheckmate: vi.fn().mockReturnValue(true),
       isStalemate: vi.fn().mockReturnValue(false),
       isThreefoldRepetition: vi.fn().mockReturnValue(false),

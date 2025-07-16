@@ -2,6 +2,11 @@ import { Chess } from 'chess.js';
 
 export function toDests(game) {
   const dests = new Map();
+  
+  if (!game || typeof game.moves !== 'function') {
+    return dests;
+  }
+
   const squares = [
     'a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1',
     'a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2',
@@ -14,8 +19,12 @@ export function toDests(game) {
   ];
 
   squares.forEach(s => {
-    const moves = game.moves({ square: s, verbose: true });
-    if (moves.length) dests.set(s, moves.map(m => m.to));
+    try {
+      const moves = game.moves({ square: s, verbose: true });
+      if (moves.length) dests.set(s, moves.map(m => m.to));
+    } catch (e) {
+      console.warn(`Error getting moves for square ${s}:`, e);
+    }
   });
 
   return dests;
