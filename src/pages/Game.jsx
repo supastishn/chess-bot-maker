@@ -29,6 +29,19 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     return toDests(gameRef.current);
   }, []);
 
+  // 7. Replace onBoardMove to use refs and be stable
+  const onBoardMove = useCallback((from, to) => {
+    try {
+      const result = gameRef.current.move({ from, to, promotion: 'q' });
+      if (result) {
+        updateBoardRef.current();
+        startBotMoveRef.current();
+      }
+    } catch (e) {
+      console.error('Invalid move', { from, to }, e);
+    }
+  }, []);
+
   // 3. Replace updateBoard to use setFen and stable dependencies
   const updateBoard = useCallback(() => {
     if (cgRef.current) {
@@ -83,19 +96,6 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
     setTimeout(makeBotMove, 200);
   }, [gameMode, selectedBot, blackBot]);
-
-  // 7. Replace onBoardMove to use refs and be stable
-  const onBoardMove = useCallback((from, to) => {
-    try {
-      const result = gameRef.current.move({ from, to, promotion: 'q' });
-      if (result) {
-        updateBoardRef.current();
-        startBotMoveRef.current();
-      }
-    } catch (e) {
-      console.error('Invalid move', { from, to }, e);
-    }
-  }, []);
 
   // 8. Replace resetBoard to be stable
   const resetBoard = useCallback(() => {
