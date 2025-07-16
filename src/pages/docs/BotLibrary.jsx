@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { getBotNames, getBotSource } from '../../bot/botInterface';
 
 const BotLibrary = () => {
-  // Remove the filter condition for names ending with '-bot'
   const botNames = getBotNames().filter(name => !name.startsWith('__temp'));
   const [selectedBot, setSelectedBot] = React.useState(botNames[0]);
+
+  // Ensure we always have a valid bot selected
+  useEffect(() => {
+    if (botNames.length > 0 && !selectedBot) {
+      setSelectedBot(botNames[0]);
+    }
+  }, [botNames, selectedBot]);
 
   return (
     <div className="docs-section">
