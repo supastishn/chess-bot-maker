@@ -80,48 +80,33 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     // eslint-disable-next-line
   }, []);
 
-  // Bot vs Bot move handler
-  const handleBotBotMove = useCallback(() => {
-    if (gameMode === 'bot-bot') {
-      const turn = gameRef.current.turn();
-      const bot = turn === 'w' ? getBot(selectedBot) : getBot(blackBot);
-      if (bot) {
-        const move = bot(gameRef.current);
-        if (move) {
-          const moveObj = typeof move === 'string'
-            ? { from: move.slice(0, 2), to: move.slice(2, 4) }
-            : move;
-          gameRef.current.move(moveObj);
-          updateBoard();
-        }
-      }
-    }
-  }, [gameMode, selectedBot, blackBot, updateBoard]);
 
   // Start bot move depending on mode
   const startBotMove = useCallback(() => {
     if (gameRef.current.isGameOver()) return;
 
-    const makeBotMove = () => {
+    const makeBotMove = async () => {
       const turn = gameRef.current.turn();
       const isBotTurn = (gameMode === 'bot-human' && turn === 'b') || gameMode === 'bot-bot';
 
       if (isBotTurn) {
         const bot = turn === 'w' ? getBot(selectedBot) : getBot(blackBot);
-        const move = bot(gameRef.current);
+        if (!bot) return;
 
-        if (move) {
-          const moveObj = typeof move === 'string'
-            ? { from: move.slice(0, 2), to: move.slice(2, 4) }
-            : move;
+        try {
+          const move = await bot(gameRef.current);
 
-          gameRef.current.move(moveObj);
-          updateBoard();
+          if (move) {
+            gameRef.current.move(move); // chess.js handles both string and object moves
+            updateBoard();
 
-          // Continue bot vs bot sequence
-          if (gameMode === 'bot-bot' && !gameRef.current.isGameOver()) {
-            setTimeout(makeBotMove, 200);
+            // Continue bot vs bot sequence
+            if (gameMode === 'bot-bot' && !gameRef.current.isGameOver()) {
+              setTimeout(makeBotMove, 200);
+            }
           }
+        } catch (e) {
+          console.error("Bot execution error:", e);
         }
       }
     };
