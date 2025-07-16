@@ -14,7 +14,7 @@ describe('toDests', () => {
     // Should have pawn and knight moves
     expect(dests.get('a2')).toEqual(['a3','a4']);
     expect(dests.get('b1')).toEqual(['a3','c3']);
-    expect(dests.size).toBeGreaterThan(10);
+    expect(dests.size).toBe(10);
   });
 
   test('returns no moves for checkmated position', () => {

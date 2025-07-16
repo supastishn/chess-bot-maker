@@ -1,3 +1,5 @@
+import React from 'react';
+
 const BotSelector = ({ selectedBot, onChange, bots }) => (
   <div className="bot-selector">
     <label>Active Bot:</label>

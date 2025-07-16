@@ -3,7 +3,7 @@ import { Chess } from 'chess.js';
 export function toDests(game) {
   const dests = new Map();
   
-  if (!game || typeof game.moves !== 'function') {
+  if (!game || typeof game.moves !== 'function' || game.isGameOver()) {
     return dests;
   }
 
