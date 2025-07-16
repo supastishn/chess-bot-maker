@@ -6,7 +6,6 @@ const BotSelector = ({ selectedBot, onChange, bots, label = "Active Bot:", disab
     <select 
       value={selectedBot} 
       onChange={e => onChange(e.target.value)}
-      disabled={disabled}
     >
       {bots.map(name => (
         <option key={name} value={name}>{name}</option>

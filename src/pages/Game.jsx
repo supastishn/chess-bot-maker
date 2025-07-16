@@ -186,46 +186,57 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
           <div ref={boardRef} className="cg-wrap" style={{ height: '100%', width: '100%' }} />
         </div>
         
-        {/* Game Mode Selector at bottom */}
-        <div className="game-mode-selector glass-card" style={{ padding: '1rem', marginBottom: '1rem' }}>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <label>
-              <input
-                type="radio"
-                value="bot-human"
-                checked={gameMode === 'bot-human'}
-                onChange={() => setGameMode('bot-human')}
-              />
-              Bot vs Human
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="bot-bot"
-                checked={gameMode === 'bot-bot'}
-                onChange={() => setGameMode('bot-bot')}
-              />
-              Bot vs Bot
-            </label>
-          </div>
-          {gameMode === 'bot-bot' && (
-            <div className="second-bot-selector" style={{ marginTop: '1rem' }}>
-              <BotSelector
-                selectedBot={blackBot}
-                onChange={setBlackBot}
-                bots={botNames}
-                label="Bot for Black:"
-              />
-            </div>
-          )}
-        </div>
         <InfoPanel status={status} turn={turn} onReset={resetBoard} />
-        <BotSelectorPanel
-          selectedBot={selectedBot}
-          onBotChange={onBotChange}
-          botNames={botNames}
-          disabled={gameMode === 'bot-bot'}
-        />
+
+        {/* Combined panel for controls */}
+        <div className="bot-panel glass-card">
+          {/* Game Mode Selector */}
+          <div className="game-mode-selector" style={{ paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <label>
+                <input
+                  type="radio"
+                  value="bot-human"
+                  checked={gameMode === 'bot-human'}
+                  onChange={() => setGameMode('bot-human')}
+                />
+                Bot vs Human
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="bot-bot"
+                  checked={gameMode === 'bot-bot'}
+                  onChange={() => setGameMode('bot-bot')}
+                />
+                Bot vs Bot
+              </label>
+            </div>
+          </div>
+          
+          {/* Bot Selectors */}
+          <div className="bot-selectors-container">
+            <BotSelector 
+              selectedBot={selectedBot} 
+              onChange={onBotChange}
+              bots={botNames}
+              disabled={false}
+              label={gameMode === 'bot-bot' ? "Bot for White:" : "Active Bot:"}
+            />
+            
+            {gameMode === 'bot-bot' && (
+              <div className="second-bot-selector" style={{ marginTop: '1rem' }}>
+                <BotSelector
+                  selectedBot={blackBot}
+                  onChange={setBlackBot}
+                  bots={botNames}
+                  disabled={false}
+                  label="Bot for Black:"
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
