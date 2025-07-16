@@ -84,8 +84,8 @@ html, body {
   
   --color-accent: #333333;
   --color-accent-hover: #000000;
-  --color-success: #333333;
-  --color-success-hover: #000000;
+  --color-success: var(--color-accent);
+  --color-success-hover: var(--color-accent-hover);
   --color-danger: #333333;
   --color-danger-hover: #000000;
   
@@ -120,8 +120,8 @@ html, body {
   
   --color-accent: #eeeeee;
   --color-accent-hover: #ffffff;
-  --color-success: #eeeeee;
-  --color-success-hover: #ffffff;
+  --color-success: var(--color-accent);
+  --color-success-hover: var(--color-accent-hover);
   --color-danger: #eeeeee;
   --color-danger-hover: #ffffff;
   

@@ -95,7 +95,7 @@ export const getFen = (gameClient) => {
 
     return fen;
   } catch (error) {
-    console.error("[Adapter] Critical FEN generation error:", error);
+    console.error('[Adapter] FEN generation error:', error);
     // Fallback to the starting position to prevent a crash
     return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
   }
