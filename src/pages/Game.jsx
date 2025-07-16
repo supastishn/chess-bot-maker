@@ -178,7 +178,15 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     <div className="page-container">
       <div className="game-content">
         <h1 className="page-title">Chess vs Computer</h1>
-        {/* Game Mode Selector */}
+        <div className="board-container" style={{
+          width: '100%',
+          maxWidth: '500px',
+          aspectRatio: '1/1'
+        }}>
+          <div ref={boardRef} className="cg-wrap" style={{ height: '100%', width: '100%' }} />
+        </div>
+        
+        {/* Game Mode Selector at bottom */}
         <div className="game-mode-selector glass-card" style={{ padding: '1rem', marginBottom: '1rem' }}>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <label>
@@ -210,13 +218,6 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
               />
             </div>
           )}
-        </div>
-        <div className="board-container" style={{
-          width: '100%',
-          maxWidth: '500px',
-          aspectRatio: '1/1'
-        }}>
-          <div ref={boardRef} className="cg-wrap" style={{ height: '100%', width: '100%' }} />
         </div>
         <InfoPanel status={status} turn={turn} onReset={resetBoard} />
         <BotSelectorPanel
