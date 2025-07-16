@@ -17,8 +17,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const boardRef = useRef(null);
   const cgRef = useRef(null);
 
-  // Track game mode and black bot
-  const [gameMode, setGameMode] = useState('bot-human'); // 'bot-human' or 'bot-bot'
+  const [gameMode, setGameMode] = useState('bot-human');
   const [blackBot, setBlackBot] = useState('random-bot');
 
   const getDests = useCallback(() => {
@@ -44,7 +43,6 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   updateBoard();
 
-  // Chessground init
   useEffect(() => {
     if (boardRef.current && !cgRef.current) {
       try {

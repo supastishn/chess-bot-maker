@@ -27,7 +27,6 @@ const useBotTester = () => {
       results.matchResults.push(result);
     }
     
-    // Calculate simple ELO-like rating
     const winPercent = results.wins / results.matchResults.length;
     results.rating = Math.round(800 + (winPercent * 1200));
     

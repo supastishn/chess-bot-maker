@@ -1,10 +1,8 @@
 export const materialBot = (game) => {
   try {
-    console.log("[MaterialBot] Calculating move");
     const moves = game.getAvailableMoves?.() || [];
     if (moves.length === 0) return null;
 
-    // Check for immediate checkmate
     for (const move of moves) {
       console.log(`[MaterialBot] Evaluating move: ${JSON.stringify(move)}`);
       game.move(move);

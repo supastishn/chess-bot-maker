@@ -1,8 +1,3 @@
-/**
- * Bot Interface Specification:
- * - Must be a function that takes a game API and returns a move object or move key
- * - Example: (game) => { from: 'e2', to: 'e4' } or (game) => 'e2e4'
- */
 
 
 import StockfishEngine from './stockfishEngine';
@@ -250,7 +245,6 @@ const createBotHelper = (gameClient) => {
     return gameClient.stockfish.runBenchmark(depth);
   };
 
-  // Stockfish engine helper
   helper.stockfish = (status) => ({
     skillLevel: 20,
     hashSize: 256,
@@ -290,7 +284,6 @@ export const registerBot = (name, botFunction, source) => {
   );
 };
 
-// Register Stockfish bot
 registerBot('stockfish-bot', async (game) => {
   const fen = game.getFEN ? game.getFEN() : game.fen();
   return game.stockfish.getBestMove(fen);

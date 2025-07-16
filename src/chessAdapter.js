@@ -1,5 +1,4 @@
 export const getFen = (gameClient) => {
-  // Use chess.js directly if available
   try {
     return gameClient.fen();
   } catch (e) {

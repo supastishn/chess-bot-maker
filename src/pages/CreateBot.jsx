@@ -36,7 +36,6 @@ const CreateBot = ({ onRegisterBot }) => {
   };
 
   const testBot = async () => {
-    if (!customBotName || !customBotCode) return;
     setIsTesting(true);
     const results = await runBotTests(customBotName, customBotCode);
     setTestResults(results);
