@@ -308,29 +308,11 @@ export const getBotNames = () => Array.from(registeredBots.keys());
  // Register built-in bots
 import { materialBot } from './materialBot';
 
-registerBot('material-bot', materialBot);
-registerBot('starter-bot', (game) => {
-  const moves = game.getAvailableMoves();
-  return moves.length > 0
-    ? moves[Math.floor(Math.random() * moves.length)]
-    : null;
-});
-
-// ToggleBot: Switches strategy every 3 moves
-registerBot('toggle-bot', (game) => {
-  const moveCount = game.getBoardState().length;
-  const aiMode = Math.floor(moveCount / 3) % 3;
-
-  if (aiMode === 0) return getBot('material-bot')(game);
-  if (aiMode === 1) return getBot('aggressive-bot')(game);
-  return getBot('positional-bot')(game);
-});
-
-// GuruBot: Expert-level positional play
+// Define all bots explicitly in a fixed order for the library
 registerBot('guru-bot', (game) => {
   const moves = game.getAvailableMoves();
   if (moves.length === 0) return null;
-
+  
   return game.prioritizeStrategy({
     development: 0.3,
     kingSafety: 0.3,
@@ -339,7 +321,8 @@ registerBot('guru-bot', (game) => {
   });
 });
 
-// Test bots for performance testing
+registerBot('material-bot', materialBot);
+
 registerBot('aggressive-bot', (game) => {
   const moves = game.getAvailableMoves();
   const captureMoves = moves.filter(move =>
@@ -372,11 +355,26 @@ registerBot('positional-bot', (game) => {
       bestMove = move;
     }
   }
-
   return bestMove;
 });
 
 registerBot('random-bot', (game) => {
+  const moves = game.getAvailableMoves();
+  return moves.length > 0
+    ? moves[Math.floor(Math.random() * moves.length)]
+    : null;
+});
+
+registerBot('toggle-bot', (game) => {
+  const moveCount = game.getBoardState().length;
+  const aiMode = Math.floor(moveCount / 3) % 3;
+
+  if (aiMode === 0) return getBot('material-bot')(game);
+  if (aiMode === 1) return getBot('aggressive-bot')(game);
+  return getBot('positional-bot')(game);
+});
+
+registerBot('starter-bot', (game) => {
   const moves = game.getAvailableMoves();
   return moves.length > 0
     ? moves[Math.floor(Math.random() * moves.length)]
