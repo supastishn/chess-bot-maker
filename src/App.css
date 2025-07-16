@@ -547,3 +547,20 @@ code {
   align-items: center;
   gap: 8px;
 }
+/* Add these to src/App.css */
+.game-mode-selector {
+  width: min(70vmin, 600px);
+}
+
+.bot-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.second-bot-selector {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}

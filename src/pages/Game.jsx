@@ -3,6 +3,7 @@ import { Chess } from 'chess.js';
 import { getBot } from '../bot/botInterface';
 import InfoPanel from '../components/InfoPanel';
 import BotSelectorPanel from '../components/BotSelectorPanel';
+import BotSelector from '../components/BotSelector';
 import { Chessground } from 'chessground';
 import { toDests } from './util';
 import '../chessground-base.css';
@@ -18,10 +19,15 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const boardRef = useRef(null);
   const cgRef = useRef(null);
 
+  // Track game mode and black bot
+  const [gameMode, setGameMode] = useState('bot-human'); // 'bot-human' or 'bot-bot'
+  const [blackBot, setBlackBot] = useState('random-bot');
+
   const getDests = useCallback(() => {
     return toDests(gameRef.current);
   }, []);
 
+  // Update board
   const updateBoard = useCallback(() => {
     if (cgRef.current) {
       const turnColor = gameRef.current.turn() === 'w' ? 'white' : 'black';
@@ -38,8 +44,8 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     }
   }, [boardOrientation, getDests]);
 
+  // Logging and board init
   useEffect(() => {
-    // Setup interval for logging dests
     const intervalId = setInterval(() => {
       const dests = getDests();
       console.log('Current destination squares (dests):', Object.fromEntries(dests));
@@ -50,14 +56,12 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       console.groupEnd();
     }, 5000);
 
-    // Initialize board
     updateBoard();
 
-    // Cleanup interval on unmount
     return () => clearInterval(intervalId);
   }, [boardOrientation, getDests, updateBoard]);
 
-  // Initialize chessground
+  // Chessground init
   useEffect(() => {
     if (boardRef.current && !cgRef.current) {
       try {
@@ -96,87 +100,72 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     // eslint-disable-next-line
   }, []);
 
-  const onBoardMove = useCallback((from, to) => {
-    handleMove({ from, to, promotion: 'q' });
-  }, []);
+  // Bot vs Bot move handler
+  const handleBotBotMove = useCallback(() => {
+    if (gameMode === 'bot-bot') {
+      const turn = gameRef.current.turn();
+      const bot = turn === 'w' ? getBot(selectedBot) : getBot(blackBot);
+      if (bot) {
+        const move = bot(gameRef.current);
+        if (move) {
+          const moveObj = typeof move === 'string'
+            ? { from: move.slice(0, 2), to: move.slice(2, 4) }
+            : move;
+          gameRef.current.move(moveObj);
+          updateBoard();
+        }
+      }
+    }
+  }, [gameMode, selectedBot, blackBot, updateBoard]);
 
-  const handleMove = useCallback((from, to) => {
+  // Start bot move depending on mode
+  const startBotMove = useCallback(() => {
+    if (!gameRef.current.isGameOver()) {
+      if (gameMode === 'bot-human' && gameRef.current.turn() === 'b') {
+        setTimeout(() => {
+          const move = getBot(selectedBot)(gameRef.current);
+          if (move) {
+            gameRef.current.move(move);
+            updateBoard();
+          }
+        }, 200);
+      } else if (gameMode === 'bot-bot') {
+        setTimeout(handleBotBotMove, 200);
+      }
+    }
+  }, [gameMode, selectedBot, updateBoard, handleBotBotMove]);
+
+  // Board move handler
+  const onBoardMove = useCallback((from, to) => {
     try {
       const result = gameRef.current.move({ from, to, promotion: 'q' });
       if (result) {
         updateBoard();
-        if (!gameRef.current.isGameOver()) {
-          setTimeout(() => {
-            const botMove = getBot(selectedBot)(gameRef.current);
-            if (botMove) {
-              gameRef.current.move(botMove);
-              updateBoard();
-            }
-          }, 200);
-        }
-        return result;
+        startBotMove();
       }
     } catch (e) {
       console.error('Invalid move', { from, to }, e);
     }
-    return null;
-  }, [selectedBot, updateBoard]);
+  }, [updateBoard, startBotMove]);
 
-  const makeMove = useCallback((move) => {
-    console.group(`Move Debug: ${move.from} to ${move.to}`);
-    console.log('Move attempt:', move);
-    console.log('Game FEN before move:', gameRef.current.fen());
-    console.log('Active chess.js state:', gameRef.current.ascii());
-    console.log('Game over status:', gameRef.current.isGameOver());
-    console.log('Turn:', gameRef.current.turn());
-    console.log('Available moves for position:');
-    try {
-      const moves = gameRef.current.moves({ square: move.from, verbose: true });
-      console.log(moves.map(m =>
-        `${m.from}${m.to}${m.promotion || ''} - ${m.san}`
-      ));
-    } catch (e) {
-      console.error('Error fetching moves:', e);
-    }
-    console.groupEnd();
-
-    try {
-      console.log(`Attempting move: ${move.from} to ${move.to}${move.promotion ? ` (promotion: ${move.promotion})` : ''}`);
-      const moveObj = {
-        from: move.from,
-        to: move.to
-      };
-      if (move.promotion) {
-        moveObj.promotion = move.promotion;
-      }
-      const result = gameRef.current.move(moveObj);
-      if (result) {
-        console.log('Move successful:', result.san);
-        console.log('New FEN:', gameRef.current.fen());
-        updateBoard();
-        return result;
-      } else {
-        console.warn('Move returned null result');
-        return null;
-      }
-    } catch (e) {
-      console.error(`Move failed: ${e.message}`);
-      console.error('Attempted move:', move);
-      console.error('Game state:', {
-        fen: gameRef.current.fen(),
-        turn: gameRef.current.turn(),
-        in_check: gameRef.current.inCheck(),
-        game_over: gameRef.current.isGameOver()
-      });
-      return null;
-    }
-  }, [updateBoard]);
-
+  // Reset board
   const resetBoard = useCallback(() => {
     console.log("[GamePage] Resetting board to start position");
     gameRef.current = new Chess();
     updateBoard();
   }, [updateBoard]);
+
+  // Reset when mode or bots change
+  useEffect(() => {
+    resetBoard();
+  }, [gameMode, selectedBot, blackBot, resetBoard]);
+
+  // Start bot vs bot sequence
+  useEffect(() => {
+    if (gameMode === 'bot-bot' && !gameRef.current.isGameOver()) {
+      startBotMove();
+    }
+  }, [gameMode, startBotMove]);
 
   const turn = gameRef.current.turn() === 'w' ? 'white' : 'black';
   const status = {
@@ -189,6 +178,39 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     <div className="page-container">
       <div className="game-content">
         <h1 className="page-title">Chess vs Computer</h1>
+        {/* Game Mode Selector */}
+        <div className="game-mode-selector glass-card" style={{ padding: '1rem', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <label>
+              <input
+                type="radio"
+                value="bot-human"
+                checked={gameMode === 'bot-human'}
+                onChange={() => setGameMode('bot-human')}
+              />
+              Bot vs Human
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="bot-bot"
+                checked={gameMode === 'bot-bot'}
+                onChange={() => setGameMode('bot-bot')}
+              />
+              Bot vs Bot
+            </label>
+          </div>
+          {gameMode === 'bot-bot' && (
+            <div className="second-bot-selector" style={{ marginTop: '1rem' }}>
+              <BotSelector
+                selectedBot={blackBot}
+                onChange={setBlackBot}
+                bots={botNames}
+                label="Bot for Black:"
+              />
+            </div>
+          )}
+        </div>
         <div className="board-container" style={{
           width: '100%',
           maxWidth: '500px',
@@ -201,6 +223,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
           selectedBot={selectedBot}
           onBotChange={onBotChange}
           botNames={botNames}
+          disabled={gameMode === 'bot-bot'}
         />
       </div>
     </div>
