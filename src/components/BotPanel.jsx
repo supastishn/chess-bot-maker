@@ -35,11 +35,16 @@ const BotPanel = ({ selectedBot, onBotChange, botNames, onRegisterBot }) => {
 
       <div className="bot-selector">
         <label>Active Bot:</label>
-        <select value={selectedBot} onChange={(e) => onBotChange(e.target.value)}>
-          {botNames.map(name => (
-            <option key={name} value={name}>{name}</option>
-          ))}
-        </select>
+        <div className="bot-selector">
+          <select 
+            value={selectedBot}
+            onChange={(e) => onBotChange(e.target.value)}
+          >
+            {botNames.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="custom-bot-creator">

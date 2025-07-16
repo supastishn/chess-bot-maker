@@ -184,6 +184,8 @@
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
   min-width: 150px;
+  position: relative;
+  z-index: 10; /* Bring above glass backdrop */
 }
 
 .bot-selector select:hover, .bot-selector select:focus {
