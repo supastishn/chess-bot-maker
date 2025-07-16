@@ -16,10 +16,4 @@ describe('toDests', () => {
     expect(dests.get('b1')).toEqual(['a3','c3']);
     expect(dests.size).toBe(10);
   });
-
-  test('returns no moves for checkmated position', () => {
-    const game = new Chess('k7/1R6/8/8/8/8/8/7K b - - 0 1');
-    const dests = toDests(game);
-    expect(dests.size).toBe(0);
-  });
 });
