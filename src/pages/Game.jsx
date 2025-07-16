@@ -10,10 +10,8 @@ import '../chessground-base.css';
 import '../chessground-brown.css';
 import '../chessground-cburnett.css';
 
-console.log("[GamePage] Component initialized");
 
 const GamePage = ({ selectedBot, onBotChange, botNames }) => {
-  console.log(`[GamePage] Rendering with bot: ${selectedBot}`);
   const gameRef = useRef(new Chess());
   const [boardOrientation] = useState('white');
   const boardRef = useRef(null);
@@ -44,22 +42,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     }
   }, [boardOrientation, getDests]);
 
-  // Logging and board init
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const dests = getDests();
-      console.log('Current destination squares (dests):', Object.fromEntries(dests));
-      console.log('Board state (fen):', gameRef.current.fen());
-      console.log('Board position:');
-      console.group();
-      console.log(gameRef.current.ascii());
-      console.groupEnd();
-    }, 5000);
-
-    updateBoard();
-
-    return () => clearInterval(intervalId);
-  }, [boardOrientation, getDests, updateBoard]);
+  updateBoard();
 
   // Chessground init
   useEffect(() => {
@@ -150,7 +133,6 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
   // Reset board
   const resetBoard = useCallback(() => {
-    console.log("[GamePage] Resetting board to start position");
     gameRef.current = new Chess();
     updateBoard();
   }, [updateBoard]);

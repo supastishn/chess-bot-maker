@@ -4,7 +4,6 @@
  * - Example: (game) => { from: 'e2', to: 'e4' } or (game) => 'e2e4'
  */
 
-console.log("[BotInterface] Initializing bot interface");
 
 import StockfishEngine from './stockfishEngine';
 
