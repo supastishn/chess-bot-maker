@@ -1,15 +1,13 @@
 import React from 'react';
+import BotSelector from './BotSelector';
 
 const BotSelectorPanel = ({ selectedBot, onBotChange, botNames }) => (
   <div className="bot-panel glass-card">
-    <div className="bot-selector">
-      <label>Active Bot:</label>
-      <select value={selectedBot} onChange={(e) => onBotChange(e.target.value)}>
-        {botNames.map(name => (
-          <option key={name} value={name}>{name}</option>
-        ))}
-      </select>
-    </div>
+    <BotSelector 
+      selectedBot={selectedBot} 
+      onChange={onBotChange} 
+      bots={botNames}
+    />
   </div>
 );
 

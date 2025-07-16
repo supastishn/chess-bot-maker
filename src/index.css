@@ -229,3 +229,24 @@ a:focus-visible {
 .active-piece {
   border: 3px solid #00ff00 !important;
 }
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.glass-card {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s ease;
+}
+
+.page-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  min-height: calc(100vh - 70px);
+}

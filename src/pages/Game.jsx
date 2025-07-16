@@ -100,45 +100,27 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     handleMove({ from, to, promotion: 'q' });
   }, []);
 
-  const handleMove = useCallback(async (move) => {
-    const currentTurn = gameRef.current.turn();
-    const isHumanTurn = (boardOrientation === 'white' && currentTurn === 'w') ||
-                        (boardOrientation === 'black' && currentTurn === 'b');
-    if (!isHumanTurn) return false;
-
-    console.log(`[GamePage] Handling move: ${move.from}->${move.to}`);
-    console.group("Pre-move game state");
-    console.log("FEN:", gameRef.current.fen());
-    console.log("Turn:", currentTurn);
-    console.log("Status:", gameRef.current.game_over ? gameRef.current.game_over() : "unknown");
-    console.groupEnd();
-
-    const moveResult = makeMove({ from: move.from, to: move.to, promotion: move.promotion || 'q' });
-
-    if (moveResult) {
-      setTimeout(async () => {
+  const handleMove = useCallback((from, to) => {
+    try {
+      const result = gameRef.current.move({ from, to, promotion: 'q' });
+      if (result) {
+        updateBoard();
         if (!gameRef.current.isGameOver()) {
-          console.log(`[GamePage] Calling bot: ${selectedBot}`);
-          const movePromise = getBot(selectedBot)(gameRef.current);
-          const botMove = movePromise instanceof Promise ? await movePromise : movePromise;
-          console.log(`[GamePage] Bot responded with move: ${JSON.stringify(botMove)}`);
-          if (botMove) {
-            if (typeof botMove === 'string') {
-              makeMove({
-                from: botMove.slice(0, 2),
-                to: botMove.slice(2, 4),
-                promotion: botMove[4] || 'q'
-              });
-            } else {
-              makeMove(botMove);
+          setTimeout(() => {
+            const botMove = getBot(selectedBot)(gameRef.current);
+            if (botMove) {
+              gameRef.current.move(botMove);
+              updateBoard();
             }
-          }
+          }, 200);
         }
-      }, 200);
+        return result;
+      }
+    } catch (e) {
+      console.error('Invalid move', { from, to }, e);
     }
-
-    return !!moveResult;
-  }, [boardOrientation, selectedBot]);
+    return null;
+  }, [selectedBot, updateBoard]);
 
   const makeMove = useCallback((move) => {
     console.group(`Move Debug: ${move.from} to ${move.to}`);

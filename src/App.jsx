@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
-import { getBotNames, registerBot } from './bot/botInterface';
 import Navbar from './components/Navbar';
 import GamePage from './pages/Game';
 import CreateBotPage from './pages/CreateBot';
@@ -11,23 +10,11 @@ import APIReference from './pages/docs/APIReference';
 import Examples from './pages/docs/Examples';
 import BlocklyGuide from './pages/docs/BlocklyGuide';
 import VisualBotBuilder from './pages/VisualBotBuilder';
+import { useBotRegistry } from './hooks/useBotRegistry';
 
 function App() {
   const [selectedBot, setSelectedBot] = useState('material-bot');
-  const [botNames, setBotNames] = useState(getBotNames());
-
-  const handleRegisterBot = (name, code) => {
-    if (!name || !code) return alert('Please provide bot name and code');
-    try {
-      registerBot(name, new Function('gameClient', `return ${code};`)());
-      setBotNames(getBotNames());
-      setSelectedBot(name);
-      return true;
-    } catch (e) {
-      alert(`Bot Error: ${e.message}`);
-      return false;
-    }
-  };
+  const { botNames, registerBot } = useBotRegistry();
 
   return (
     <div className="app-container">
@@ -46,11 +33,11 @@ function App() {
           />
           <Route 
             path="/create-bot" 
-            element={<CreateBotPage onRegisterBot={handleRegisterBot} />} 
+            element={<CreateBotPage onRegisterBot={registerBot} />} 
           />
           <Route
             path="/visual-bot-builder"
-            element={<VisualBotBuilder onRegisterBot={handleRegisterBot} />}
+            element={<VisualBotBuilder onRegisterBot={registerBot} />}
           />
           <Route path="/docs" element={<DocLayout />}>
             <Route index element={<Introduction />} />
