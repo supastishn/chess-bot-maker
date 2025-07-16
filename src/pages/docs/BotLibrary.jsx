@@ -2,7 +2,8 @@ import React from 'react';
 import { getBotNames, getBotSource } from '../../bot/botInterface';
 
 const BotLibrary = () => {
-  const botNames = getBotNames().filter(name => !name.startsWith('__temp') && !name.endsWith('-bot'));
+  // Remove the filter condition for names ending with '-bot'
+  const botNames = getBotNames().filter(name => !name.startsWith('__temp'));
   const [selectedBot, setSelectedBot] = React.useState(botNames[0]);
 
   return (
