@@ -1,6 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { HashRouter } from 'react-router-dom';
 import GamePage from '../../src/pages/Game';
 import { Chess } from 'chess.js';
 
@@ -32,7 +33,11 @@ describe('GamePage', () => {
   });
 
   test('renders chess board and controls', () => {
-    render(<GamePage selectedBot="random-bot" botNames={[]} />);
+    render(
+      <HashRouter>
+        <GamePage selectedBot="random-bot" botNames={[]} />
+      </HashRouter>
+    );
     
     expect(screen.getByText('Chess vs Computer')).toBeInTheDocument();
     expect(screen.getByText(/Current turn/i)).toBeInTheDocument();
@@ -51,7 +56,11 @@ describe('GamePage', () => {
       isGameOver: vi.fn().mockReturnValue(true),
     }));
 
-    render(<GamePage selectedBot="random-bot" botNames={[]} />);
+    render(
+      <HashRouter>
+        <GamePage selectedBot="random-bot" botNames={[]} />
+      </HashRouter>
+    );
     expect(screen.getByText('White wins by Checkmate')).toBeInTheDocument();
   });
 });

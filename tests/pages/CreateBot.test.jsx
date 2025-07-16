@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import CreateBot from '../../src/pages/CreateBot';
 import useBotTester from '../../src/hooks/useBotTester.js';
 
@@ -19,9 +19,9 @@ describe('CreateBot', () => {
   
   test('renders bot creation form', () => {
     render(
-      <BrowserRouter>
+      <HashRouter>
         <CreateBot onRegisterBot={mockRegister} />
-      </BrowserRouter>
+      </HashRouter>
     );
     
     expect(screen.getByLabelText(/Bot Name/i)).toBeInTheDocument();

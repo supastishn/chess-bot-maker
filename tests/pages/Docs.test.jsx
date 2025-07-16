@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import DocLayout from '../../src/pages/Docs';
 
-const Wrapper = ({ children }) => <BrowserRouter>{children}</BrowserRouter>;
+const Wrapper = ({ children }) => <HashRouter>{children}</HashRouter>;
 
 describe('DocLayout', () => {
   test('renders documentation sidebar', () => {

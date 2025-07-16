@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 import eruda from 'eruda'
 import './index.css'
 import App from './App.jsx'
@@ -25,12 +25,12 @@ if (import.meta.env.DEV) {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter basename="/chess-bot-maker">
+    <HashRouter>
       <ErrorBoundary>
         <ThemeProvider>
           <App />
         </ThemeProvider>
       </ErrorBoundary>
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>
 )
