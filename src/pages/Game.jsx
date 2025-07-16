@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { Chess } from 'chess.js';
 import { getBot } from '../bot/botInterface';
 import InfoPanel from '../components/InfoPanel';
 import BotSelectorPanel from '../components/BotSelectorPanel';
 import { Chessground } from 'chessground';
+import { toDests } from './util';
 import '../chessground-base.css';
 import '../chessground-brown.css';
 import '../chessground-cburnett.css';
@@ -13,57 +14,48 @@ console.log("[GamePage] Component initialized");
 const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   console.log(`[GamePage] Rendering with bot: ${selectedBot}`);
   const gameRef = useRef(new Chess());
-  const [fen, setFen] = useState(gameRef.current.fen());
   const [boardOrientation] = useState('white');
   const boardRef = useRef(null);
   const cgRef = useRef(null);
-  const destsRef = useRef(null);
 
-  const getDests = () => {
-    const dests = new Map();
-    gameRef.current.moves({ verbose: true }).forEach(m => {
-      const targets = dests.get(m.from) || [];
-      targets.push(m.to);
-      dests.set(m.from, targets);
-    });
-    destsRef.current = dests; // Store dests in ref
-    return dests;
-  };
+  const getDests = useCallback(() => {
+    return toDests(gameRef.current);
+  }, []);
 
-  // Update chessground board when FEN changes
-  useEffect(() => {
-    // Setup interval for logging dests
-    const intervalId = setInterval(() => {
-      if (destsRef.current) {
-        console.log('Current destination squares (dests):',
-          Object.fromEntries(destsRef.current));
-        console.log('Board state (fen):', gameRef.current.fen());
-        console.log('Board position:');
-        console.group();
-        console.log(gameRef.current.ascii());
-        console.groupEnd();
-      }
-    }, 5000);
-
+  const updateBoard = useCallback(() => {
     if (cgRef.current) {
+      const turnColor = gameRef.current.turn() === 'w' ? 'white' : 'black';
       cgRef.current.set({
-        fen,
-        orientation: boardOrientation,
-        turnColor: gameRef.current.turn() === 'w' ? 'white' : 'black',
+        fen: gameRef.current.fen(),
+        turnColor,
         movable: {
           color: boardOrientation,
           dests: getDests(),
           free: false,
-          events: {
-            after: onBoardMove
-          }
+          events: { after: onBoardMove }
         }
       });
     }
+  }, [boardOrientation, getDests]);
+
+  useEffect(() => {
+    // Setup interval for logging dests
+    const intervalId = setInterval(() => {
+      const dests = getDests();
+      console.log('Current destination squares (dests):', Object.fromEntries(dests));
+      console.log('Board state (fen):', gameRef.current.fen());
+      console.log('Board position:');
+      console.group();
+      console.log(gameRef.current.ascii());
+      console.groupEnd();
+    }, 5000);
+
+    // Initialize board
+    updateBoard();
 
     // Cleanup interval on unmount
     return () => clearInterval(intervalId);
-  }, [fen, boardOrientation]);
+  }, [boardOrientation, getDests, updateBoard]);
 
   // Initialize chessground
   useEffect(() => {
@@ -73,15 +65,14 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
           throw new TypeError('Chessground is not a function!');
         }
         cgRef.current = Chessground(boardRef.current, {
-          fen: fen,
+          fen: gameRef.current.fen(),
           orientation: boardOrientation,
           turnColor: gameRef.current.turn() === 'w' ? 'white' : 'black',
           movable: {
             color: boardOrientation,
+            dests: getDests(),
             free: false,
-            events: {
-              after: onBoardMove
-            }
+            events: { after: onBoardMove }
           },
           animation: {
             enabled: true,
@@ -102,13 +93,14 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       }
       cgRef.current = null;
     };
+    // eslint-disable-next-line
   }, []);
 
-  const onBoardMove = (from, to) => {
+  const onBoardMove = useCallback((from, to) => {
     handleMove({ from, to, promotion: 'q' });
-  };
+  }, []);
 
-  const handleMove = async (move) => {
+  const handleMove = useCallback(async (move) => {
     const currentTurn = gameRef.current.turn();
     const isHumanTurn = (boardOrientation === 'white' && currentTurn === 'w') ||
                         (boardOrientation === 'black' && currentTurn === 'b');
@@ -118,7 +110,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     console.group("Pre-move game state");
     console.log("FEN:", gameRef.current.fen());
     console.log("Turn:", currentTurn);
-    console.log("Status:", gameRef.current.game_over() ? "game over" : "active");
+    console.log("Status:", gameRef.current.game_over ? gameRef.current.game_over() : "unknown");
     console.groupEnd();
 
     const moveResult = makeMove({ from: move.from, to: move.to, promotion: move.promotion || 'q' });
@@ -146,9 +138,9 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     }
 
     return !!moveResult;
-  };
+  }, [boardOrientation, selectedBot]);
 
-  const makeMove = (move) => {
+  const makeMove = useCallback((move) => {
     console.group(`Move Debug: ${move.from} to ${move.to}`);
     console.log('Move attempt:', move);
     console.log('Game FEN before move:', gameRef.current.fen());
@@ -179,7 +171,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       if (result) {
         console.log('Move successful:', result.san);
         console.log('New FEN:', gameRef.current.fen());
-        setFen(gameRef.current.fen());
+        updateBoard();
         return result;
       } else {
         console.warn('Move returned null result');
@@ -196,13 +188,13 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       });
       return null;
     }
-  };
+  }, [updateBoard]);
 
-  const resetBoard = () => {
+  const resetBoard = useCallback(() => {
     console.log("[GamePage] Resetting board to start position");
     gameRef.current = new Chess();
-    setFen(gameRef.current.fen());
-  };
+    updateBoard();
+  }, [updateBoard]);
 
   const turn = gameRef.current.turn() === 'w' ? 'white' : 'black';
   const status = {
