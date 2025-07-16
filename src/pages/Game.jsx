@@ -17,6 +17,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const [boardOrientation] = useState('white');
   const boardRef = useRef(null);
   const cgRef = useRef(null);
+  const destsRef = useRef(null);
 
   const getDests = () => {
     const dests = new Map();
@@ -25,11 +26,20 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       targets.push(m.to);
       dests.set(m.from, targets);
     });
+    destsRef.current = dests; // Store dests in ref
     return dests;
   };
 
   // Update chessground board when FEN changes
   useEffect(() => {
+    // Setup interval for logging dests
+    const intervalId = setInterval(() => {
+      if (destsRef.current) {
+        console.log('Current destination squares (dests):',
+          Object.fromEntries(destsRef.current));
+      }
+    }, 5000);
+
     if (cgRef.current) {
       cgRef.current.set({
         fen,
@@ -45,6 +55,9 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
         }
       });
     }
+
+    // Cleanup interval on unmount
+    return () => clearInterval(intervalId);
   }, [fen, boardOrientation]);
 
   // Initialize chessground
