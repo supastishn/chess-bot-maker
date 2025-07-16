@@ -17,16 +17,11 @@ function App() {
   const [botNames, setBotNames] = useState(getBotNames());
 
   const handleRegisterBot = (name, code) => {
-    if (!name || !code) {
-      alert('Please provide a name and code for the bot.');
-      return false;
-    }
+    if (!name || !code) return alert('Please provide bot name and code');
     try {
-      // Using new Function() can be a security risk in production environments
-      const botFunc = new Function('gameClient', `return (${code});`)();
-      registerBot(name, botFunc);
-      setBotNames(getBotNames()); // Refresh bot names
-      setSelectedBot(name); // Select the newly registered bot
+      registerBot(name, new Function('gameClient', `return ${code};`)());
+      setBotNames(getBotNames());
+      setSelectedBot(name);
       return true;
     } catch (e) {
       alert(`Bot Error: ${e.message}`);
