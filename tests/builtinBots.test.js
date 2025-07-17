@@ -63,7 +63,10 @@ describe('Built-in Bots', () => {
       mockGame.getTurn.mockReturnValue('w'); // Bot is white, opponent is black
       mockGame.getAvailableMoves.mockReturnValue(['a2a3', 'b2b3', 'c2c3']);
       // Mock 'b2b3' as a move to an attacked square
-      mockGame.isAttacked.mockImplementation((square, byColor) => square === 'b3' && byColor === 'b');
+      mockGame.isAttacked
+        .mockReturnValueOnce(false) // for a2a3 -> a3
+        .mockReturnValueOnce(true)  // for b2b3 -> b3
+        .mockReturnValueOnce(false); // for c2c3 -> c3
 
       const safeMoves = ['a2a3', 'c2c3'];
       // Math.floor(2 * 0.5) = 1 -> should pick the second safe move
