@@ -5,6 +5,8 @@ import GamePage from '../../src/pages/Game';
 import { Chess } from 'chess.js';
 import '@testing-library/jest-dom';
 
+vi.mock('chess.js');
+
 vi.mock('chessground', () => ({
   Chessground: vi.fn(() => ({
     set: vi.fn(),
@@ -23,17 +25,17 @@ window.ResizeObserver = ResizeObserver;
 
 describe('GamePage', () => {
   beforeEach(() => {
-    vi.mocked(Chess).mockImplementation(() => ({
+    Chess.mockImplementation(() => ({
       turn: vi.fn().mockReturnValue('w'),
       fen: vi.fn().mockReturnValue('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'),
-      isCheckmate: vi.fn(),
-      isStalemate: vi.fn(),
-      isThreefoldRepetition: vi.fn(),
+      isCheckmate: vi.fn().mockReturnValue(false),
+      isStalemate: vi.fn().mockReturnValue(false),
+      isThreefoldRepetition: vi.fn().mockReturnValue(false),
       move: vi.fn(),
       board: vi.fn(),
       history: vi.fn(() => []),
-      inCheck: vi.fn(),
-      isGameOver: vi.fn(),
+      inCheck: vi.fn().mockReturnValue(false),
+      isGameOver: vi.fn().mockReturnValue(false),
       moves: vi.fn(() => [
         { from: 'e2', to: 'e4' },
         { from: 'g1', to: 'f3' }
@@ -55,11 +57,15 @@ describe('GamePage', () => {
   });
 
   test('updates status on checkmate', async () => {
-    vi.mocked(Chess).mockImplementation(() => ({
-      ...Chess.prototype,
+    Chess.mockImplementation(() => ({
       turn: vi.fn().mockReturnValue('b'),
+      fen: vi.fn().mockReturnValue('r1bqkbnr/pppp1Qpp/2n5/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 3'),
       isCheckmate: vi.fn().mockReturnValue(true),
-      fen: vi.fn().mockReturnValue('r1bqkbnr/pppp1Qpp/2n5/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 3')
+      isStalemate: vi.fn().mockReturnValue(false),
+      isThreefoldRepetition: vi.fn().mockReturnValue(false),
+      isGameOver: vi.fn().mockReturnValue(true),
+      move: vi.fn(),
+      history: vi.fn(() => [])
     }));
     
     render(
