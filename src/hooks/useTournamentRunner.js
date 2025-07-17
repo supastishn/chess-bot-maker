@@ -14,7 +14,7 @@ const useTournamentRunner = () => {
         return data;
       }
     } catch (e) { console.error("Failed to load tournament data:", e); }
-    return { standings: [], matches: [], currentMatch: null, status: 'idle' };
+    return { standings: [], matches: [], completedMatches: [], currentMatch: null, status: 'idle' };
   });
 
   const { standings, matches, currentMatch, status } = tournamentState;
@@ -84,7 +84,7 @@ const useTournamentRunner = () => {
       // Otherwise, it's a draw (stalemate, repetition, etc.), so winner remains null.
 
       const result = winner || 'draw';
-      resolve({ result, winner });
+      resolve({ result, winner, moves: game.history().length });
     });
   };
 
@@ -123,7 +123,7 @@ const useTournamentRunner = () => {
       for (const match of newMatches) {
         if (!isRunningRef.current) break;
         setTournamentState(s => ({ ...s, currentMatch: match }));
-        const { winner } = await runGame(match.white, match.black);
+        const { winner, moves } = await runGame(match.white, match.black);
 
         setTournamentState(prevState => {
           const newStandings = [...prevState.standings];
@@ -144,7 +144,23 @@ const useTournamentRunner = () => {
             newStandings[whiteIndex].p += 0.5;
             newStandings[blackIndex].p += 0.5;
           }
-          return { ...prevState, standings: newStandings };
+
+          let winnerName = null;
+          if (winner === 'white') winnerName = match.white;
+          else if (winner === 'black') winnerName = match.black;
+
+          const completedMatch = {
+            white: match.white,
+            black: match.black,
+            result: winnerName || 'Draw',
+            moves
+          };
+
+          return {
+            ...prevState,
+            standings: newStandings,
+            completedMatches: [...prevState.completedMatches, completedMatch]
+          };
         });
         // Yield to UI thread after each match
         await new Promise(res => setTimeout(res, 0));
@@ -163,10 +179,10 @@ const useTournamentRunner = () => {
   };
 
   const clearTournament = () => {
-    setTournamentState({ standings: [], matches: [], currentMatch: null, status: 'idle' });
+    setTournamentState({ standings: [], matches: [], completedMatches: [], currentMatch: null, status: 'idle' });
   };
 
-  return { standings, status, currentMatch, currentGameState, startTournament, stopTournament, clearTournament };
+  return { standings, status, currentMatch, currentGameState, startTournament, stopTournament, clearTournament, completedMatches: tournamentState.completedMatches };
 };
 
 export default useTournamentRunner;

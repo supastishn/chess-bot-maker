@@ -200,11 +200,6 @@ game.prioritizeStrategy({
             <pre>game.setContempt(24); // More aggressive play</pre>
           </div>
           <div className="method-item">
-            <h3><code>await getPositionEvaluation(fen): object</code></h3>
-            <p>Asynchronously gets a detailed evaluation from Stockfish.</p>
-            <pre>const eval = await game.getPositionEvaluation();</pre>
-          </div>
-          <div className="method-item">
             <h3><code>await benchmark(depth: number): object</code></h3>
             <p>Runs engine performance diagnostics at specified depth.</p>
             <pre>const stats = await game.benchmark(16);</pre>

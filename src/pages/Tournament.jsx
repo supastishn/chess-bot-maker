@@ -3,11 +3,12 @@ import { Trophy } from 'lucide-react';
 import useTournamentRunner from '../hooks/useTournamentRunner';
 import StandingsTable from '../components/StandingsTable';
 import MatchVisualizer from '../components/MatchVisualizer';
+import MatchHistory from '../components/MatchHistory';
 import './Tournament.css';
 
 const TournamentPage = ({ botNames }) => {
   const [selectedBots, setSelectedBots] = useState(new Set());
-  const { standings, status, currentGameState, startTournament, stopTournament, clearTournament } = useTournamentRunner();
+  const { standings, status, currentGameState, startTournament, stopTournament, clearTournament, completedMatches } = useTournamentRunner();
   
   const handleBotSelection = (botName) => {
     setSelectedBots(prev => {
@@ -57,6 +58,7 @@ const TournamentPage = ({ botNames }) => {
           <div className="tournament-running">
             <div className="standings-container">
               <StandingsTable standings={standings} />
+              <MatchHistory matches={completedMatches} />
               <div className="tournament-controls">
                 {isRunning ? (
                   <button className="btn reset-button" onClick={stopTournament}>Stop Tournament</button>
