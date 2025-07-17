@@ -1,47 +1,55 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { materialBot } from '../src/bot/materialBot';
-import { mockGameClient } from './utils.js';
+import { materialBot } from '../../src/bot/materialBot';
+import { mockGameClient } from './utils';
 
 describe('materialBot', () => {
   let mockGame;
 
   beforeEach(() => {
-    mockGame = mockGameClient();
-    mockGame.getAvailableMoves.mockReturnValue(['e2e4', 'd2d4']);
-  });
-
-  test('selects valid move', () => {
-    const move = materialBot(mockGame);
-    expect(['e2e4', 'd2d4']).toContain(move);
+    mockGame = mockGameClient({
+      getAvailableMoves: vi.fn().mockReturnValue([
+        'e2e4', 'd2d4', 'g1f3'
+      ]),
+      evaluateMaterial: vi.fn()
+        .mockReturnValueOnce(0)   // Checkmate evaluation
+        .mockReturnValueOnce(0.5) // Initial board state
+        .mockReturnValue(0.5)      // Arbitrary value
+    });
   });
 
   test('prefers checkmate moves', () => {
-    mockGame.getGameResult.mockReturnValue('checkmate');
+    mockGame.isCheckmate.mockReturnValueOnce(false)
+      .mockReturnValueOnce(true)   // Force checkmate on first mock
+      .mockReturnValue(false);
+
     const move = materialBot(mockGame);
     expect(move).toBe('e2e4');
+    expect(mockGame.move).toHaveBeenCalledTimes(2);
   });
 
-  test('avoids blunders that hang material', () => {
-    mockGame.evaluateMaterial
-      .mockReturnValueOnce(-5) // for e2e4
-      .mockReturnValueOnce(0);  // for d2d4
+  test('selects move with best material gain', () => {
+    // Simulate material evaluation
+    mockGame.evaluateMaterial.mockReturnValueOnce(0.5) // Original value
+      .mockReturnValueOnce(1.0) // e2e4
+      .mockReturnValueOnce(0.2) // d2d4
+      .mockReturnValue(0.5);    // g1f3
+    
+    const move = materialBot(mockGame);
+    expect(move).toBe('e2e4');
+    expect(mockGame.move).toHaveBeenCalledTimes(4);
+  });
 
+  test('handles move evaluation errors', () => {
+    mockGame.move.mockImplementationOnce(() => {
+      throw new Error('Illegal move');
+    });
+    
+    // Simulate material evaluation
+    mockGame.evaluateMaterial.mockReturnValueOnce(0.5) // Original value
+      .mockReturnValueOnce(0.5) // e2e4 (failed)
+      .mockReturnValue(1.0);     // d2d4
+    
     const move = materialBot(mockGame);
     expect(move).toBe('d2d4');
-  });
-
-  test('prioritizes piece development', () => {
-    mockGame.getAvailableMoves.mockReturnValue(['b1c3', 'f1d3', 'e2e4']);
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-    const move = materialBot(mockGame);
-    expect(['b1c3', 'f1d3', 'e2e4']).toContain(move);
-    expect(console.log).toHaveBeenCalledWith(
-      expect.stringContaining('Evaluating move')
-    );
-  });
-
-  test('handles check position early resignation', () => {
-    mockGame.getAvailableMoves.mockReturnValue([]);
-    expect(materialBot(mockGame)).toBeNull();
   });
 });

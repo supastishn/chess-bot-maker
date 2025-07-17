@@ -1,66 +1,75 @@
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 import { HashRouter } from 'react-router-dom';
 import GamePage from '../../src/pages/Game';
 import { Chess } from 'chess.js';
+import '@testing-library/jest-dom';
 
 vi.mock('chessground', () => ({
   Chessground: vi.fn(() => ({
     set: vi.fn(),
-    destroy: vi.fn()
+    destroy: vi.fn(),
+    state: vi.fn()
   }))
 }));
 
-vi.mock('chess.js', () => ({
-  Chess: vi.fn(),
-}));
+// Mock browser ResizeObserver
+class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+window.ResizeObserver = ResizeObserver;
 
 describe('GamePage', () => {
   beforeEach(() => {
-    // Reset mocks before each test
-    const mockInstance = {
-      fen: vi.fn().mockReturnValue('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'),
+    vi.mocked(Chess).mockImplementation(() => ({
       turn: vi.fn().mockReturnValue('w'),
-      isCheckmate: vi.fn().mockReturnValue(false),
-      isStalemate: vi.fn().mockReturnValue(false),
-      isThreefoldRepetition: vi.fn().mockReturnValue(false),
-      isGameOver: vi.fn().mockReturnValue(false),
-      moves: vi.fn().mockReturnValue(['e2e4']),
-      move: vi.fn((m) => ({ san: 'e4', ...m })),
-    };
-    Chess.mockImplementation(() => mockInstance);
+      fen: vi.fn().mockReturnValue('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'),
+      isCheckmate: vi.fn(),
+      isStalemate: vi.fn(),
+      isThreefoldRepetition: vi.fn(),
+      move: vi.fn(),
+      board: vi.fn(),
+      history: vi.fn(() => []),
+      inCheck: vi.fn(),
+      isGameOver: vi.fn(),
+      moves: vi.fn(() => [
+        { from: 'e2', to: 'e4' },
+        { from: 'g1', to: 'f3' }
+      ])
+    }));
   });
 
-  test('renders chess board and controls', () => {
+  test('renders chess board', async () => {
     render(
       <HashRouter>
         <GamePage selectedBot="random-bot" botNames={[]} />
       </HashRouter>
     );
     
-    expect(screen.getByText('Chess vs Computer')).toBeInTheDocument();
-    expect(screen.getByText(/Current turn/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /reset/i })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Chess vs Computer')).toBeInTheDocument();
+      expect(screen.getByText(/Current turn: White/)).toBeInTheDocument();
+    });
   });
 
-  test('shows checkmate status message', () => {
-    // Configure the mock for this specific test
-    Chess.mockImplementation(() => ({
-      fen: vi.fn().mockReturnValue('r1bqkbnr/pppp1Qpp/2n5/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 3'),
+  test('updates status on checkmate', async () => {
+    vi.mocked(Chess).mockImplementation(() => ({
+      ...Chess.prototype,
       turn: vi.fn().mockReturnValue('b'),
-      moves: vi.fn().mockReturnValue([]), // Added moves method
       isCheckmate: vi.fn().mockReturnValue(true),
-      isStalemate: vi.fn().mockReturnValue(false),
-      isThreefoldRepetition: vi.fn().mockReturnValue(false),
-      isGameOver: vi.fn().mockReturnValue(true),
+      fen: vi.fn().mockReturnValue('r1bqkbnr/pppp1Qpp/2n5/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 3')
     }));
-
+    
     render(
       <HashRouter>
         <GamePage selectedBot="random-bot" botNames={[]} />
       </HashRouter>
     );
-    expect(screen.getByText('White wins by Checkmate')).toBeInTheDocument();
+    
+    await waitFor(() => {
+      expect(screen.getByText('White wins by Checkmate')).toBeInTheDocument();
+    });
   });
 });

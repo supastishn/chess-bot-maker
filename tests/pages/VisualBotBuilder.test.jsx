@@ -3,11 +3,14 @@ import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import VisualBotBuilder from '../../src/pages/VisualBotBuilder';
 
+// Mock Blockly execution
+const mockBlocklyInstance = {
+  workspaceToCode: vi.fn(() => `console.log("Generated code")`)
+};
+
 vi.mock('../../src/components/BlocklyComponent', () => ({
   default: React.forwardRef((props, ref) => {
-    React.useImperativeHandle(ref, () => ({
-      workspaceToCode: () => 'console.log("mock code");'
-    }));
+    React.useImperativeHandle(ref, () => mockBlocklyInstance);
     return <div data-testid="mock-blockly" />;
   })
 }));
@@ -27,7 +30,10 @@ describe('VisualBotBuilder', () => {
     render(<VisualBotBuilder onRegisterBot={mockRegister} />);
     
     fireEvent.click(screen.getByRole('button', { name: /Generate Code/i }));
-    expect(await screen.findByDisplayValue(/mock code/i)).toBeInTheDocument();
+    expect(await screen.findByDisplayValue(/Generated code/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Register Bot/i })).toBeInTheDocument();
+    
+    fireEvent.click(screen.getByRole('button', { name: /Edit Code/i }));
+    expect(screen.getByTestId('mock-blockly')).toBeInTheDocument();
   });
 });
