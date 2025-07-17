@@ -227,6 +227,13 @@ const createBotHelper = (gameClient) => {
   };
 
   // --- Advanced Stockfish API methods ---
+  helper.getPositionEvaluation = (fen = gameClient.fen()) => {
+    if (!gameClient.stockfish?.engine) {
+      return Promise.reject("Stockfish engine not initialized");
+    }
+    return gameClient.stockfish.getEvaluation(fen);
+  };
+
   helper.setSkillLevel = (level) => {
     if (gameClient.stockfish?.engine) {
       gameClient.stockfish.setOption("Skill Level", level);
