@@ -23,7 +23,7 @@ const APIReference = () => {
       </div>
       
       <div className="docs-card glass-card">
-        <h2><Library size={20} /> Game State & Queries</h2>
+        <h2><Library size={20} /> Game State &amp; Queries</h2>
         <div className="method-list">
           <div className="method-item">
             <h3><code>getAvailableMoves(): string[]</code></h3>
