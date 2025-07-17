@@ -200,9 +200,15 @@ game.prioritizeStrategy({
             <pre>game.setContempt(24); // More aggressive play</pre>
           </div>
           <div className="method-item">
-            <h3><code>await analyzeGame(pgn: string): object</code></h3>
-            <p>Provides detailed move-by-move analysis of complete PGN games.</p>
-            <pre>{`const analysis = await game.analyzeGame('[Event \"Tournament Game\"] ...');`}</pre>
+            <h3><code>await analyzePosition(): object</code></h3>
+            <p>Asynchronously analyzes the current position using Stockfish.</p>
+            <pre>const analysis = await game.analyzePosition();</pre>
+            <p>Returns an object with:</p>
+            <ul>
+              <li><strong>scoreValue</strong>: Numerical evaluation of the position</li>
+              <li><strong>scoreType</strong>: 'cp' (centipawns) or 'mate' (checkmate moves)</li>
+              <li><strong>bestMove</strong>: Recommended move in UCI format</li>
+            </ul>
           </div>
           <div className="method-item">
             <h3><code>await benchmark(depth: number): object</code></h3>

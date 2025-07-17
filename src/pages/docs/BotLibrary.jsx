@@ -15,6 +15,10 @@ const BotLibrary = () => {
     <div className="docs-section">
       <h1 className="page-title">🤖 Bot Library</h1>
       <div className="docs-card glass-card">
+        <div className="alert-note">
+          <strong>Recent change:</strong> analyzeGame() has been renamed to analyzePosition() 
+          and now only analyzes the current board position.
+        </div>
         <div className="bot-selector">
           <label>Select Bot:</label>
           <select

@@ -252,11 +252,9 @@ const createBotHelper = (gameClient) => {
     return gameClient.stockfish.getEvaluation(fen);
   };
 
-  helper.analyzeGame = (pgn) => {
-    if (!gameClient.stockfish?.engine) {
-      return Promise.reject("Stockfish engine not initialized");
-    }
-    return gameClient.stockfish.analyzeGame(pgn);
+  // New: analyzePosition analyzes only the current position
+  helper.analyzePosition = () => {
+    return gameClient.stockfish.getPositionEvaluation(gameClient.getFEN());
   };
 
   helper.benchmark = (depth = 16) => {
