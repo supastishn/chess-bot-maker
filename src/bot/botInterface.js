@@ -304,10 +304,11 @@ export const registerBot = (name, botFunction, source) => {
   );
 };
 
-registerBot('stockfish-bot', async (game) => {
+const stockfishBotFn = async (game) => {
   const fen = game.getFEN ? game.getFEN() : game.fen();
   return game.stockfish.getBestMove(fen);
-});
+};
+registerBot('stockfish-bot', stockfishBotFn, stockfishBotFn.toString());
 
 export const getBot = (name) => {
   const bot = registeredBots.get(name);
@@ -319,8 +320,7 @@ export const getBotNames = () => Array.from(registeredBots.keys());
  // Register built-in bots
 import { materialBot } from './materialBot';
 
-// Define all bots explicitly in a fixed order for the library
-registerBot('guru-bot', (game) => {
+const guruBotFn = (game) => {
   const moves = game.getAvailableMoves();
   if (moves.length === 0) return null;
   
@@ -330,11 +330,12 @@ registerBot('guru-bot', (game) => {
     centerControl: 0.2,
     material: 0.2
   });
-});
+};
+registerBot('guru-bot', guruBotFn, guruBotFn.toString());
 
-registerBot('material-bot', materialBot);
+registerBot('material-bot', materialBot, materialBot.toString());
 
-registerBot('aggressive-bot', (game) => {
+const aggressiveBotFn = (game) => {
   const moves = game.getVerboseMoves();
   if (!moves.length) return null;
 
@@ -357,9 +358,10 @@ registerBot('aggressive-bot', (game) => {
   return randomMove.promotion 
     ? randomMove.from + randomMove.to + randomMove.promotion
     : randomMove.from + randomMove.to;
-});
+};
+registerBot('aggressive-bot', aggressiveBotFn, aggressiveBotFn.toString());
 
-registerBot('defensive-bot', (game) => {
+const defensiveBotFn = (game) => {
   const moves = game.getAvailableMoves();
   if (!moves.length) return null;
 
@@ -375,19 +377,10 @@ registerBot('defensive-bot', (game) => {
   }
 
   return moves[Math.floor(Math.random() * moves.length)];
-});
+};
+registerBot('defensive-bot', defensiveBotFn, defensiveBotFn.toString());
 
-registerBot('toggle-bot', (game) => {
-  const moveCount = game.getMoveCount();
-  const turnNumber = Math.floor(moveCount / 2);
-  const aiMode = turnNumber % 3;
-
-  if (aiMode === 0) return getBot('material-bot')(game);
-  if (aiMode === 1) return getBot('aggressive-bot')(game);
-  return getBot('positional-bot')(game);
-});
-
-registerBot('positional-bot', (game) => {
+const positionalBotFn = (game) => {
   const moves = game.getAvailableMoves();
   let bestScore = -Infinity;
   let bestMove = moves[0];
@@ -400,27 +393,25 @@ registerBot('positional-bot', (game) => {
     }
   }
   return bestMove;
-});
+};
+registerBot('positional-bot', positionalBotFn, positionalBotFn.toString());
 
-registerBot('random-bot', (game) => {
-  const moves = game.getAvailableMoves();
-  return moves.length > 0
-    ? moves[Math.floor(Math.random() * moves.length)]
-    : null;
-});
-
-registerBot('toggle-bot', (game) => {
-  const moveCount = game.getBoardState().length;
-  const aiMode = Math.floor(moveCount / 3) % 3;
+const toggleBotFn = (game) => {
+  const moveCount = game.getMoveCount();
+  const turnNumber = Math.floor(moveCount / 2);
+  const aiMode = turnNumber % 3;
 
   if (aiMode === 0) return getBot('material-bot')(game);
   if (aiMode === 1) return getBot('aggressive-bot')(game);
   return getBot('positional-bot')(game);
-});
+};
+registerBot('toggle-bot', toggleBotFn, toggleBotFn.toString());
 
-registerBot('starter-bot', (game) => {
+const randomBotFn = (game) => {
   const moves = game.getAvailableMoves();
   return moves.length > 0
     ? moves[Math.floor(Math.random() * moves.length)]
     : null;
-});
+};
+registerBot('random-bot', randomBotFn, randomBotFn.toString());
+registerBot('starter-bot', randomBotFn, randomBotFn.toString());
