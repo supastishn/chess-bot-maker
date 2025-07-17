@@ -225,55 +225,38 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
         {/* Combined panel for controls */}
         <div className="bot-panel glass-card">
           {/* Game Mode Selector */}
-          <div className="game-mode-selector" style={{ paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-              <label>
-                <input
-                  type="radio"
-                  value="bot-human"
-                  checked={gameMode === 'bot-human'}
-                  onChange={() => setGameMode('bot-human')}
-                />
-                Bot vs Human
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  value="bot-bot"
-                  checked={gameMode === 'bot-bot'}
-                  onChange={() => setGameMode('bot-bot')}
-                />
-                Bot vs Bot
-              </label>
-            </div>
+          <div className="toggle-group">
+            <button
+              className={`toggle-btn ${gameMode === 'bot-human' ? 'active' : ''}`}
+              onClick={() => setGameMode('bot-human')}
+            >
+              <span>Bot vs Human</span>
+            </button>
+            <button
+              className={`toggle-btn ${gameMode === 'bot-bot' ? 'active' : ''}`}
+              onClick={() => setGameMode('bot-bot')}
+            >
+              <span>Bot vs Bot</span>
+            </button>
           </div>
-          
+
           {gameMode === 'bot-human' && (
-            <div className="game-mode-selector" style={{ padding: '0.5rem 0' }}>
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <label>Play as:</label>
-                <label>
-                  <input
-                    type="radio"
-                    value="white"
-                    checked={playerColor === 'white'}
-                    onChange={() => setPlayerColor('white')}
-                  />
-                  White
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    value="black"
-                    checked={playerColor === 'black'}
-                    onChange={() => setPlayerColor('black')}
-                  />
-                  Black
-                </label>
-              </div>
+            <div className="toggle-group">
+              <button
+                className={`toggle-btn ${playerColor === 'white' ? 'active' : ''}`}
+                onClick={() => setPlayerColor('white')}
+              >
+                <span>Play as White</span>
+              </button>
+              <button
+                className={`toggle-btn ${playerColor === 'black' ? 'active' : ''}`}
+                onClick={() => setPlayerColor('black')}
+              >
+                <span>Play as Black</span>
+              </button>
             </div>
           )}
-          
+
           {/* Bot Selectors */}
           <div className="bot-selectors-container">
             <BotSelector 
