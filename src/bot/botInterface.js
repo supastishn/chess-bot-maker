@@ -20,29 +20,29 @@ const createBotHelper = (gameClient) => {
   const helper = Object.create(gameClient);
 
   // Game state methods
-  helper.getAvailableMoves = () => {
+  if (gameClient.getAvailableMoves === undefined) helper.getAvailableMoves = () => {
     const verboseMoves = gameClient.moves({ verbose: true });
     return verboseMoves.map(move => move.from + move.to + (move.promotion || ''));
   };
-  helper.getVerboseMoves = () => gameClient.moves({ verbose: true });
-  helper.getTurn = () => gameClient.turn();
-  helper.isCheckmate = () => gameClient.isCheckmate();
-  helper.isStalemate = () => gameClient.isStalemate();
-  helper.isDraw = () => gameClient.isDraw();
-  helper.isGameOver = () => gameClient.isGameOver();
-  helper.getFEN = () => gameClient.fen();
-  helper.undoMove = () => gameClient.undo();
-  helper.move = (m) => gameClient.move(m);
-  helper.isAttacked = (square, byColor) => gameClient.isAttacked(square, byColor);
-  helper.getMoveCount = () => gameClient.history().length;
+  if (gameClient.getVerboseMoves === undefined) helper.getVerboseMoves = () => gameClient.moves({ verbose: true });
+  if (gameClient.getTurn === undefined) helper.getTurn = () => gameClient.turn();
+  if (gameClient.isCheckmate === undefined) helper.isCheckmate = () => gameClient.isCheckmate();
+  if (gameClient.isStalemate === undefined) helper.isStalemate = () => gameClient.isStalemate();
+  if (gameClient.isDraw === undefined) helper.isDraw = () => gameClient.isDraw();
+  if (gameClient.isGameOver === undefined) helper.isGameOver = () => gameClient.isGameOver();
+  if (gameClient.getFEN === undefined) helper.getFEN = () => gameClient.fen();
+  if (gameClient.undoMove === undefined) helper.undoMove = () => gameClient.undo();
+  if (gameClient.move === undefined) helper.move = (m) => gameClient.move(m);
+  if (gameClient.isAttacked === undefined) helper.isAttacked = (square, byColor) => gameClient.isAttacked(square, byColor);
+  if (gameClient.getMoveCount === undefined) helper.getMoveCount = () => gameClient.history().length;
 
   // --- Opening Book helpers ---
-  helper.getBookMoves = () => {
+  if (gameClient.getBookMoves === undefined) helper.getBookMoves = () => {
     const key = getPositionKey(gameClient.fen());
     return openingDB[key] || [];
   };
 
-  helper.playBookMove = () => {
+  if (gameClient.playBookMove === undefined) helper.playBookMove = () => {
     const bookMoves = helper.getBookMoves();
     if (bookMoves.length > 0) {
       return bookMoves[Math.floor(Math.random() * bookMoves.length)];
@@ -52,7 +52,7 @@ const createBotHelper = (gameClient) => {
 
   // --- More advanced helpers ---
   const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 100 };
-  helper.evaluateMaterial = () => {
+  if (gameClient.evaluateMaterial === undefined) helper.evaluateMaterial = () => {
     const board = gameClient.board();
     let score = 0;
     for (const row of board) {
@@ -66,7 +66,7 @@ const createBotHelper = (gameClient) => {
     return score;
   };
 
-  helper.lookAhead = (move, depth) => {
+  if (gameClient.lookAhead === undefined) helper.lookAhead = (move, depth) => {
     // This is a simplified implementation for bot compatibility
     const clientCopy = new Chess(gameClient.fen());
     const moveResult = clientCopy.move(move);
@@ -79,7 +79,7 @@ const createBotHelper = (gameClient) => {
     return { score };
   };
 
-  helper.prioritizeStrategy = (weights) => {
+  if (gameClient.prioritizeStrategy === undefined) helper.prioritizeStrategy = (weights) => {
     const moves = helper.getAvailableMoves();
     if (moves.length === 0) return null;
 
@@ -133,7 +133,7 @@ const createBotHelper = (gameClient) => {
     return bestMoves[Math.floor(Math.random() * bestMoves.length)];
   };
 
-  helper.stockfish = () => ({
+  if (gameClient.stockfish === undefined) helper.stockfish = () => ({
     skillLevel: 20,
     hashSize: 256,
     contempt: 0,
@@ -172,7 +172,7 @@ const createBotHelper = (gameClient) => {
     }
   });
 
-  helper.benchmark = (depth = 16) => {
+  if (gameClient.benchmark === undefined) helper.benchmark = (depth = 16) => {
     if (!gameClient.stockfish?.engine) {
       return Promise.reject("Stockfish engine not initialized");
     }
