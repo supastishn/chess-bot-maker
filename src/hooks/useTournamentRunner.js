@@ -1,14 +1,34 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Chess } from 'chess.js';
 import { getBot } from '../bot/botInterface';
 
+const TOURNAMENT_STORAGE_KEY = 'chess-tournament-last';
+
 const useTournamentRunner = () => {
-  const [standings, setStandings] = useState([]);
-  const [matches, setMatches] = useState([]);
-  const [currentMatch, setCurrentMatch] = useState(null);
-  const [status, setStatus] = useState('idle'); // idle, running, complete
+  const [tournamentState, setTournamentState] = useState(() => {
+    try {
+      const saved = localStorage.getItem(TOURNAMENT_STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.status === 'running') data.status = 'complete';
+        return data;
+      }
+    } catch (e) { console.error("Failed to load tournament data:", e); }
+    return { standings: [], matches: [], currentMatch: null, status: 'idle' };
+  });
+
+  const { standings, matches, currentMatch, status } = tournamentState;
+
   const [currentGameState, setCurrentGameState] = useState({ fen: null, white: null, black: null });
   const isRunningRef = useRef(false);
+
+  useEffect(() => {
+    if (status !== 'idle') {
+      localStorage.setItem(TOURNAMENT_STORAGE_KEY, JSON.stringify(tournamentState));
+    } else {
+      localStorage.removeItem(TOURNAMENT_STORAGE_KEY);
+    }
+  }, [tournamentState, status]);
 
   const runGame = async (whiteBotName, blackBotName) => {
     return new Promise(async (resolve) => {
@@ -74,13 +94,22 @@ const useTournamentRunner = () => {
       return;
     }
     isRunningRef.current = true;
-    setStatus('running');
-    
-    // Initialize standings
-    const initialStandings = botNames.map(name => ({ name, w: 0, l: 0, d: 0, p: 0 }));
-    setStandings(initialStandings);
+    setTournamentState({
+      status: 'running',
+      standings: botNames.map(name => ({ name, w: 0, l: 0, d: 0, p: 0 })),
+      matches: (() => {
+        const arr = [];
+        for (let i = 0; i < botNames.length; i++) {
+          for (let j = i + 1; j < botNames.length; j++) {
+            arr.push({ white: botNames[i], black: botNames[j] });
+            arr.push({ white: botNames[j], black: botNames[i] });
+          }
+        }
+        return arr;
+      })(),
+      currentMatch: null,
+    });
 
-    // Generate round-robin matches
     const newMatches = [];
     for (let i = 0; i < botNames.length; i++) {
       for (let j = i + 1; j < botNames.length; j++) {
@@ -88,17 +117,16 @@ const useTournamentRunner = () => {
         newMatches.push({ white: botNames[j], black: botNames[i] });
       }
     }
-    setMatches(newMatches);
 
     // Asynchronous match runner to avoid UI blocking
     const runMatches = async () => {
       for (const match of newMatches) {
         if (!isRunningRef.current) break;
-        setCurrentMatch(match);
+        setTournamentState(s => ({ ...s, currentMatch: match }));
         const { winner } = await runGame(match.white, match.black);
 
-        setStandings(prevStandings => {
-          const newStandings = [...prevStandings];
+        setTournamentState(prevState => {
+          const newStandings = [...prevState.standings];
           const whiteIndex = newStandings.findIndex(s => s.name === match.white);
           const blackIndex = newStandings.findIndex(s => s.name === match.black);
 
@@ -116,12 +144,12 @@ const useTournamentRunner = () => {
             newStandings[whiteIndex].p += 0.5;
             newStandings[blackIndex].p += 0.5;
           }
-          return newStandings;
+          return { ...prevState, standings: newStandings };
         });
         // Yield to UI thread after each match
         await new Promise(res => setTimeout(res, 0));
       }
-      setStatus('complete');
+      setTournamentState(s => ({ ...s, status: 'complete' }));
       isRunningRef.current = false;
     };
 
@@ -131,10 +159,14 @@ const useTournamentRunner = () => {
 
   const stopTournament = () => {
     isRunningRef.current = false;
-    setStatus('complete');
+    setTournamentState(s => ({ ...s, status: 'complete' }));
   };
 
-  return { standings, status, currentMatch, currentGameState, startTournament, stopTournament };
+  const clearTournament = () => {
+    setTournamentState({ standings: [], matches: [], currentMatch: null, status: 'idle' });
+  };
+
+  return { standings, status, currentMatch, currentGameState, startTournament, stopTournament, clearTournament };
 };
 
 export default useTournamentRunner;

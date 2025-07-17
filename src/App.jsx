@@ -15,7 +15,7 @@ import { useBotRegistry } from './hooks/useBotRegistry';
 
 function App() {
   const [selectedBot, setSelectedBot] = useState('material-bot');
-  const { botNames, registerBot } = useBotRegistry();
+  const { botNames, registerBot, deleteBot } = useBotRegistry();
 
   return (
     <div className="app-container">
@@ -34,7 +34,7 @@ function App() {
           />
           <Route 
             path="/create-bot" 
-            element={<CreateBotPage onRegisterBot={registerBot} />} 
+            element={<CreateBotPage onRegisterBot={registerBot} onDeleteBot={deleteBot} />} 
           />
           <Route
             path="/visual-bot-builder"

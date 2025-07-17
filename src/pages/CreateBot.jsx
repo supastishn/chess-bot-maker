@@ -4,6 +4,7 @@ import { Zap } from 'lucide-react';
 import useBotTester from '../hooks/useBotTester.js';
 import BotPerformanceWidget from '../components/BotPerformanceWidget';
 import BotLibrary from '../components/BotLibrary';
+import { getBotSource } from '../bot/botInterface';
 
 const CUSTOM_BOT_PLACEHOLDER = `(game) => {
   // Returns UCI string: 'e2e4' or 'e7e8q'
@@ -11,7 +12,7 @@ const CUSTOM_BOT_PLACEHOLDER = `(game) => {
   return moves.length > 0 ? moves[Math.floor(Math.random() * moves.length)] : null;
 }`;
 
-const CreateBot = ({ onRegisterBot }) => {
+const CreateBot = ({ onRegisterBot, onDeleteBot }) => {
   const [customBotName, setCustomBotName] = useState('');
   const [customBotCode, setCustomBotCode] = useState('');
   const [isTesting, setIsTesting] = useState(false);
@@ -19,6 +20,24 @@ const CreateBot = ({ onRegisterBot }) => {
   const { runBotTests } = useBotTester();
   const navigate = useNavigate();
   const [showLibrary, setShowLibrary] = useState(false);
+
+  const handleEditBot = (botName) => {
+    const source = getBotSource(botName);
+    setCustomBotName(botName);
+    setCustomBotCode(source);
+    setShowLibrary(false);
+  };
+
+  const handleDeleteBot = (botName) => {
+    if (window.confirm(`Are you sure you want to delete "${botName}"?`)) {
+      if (onDeleteBot(botName)) {
+        if (customBotName === botName) {
+          setCustomBotName('');
+          setCustomBotCode('');
+        }
+      }
+    }
+  };
 
   const handleRegisterClick = () => {
     if (!customBotName || !customBotCode) {
@@ -59,7 +78,7 @@ const CreateBot = ({ onRegisterBot }) => {
           ))}
         </div>
         {isLibraryTab ? (
-          <BotLibrary />
+          <BotLibrary onEdit={handleEditBot} onDelete={handleDeleteBot} />
         ) : (
           <>
             <h1 className="page-title">Create New Bot</h1>

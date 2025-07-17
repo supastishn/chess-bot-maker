@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getBotNames as getBotNamesFromInterface, registerUserBot } from '../bot/botInterface';
+import { getBotNames as getBotNamesFromInterface, registerUserBot, deleteUserBot } from '../bot/botInterface';
 
 export const useBotRegistry = () => {
   const [botNames, setBotNames] = useState(getBotNamesFromInterface());
@@ -19,5 +19,13 @@ export const useBotRegistry = () => {
     }
   };
 
-  return { botNames, registerBot };
+  const deleteBot = (name) => {
+    if (deleteUserBot(name)) {
+      setBotNames(getBotNamesFromInterface());
+      return true;
+    }
+    return false;
+  };
+
+  return { botNames, registerBot, deleteBot };
 };

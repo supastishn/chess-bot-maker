@@ -8,6 +8,7 @@ const openingDB = getOpeningBook();
 let stockfishEngine = null;
 
 const USER_BOTS_KEY = 'chess-user-bots';
+const userBotNames = new Set();
 const registeredBots = new Map();
 const botSources = new Map();
 const DEFAULT_BOT_NAME = 'starter-bot';
@@ -334,6 +335,7 @@ const loadUserBots = () => {
     userBots.forEach(({ name, source }) => {
       if (registeredBots.has(name)) return; // Avoid re-registering
       try {
+        userBotNames.add(name);
         const botFunction = new Function('game', `return ${source};`)();
         registerBot(name, botFunction, source);
       } catch (e) {
@@ -342,6 +344,26 @@ const loadUserBots = () => {
     });
   } catch (e) {
     console.error("Failed to load user bots from localStorage:", e);
+  }
+};
+
+export const isUserBot = (name) => userBotNames.has(name);
+
+export const deleteUserBot = (name) => {
+  if (!isUserBot(name)) return false;
+
+  try {
+    registeredBots.delete(name);
+    botSources.delete(name);
+    userBotNames.delete(name);
+
+    const userBots = JSON.parse(localStorage.getItem(USER_BOTS_KEY) || '[]');
+    const updatedBots = userBots.filter(b => b.name !== name);
+    localStorage.setItem(USER_BOTS_KEY, JSON.stringify(updatedBots));
+    return true;
+  } catch (e) {
+    console.error(`Failed to delete bot "${name}":`, e);
+    return false;
   }
 };
 

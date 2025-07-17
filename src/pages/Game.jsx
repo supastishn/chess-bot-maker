@@ -11,9 +11,10 @@ import '../chessground-cburnett.css';
 
 const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const gameRef = useRef(new Chess());
-  const [boardOrientation] = useState('white');
+  const [playerColor, setPlayerColor] = useState('white');
   const boardRef = useRef(null);
   const cgRef = useRef(null);
+  const boardOrientation = playerColor;
 
   // 1. Add FEN state for re-rendering
   const [fen, setFen] = useState(gameRef.current.fen());
@@ -87,7 +88,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
         fen: newFen,
         turnColor,
         movable: {
-          color: boardOrientation,
+          color: playerColor,
           dests: getDests(),
           free: false,
           events: { after: onBoardMove }
@@ -95,7 +96,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       });
       setFen(newFen);
     }
-  }, [boardOrientation, getDests, onBoardMove]);
+  }, [playerColor, getDests, onBoardMove]);
 
   // 4. REMOVE erroneous direct call to updateBoard()
   // (No call to updateBoard() here)
@@ -106,7 +107,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
     const makeBotMove = async () => {
       const turn = gameRef.current.turn();
-      const isBotTurn = (gameMode === 'bot-human' && turn === 'b') || gameMode === 'bot-bot';
+      const isBotTurn = (gameMode === 'bot-human' && turn !== playerColor[0]) || gameMode === 'bot-bot';
 
       if (isBotTurn) {
         const botName = (gameMode === 'bot-bot')
@@ -139,7 +140,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     };
 
     setTimeout(makeBotMove, 200);
-  }, [gameMode, selectedBot, blackBot]);
+  }, [gameMode, selectedBot, blackBot, playerColor]);
 
   // 8. Replace resetBoard to be stable
   const resetBoard = useCallback(() => {
@@ -192,13 +193,19 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   // Reset when mode or bots change
   useEffect(() => {
     resetBoard();
-    if (gameMode === 'bot-bot') {
-      console.log(`[Play] Starting game: ${selectedBot} (W) vs ${blackBot} (B)`);
+    
+    const game = gameRef.current;
+    const isHumanVsBot = gameMode === 'bot-human';
+    const botIsWhite = isHumanVsBot && playerColor === 'black';
+    const botsArePlaying = gameMode === 'bot-bot';
+    
+    if ((botsArePlaying && game.turn() === 'w') || (isHumanVsBot && botIsWhite)) {
+      console.log(`[Play] Starting game: Bot turn`);
       startBotMove();
     } else {
-      console.log(`[Play] Starting game: Human (W) vs ${selectedBot} (B)`);
+      console.log(`[Play] Starting game: Human turn`);
     }
-  }, [gameMode, selectedBot, blackBot, resetBoard, startBotMove]);
+  }, [gameMode, selectedBot, blackBot, playerColor, resetBoard, startBotMove]);
 
   return (
     <div className="page-container">
@@ -239,6 +246,32 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
               </label>
             </div>
           </div>
+          
+          {gameMode === 'bot-human' && (
+            <div className="game-mode-selector" style={{ padding: '0.5rem 0' }}>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <label>Play as:</label>
+                <label>
+                  <input
+                    type="radio"
+                    value="white"
+                    checked={playerColor === 'white'}
+                    onChange={() => setPlayerColor('white')}
+                  />
+                  White
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    value="black"
+                    checked={playerColor === 'black'}
+                    onChange={() => setPlayerColor('black')}
+                  />
+                  Black
+                </label>
+              </div>
+            </div>
+          )}
           
           {/* Bot Selectors */}
           <div className="bot-selectors-container">

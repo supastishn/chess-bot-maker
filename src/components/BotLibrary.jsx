@@ -1,9 +1,11 @@
 import React from 'react';
-import { getBotNames, getBotSource } from '../bot/botInterface';
+import { getBotNames, getBotSource, isUserBot } from '../bot/botInterface';
 
-const BotLibrary = () => {
+const BotLibrary = ({ onEdit, onDelete }) => {
   const botNames = getBotNames().filter(name => !name.startsWith('__temp'));
   const [selectedBot, setSelectedBot] = React.useState(botNames[0] ?? '');
+
+  const isEditable = selectedBot && isUserBot(selectedBot);
 
   return (
     <div className="bot-library glass-card">
@@ -20,8 +22,19 @@ const BotLibrary = () => {
         </select>
       </div>
 
+      {onEdit && onDelete && isEditable && (
+        <div className="action-buttons" style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'flex-end' }}>
+          <button onClick={() => onEdit(selectedBot)} className="btn">
+            Edit
+          </button>
+          <button onClick={() => onDelete(selectedBot)} className="btn reset-button">
+            Delete
+          </button>
+        </div>
+      )}
+
       {selectedBot && (
-        <div className="bot-code-viewer">
+        <div className="bot-code-viewer" style={{ marginTop: isEditable ? '1rem' : '0' }}>
           <pre className="form-textarea">
             {getBotSource(selectedBot)}
           </pre>

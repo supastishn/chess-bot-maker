@@ -7,7 +7,7 @@ import './Tournament.css';
 
 const TournamentPage = ({ botNames }) => {
   const [selectedBots, setSelectedBots] = useState(new Set());
-  const { standings, status, currentGameState, startTournament, stopTournament } = useTournamentRunner();
+  const { standings, status, currentGameState, startTournament, stopTournament, clearTournament } = useTournamentRunner();
   
   const handleBotSelection = (botName) => {
     setSelectedBots(prev => {
@@ -61,7 +61,12 @@ const TournamentPage = ({ botNames }) => {
                 {isRunning ? (
                   <button className="btn reset-button" onClick={stopTournament}>Stop Tournament</button>
                 ) : (
-                   <p>Tournament Complete!</p>
+                  <>
+                    <p>Tournament Complete!</p>
+                    <button className="btn primary-button" onClick={clearTournament}>
+                      Start New Tournament
+                    </button>
+                  </>
                 )}
               </div>
             </div>
