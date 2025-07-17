@@ -17,7 +17,7 @@ export const getBotSource = (name) => {
 };
 
 const createBotHelper = (gameClient) => {
-  const helper = {};
+  const helper = Object.create(gameClient);
 
   // Game state methods
   helper.getAvailableMoves = () => gameClient.moves({ verbose: false });
@@ -144,7 +144,7 @@ const createBotHelper = (gameClient) => {
     return gameClient.stockfish.runBenchmark(depth);
   };
 
-  return { ...helper, ...gameClient };
+  return helper;
 };
 
 export const registerBot = (name, botFunction, source) => {
