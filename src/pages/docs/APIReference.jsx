@@ -86,6 +86,52 @@ const APIReference = () => {
           </div>
         </div>
       </div>
+
+      <div className="docs-card glass-card">
+        <h2><Library size={20} /> Strategic Decision Making</h2>
+        <div className="method-list">
+          <div className="method-item">
+            <h3><code>prioritizeStrategy(weights: object, depth?: number): string</code></h3>
+            <p>Evaluates moves using weighted strategic priorities. Returns the best move in UCI format.</p>
+            
+            <h4>Weight Parameters:</h4>
+            <ul className="method-summary">
+              <li><strong>material</strong> (0-1) - Focus on piece values and captures</li>
+              <li><strong>development</strong> (0-1) - Prioritize piece mobilization</li>
+              <li><strong>centerControl</strong> (0-1) - Value central square occupation</li>
+              <li><strong>kingSafety</strong> (0-1) - Minimize king vulnerability</li>
+            </ul>
+
+            <h4>Example Usage:</h4>
+            <div className="syntax-highlighting">
+              <pre>
+{`// Positional player bot
+const move = game.prioritizeStrategy({
+  centerControl: 0.8,
+  development: 0.7,
+  kingSafety: 0.4,
+  material: 0.3
+});
+
+// Aggressive attacker bot  
+game.prioritizeStrategy({
+  material: 0.9,
+  kingSafety: 0.1,
+  centerControl: 0.5
+}, 3); // Deeper lookahead`}
+              </pre>
+            </div>
+
+            <h4>Default Weights (if unspecified):</h4>
+            <pre>{`{
+  material: 0.6,
+  development: 0.4,
+  centerControl: 0.5, 
+  kingSafety: 0.4
+}`}</pre>
+          </div>
+        </div>
+      </div>
       
        <div className="docs-card glass-card">
         <h2><Library size={20} /> Opening Book</h2>
