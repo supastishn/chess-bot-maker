@@ -14,6 +14,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const [playerColor, setPlayerColor] = useState('white');
   const boardRef = useRef(null);
   const cgRef = useRef(null);
+  const timeoutRef = useRef(null); // Track pending bot move timeouts
   const boardOrientation = playerColor;
 
   // 1. Add FEN state for re-rendering
@@ -129,7 +130,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
 
             // Continue bot vs bot sequence
             if (gameMode === 'bot-bot' && !gameRef.current.isGameOver()) {
-              setTimeout(makeBotMove, 200);
+              timeoutRef.current = setTimeout(makeBotMove, 200);
             }
           } else {
             console.log(`[Play] ${botName} returned a null move.`);
@@ -140,11 +141,16 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       }
     };
 
-    setTimeout(makeBotMove, 200);
+    timeoutRef.current = setTimeout(makeBotMove, 200);
   }, [gameMode, selectedBot, blackBot, playerColor]);
 
   // 8. Replace resetBoard to be stable
   const resetBoard = useCallback(() => {
+    // Clear any pending bot move timeouts
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     gameRef.current = new Chess();
     updateBoard();
   }, [updateBoard]);
@@ -183,6 +189,9 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       }
     }
     return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
       if (cgRef.current?.destroy) {
         cgRef.current.destroy();
       }
