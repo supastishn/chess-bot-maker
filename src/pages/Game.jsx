@@ -116,7 +116,9 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
         if (!bot) return;
 
         try {
-          const move = await bot(gameRef.current);
+          // Give the bot a copy of the game to prevent state corruption
+          const gameCopy = new Chess(gameRef.current.fen());
+          const move = await bot(gameCopy);
 
           if (move) {
             console.log(`[Play] ${botName} plays ${typeof move === 'object' ? JSON.stringify(move) : move}`);
