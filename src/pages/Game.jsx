@@ -86,9 +86,10 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       setGameState({ turn: turnColor, status: newStatus });
       cgRef.current.set({
         fen: newFen,
+        orientation: playerColor,
         turnColor,
         movable: {
-          color: playerColor,
+          color: gameMode === 'bot-human' ? playerColor : null,
           dests: getDests(),
           free: false,
           events: { after: onBoardMove }
@@ -96,7 +97,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       });
       setFen(newFen);
     }
-  }, [playerColor, getDests, onBoardMove]);
+  }, [gameMode, playerColor, getDests, onBoardMove]);
 
   // 4. REMOVE erroneous direct call to updateBoard()
   // (No call to updateBoard() here)
