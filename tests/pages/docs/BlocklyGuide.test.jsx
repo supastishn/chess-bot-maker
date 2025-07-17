@@ -8,7 +8,7 @@ describe('BlocklyGuide', () => {
     render(<BlocklyGuide />);
     
     expect(screen.getByText(/Visual Bot Builder/i)).toBeInTheDocument();
-    expect(screen.getByText(/New blocks for advanced strategies/i)).toBeInTheDocument();
-    expect(screen.getByText(/Example workflow/i)).toBeInTheDocument();
+    expect(screen.getByText(/New Advanced Blocks/i)).toBeInTheDocument();
+    expect(screen.getByText(/A Smarter Bot/i)).toBeInTheDocument();
   });
 });

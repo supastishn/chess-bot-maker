@@ -32,12 +32,12 @@ describe('CreateBot', () => {
   test('validates form submission', () => {
     window.alert = vi.fn();
     render(
-      <BrowserRouter>
+      <HashRouter>
         <CreateBot onRegisterBot={mockRegister} />
-      </BrowserRouter>
+      </HashRouter>
     );
     
-    fireEvent.click(screen.getByRole('button', { name: /Register Bot/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Register Bot and Play/i }));
     expect(window.alert).toHaveBeenCalledWith('Please provide a name and code for the bot.');
   });
 });

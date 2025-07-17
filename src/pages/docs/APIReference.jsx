@@ -1,5 +1,5 @@
 import React from 'react';
-import { Puzzle, Library } from 'lucide-react';
+import { Puzzle, Library, Bot } from 'lucide-react';
 
 const APIReference = () => {
   return (
@@ -7,32 +7,68 @@ const APIReference = () => {
       <h1 className="page-title"><Puzzle size={24} /> API Reference</h1>
       
       <div className="docs-card glass-card">
-        <h2><Library size={20} /> Game Helper API v2.1</h2>
+        <h2><Library size={20} /> Core Actions</h2>
+        <div className="method-list">
+          <div className="method-item">
+            <h3><code>move(uci: string): object|null</code></h3>
+            <p>Applies a move to the board. Returns move object on success.</p>
+            <pre>game.move('e2e4');</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>undoMove(): object|null</code></h3>
+            <p>Takes back the last move. Returns the undone move object.</p>
+            <pre>game.undoMove();</pre>
+          </div>
+        </div>
+      </div>
+      
+      <div className="docs-card glass-card">
+        <h2><Library size={20} /> Game State & Queries</h2>
         <div className="method-list">
           <div className="method-item">
             <h3><code>getAvailableMoves(): string[]</code></h3>
-            <p>Returns all legal moves in UCI format</p>
+            <p>Returns all legal moves for the current player in UCI format.</p>
             <pre>const moves = game.getAvailableMoves();</pre>
           </div>
-          <div className="method-item">
-            <h3><code>getBookMoves(): string[]</code></h3>
-            <p>Returns opening book moves for current position</p>
-            <pre>const bookMoves = game.getBookMoves();</pre>
+           <div className="method-item">
+            <h3><code>getVerboseMoves(): object[]</code></h3>
+            <p>Returns all legal moves as detailed objects.</p>
+            <pre>const verboseMoves = game.getVerboseMoves();</pre>
           </div>
           <div className="method-item">
-            <h3><code>playBookMove(): string|null</code></h3>
-            <p>Plays a random move from opening book</p>
-            <pre>const move = game.playBookMove();</pre>
+            <h3><code>evaluateMaterial(): number</code></h3>
+            <p>Returns the board's material balance. Positive for white, negative for black.</p>
+            <pre>const material = game.evaluateMaterial();</pre>
           </div>
           <div className="method-item">
-            <h3><code>lookAhead(move: string, depth: number): {"{ score: number }"}</code></h3>
-            <p>Simulates a move and evaluates position up to 'depth' plies ahead</p>
-            <pre>const score = game.lookAhead('e2e4', 3).score;</pre>
+            <h3><code>getGameResult(): string</code></h3>
+            <p>Returns the game status: 'checkmate', 'stalemate', 'repetition', or 'ongoing'.</p>
+            <pre>if (game.getGameResult() === 'checkmate') ...</pre>
+          </div>
+           <div className="method-item">
+            <h3><code>isInCheck(): boolean</code></h3>
+            <p>Returns true if the current player is in check.</p>
+            <pre>if (game.isInCheck()) ...</pre>
           </div>
           <div className="method-item">
             <h3><code>isCheckmate(): boolean</code></h3>
             <p>Returns true if the current player is in checkmate.</p>
-            <pre>if (game.isCheckmate()) { return null; /* Resign */ }</pre>
+            <pre>if (game.isCheckmate()) { /* resign */ }</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>isAttacked(square: string, byColor: 'w'|'b'): boolean</code></h3>
+            <p>Returns true if the given square is attacked by the specified color.</p>
+            <pre>const isAttacked = game.isAttacked('e4', 'b');</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>getThreatenedSquares(opponentColor: 'w' | 'b'): string[]</code></h3>
+            <p>Returns all squares attacked by the current player. Note: you must pass the opponent's color.</p>
+            <pre>{`const opponent = game.getTurn() === 'w' ? 'b' : 'w';\nconst attacks = game.getThreatenedSquares(opponent);`}</pre>
+          </div>
+           <div className="method-item">
+            <h3><code>getMoveCount(): number</code></h3>
+            <p>Returns the number of half-moves (plies) made in the game.</p>
+            <pre>const ply = game.getMoveCount();</pre>
           </div>
           <div className="method-item">
             <h3><code>getPositionScore(): number</code></h3>
@@ -44,21 +80,50 @@ const APIReference = () => {
             <pre>if (game.getGamePhase() === 'endgame') {/* King activation logic */}</pre>
           </div>
           <div className="method-item">
-            <h3><code>getThreatenedSquares(color: 'w' | 'b'): string[]</code></h3>
-            <pre>const threats = game.getThreatenedSquares(game.getTurn());</pre>
+            <h3><code>lookAhead(move: string, depth: number): {"{ score: number }"}</code></h3>
+            <p>Simulates a move and evaluates position up to 'depth' plies ahead.</p>
+            <pre>const score = game.lookAhead('e2e4', 3).score;</pre>
           </div>
         </div>
       </div>
-      <div className="docs-card glass-card">
-        <h2><Library size={20} /> Position Evaluation Formula</h2>
-        <code className="formula">
-          Score = Material + Center Control + King Safety
-        </code>
-        <div className="math-breakdown">
-          <p><strong>Material:</strong> ∑(Piece values) | Center Control: 0.1 per central square</p>
-          <p><strong>King Safety:</strong> Penalty for exposed king in middlegame</p>
+      
+       <div className="docs-card glass-card">
+        <h2><Library size={20} /> Opening Book</h2>
+        <div className="method-list">
+          <div className="method-item">
+            <h3><code>getBookMoves(): string[]</code></h3>
+            <p>Returns opening book moves for current position.</p>
+            <pre>const bookMoves = game.getBookMoves();</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>playBookMove(): string|null</code></h3>
+            <p>Plays a random move from opening book if available.</p>
+            <pre>const move = game.playBookMove();</pre>
+          </div>
         </div>
       </div>
+
+      <div className="docs-card glass-card">
+        <h2><Bot size={20} /> Stockfish API</h2>
+        <div className="method-list">
+          <div className="method-item">
+            <h3><code>await stockfish.getBestMove(fen, depth): string</code></h3>
+            <p>Asynchronously gets the best move from the Stockfish engine.</p>
+            <pre>const bestMove = await game.stockfish.getBestMove(game.getFEN(), 15);</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>setSkillLevel(level: number)</code></h3>
+            <p>Sets Stockfish's skill level (0-20). Lower values induce more errors.</p>
+            <pre>game.setSkillLevel(10);</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>await getPositionEvaluation(fen): object</code></h3>
+            <p>Asynchronously gets a detailed evaluation from Stockfish.</p>
+            <pre>const eval = await game.getPositionEvaluation();</pre>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };
