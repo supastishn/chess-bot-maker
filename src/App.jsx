@@ -41,7 +41,6 @@ function App() {
           />
           <Route path="/docs" element={<DocLayout />}>
             <Route index element={<Introduction />} />
-            <Route path="introduction" element={<Introduction />} />
             <Route path="api" element={<APIReference />} />
             <Route path="examples" element={<Examples />} />
             <Route path="blockly" element={<BlocklyGuide />} />

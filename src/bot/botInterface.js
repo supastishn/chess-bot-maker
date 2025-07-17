@@ -26,6 +26,11 @@ const createBotHelper = (gameClient) => {
     );
   };
 
+  // New helpers for advanced bots
+  helper.getVerboseMoves = () => gameClient.moves({ verbose: true });
+  helper.isAttacked = (square, byColor) => gameClient.isAttacked(square, byColor);
+  helper.getMoveCount = () => gameClient.history().length;
+
   // Opening book API
   helper.getPositionKey = () => getPositionKey(gameClient.fen());
   helper.getBookMoves = () => {
@@ -330,23 +335,56 @@ registerBot('guru-bot', (game) => {
 registerBot('material-bot', materialBot);
 
 registerBot('aggressive-bot', (game) => {
-  const moves = game.getAvailableMoves();
-  const captureMoves = moves.filter(move =>
-    game.lookAhead(move, 1).capturedPiece
-  );
-  return captureMoves.length > 0
-    ? captureMoves[0]
-    : moves[Math.floor(Math.random() * moves.length)];
+  const moves = game.getVerboseMoves();
+  if (!moves.length) return null;
+
+  const captureMoves = moves.filter(m => m.flags.includes('c'));
+
+  if (captureMoves.length > 0) {
+    const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9 };
+    captureMoves.sort((a, b) => {
+        const valA = pieceValues[a.captured] || 0;
+        const valB = pieceValues[b.captured] || 0;
+        return valB - valA; // highest value first
+    });
+    const bestCapture = captureMoves[0];
+    return bestCapture.promotion 
+      ? bestCapture.from + bestCapture.to + bestCapture.promotion 
+      : bestCapture.from + bestCapture.to;
+  }
+  
+  const randomMove = moves[Math.floor(Math.random() * moves.length)];
+  return randomMove.promotion 
+    ? randomMove.from + randomMove.to + randomMove.promotion
+    : randomMove.from + randomMove.to;
 });
 
 registerBot('defensive-bot', (game) => {
   const moves = game.getAvailableMoves();
-  const safeMoves = moves.filter(move =>
-    !game.lookAhead(move, 1).inCheckAfter
-  );
-  return safeMoves.length > 0
-    ? safeMoves[0]
-    : moves[Math.floor(Math.random() * moves.length)];
+  if (!moves.length) return null;
+
+  const opponentColor = game.getTurn() === 'w' ? 'b' : 'w';
+  
+  const safeMoves = moves.filter(move => {
+    const dest = move.slice(2, 4);
+    return !game.isAttacked(dest, opponentColor);
+  });
+
+  if (safeMoves.length > 0) {
+    return safeMoves[Math.floor(Math.random() * safeMoves.length)];
+  }
+
+  return moves[Math.floor(Math.random() * moves.length)];
+});
+
+registerBot('toggle-bot', (game) => {
+  const moveCount = game.getMoveCount();
+  const turnNumber = Math.floor(moveCount / 2);
+  const aiMode = turnNumber % 3;
+
+  if (aiMode === 0) return getBot('material-bot')(game);
+  if (aiMode === 1) return getBot('aggressive-bot')(game);
+  return getBot('positional-bot')(game);
 });
 
 registerBot('positional-bot', (game) => {

@@ -3,14 +3,14 @@ import { Outlet, NavLink } from 'react-router-dom';
 import { Puzzle, Library, Zap, Wrench, Bot } from 'lucide-react';
 import './DocLayout.css';
 
-const DocLayout = () => {
-  const navItems = [
-    { path: 'introduction', icon: Puzzle, label: 'Introduction' },
-    { path: 'api', icon: Library, label: 'API Reference' },
-    { path: 'examples', icon: Zap, label: 'Examples' },
-    { path: 'blockly', icon: Wrench, label: 'Blockly Guide' }
-  ];
+const navItems = [
+  { path: '.', icon: Puzzle, label: 'Introduction' },
+  { path: 'api', icon: Library, label: 'API Reference' },
+  { path: 'examples', icon: Zap, label: 'Examples' },
+  { path: 'blockly', icon: Wrench, label: 'Blockly Guide' }
+];
 
+const DocLayout = () => {
   return (
     <div className="page-container">
       <div className="docs-layout">
@@ -20,6 +20,7 @@ const DocLayout = () => {
               <NavLink 
                 key={item.path}
                 to={item.path}
+                end={item.path === '.'}
                 className={({isActive}) => isActive ? 'active' : ''}
               >
                 <item.icon size={18} /> 

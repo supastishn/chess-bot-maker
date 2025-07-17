@@ -22,6 +22,16 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   const updateBoardRef = useRef();
   const startBotMoveRef = useRef();
 
+  // Centralized game state
+  const [gameState, setGameState] = useState(() => ({
+    turn: gameRef.current.turn() === 'w' ? 'white' : 'black',
+    status: {
+      isCheckmate: gameRef.current.isCheckmate(),
+      isStalemate: gameRef.current.isStalemate(),
+      isRepetition: gameRef.current.isThreefoldRepetition(),
+    },
+  }));
+
   const [gameMode, setGameMode] = useState('bot-human');
   const [blackBot, setBlackBot] = useState('random-bot');
 
@@ -47,6 +57,12 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     if (cgRef.current) {
       const newFen = gameRef.current.fen();
       const turnColor = gameRef.current.turn() === 'w' ? 'white' : 'black';
+      const newStatus = {
+        isCheckmate: gameRef.current.isCheckmate(),
+        isStalemate: gameRef.current.isStalemate(),
+        isRepetition: gameRef.current.isThreefoldRepetition(),
+      };
+      setGameState({ turn: turnColor, status: newStatus });
       cgRef.current.set({
         fen: newFen,
         turnColor,
@@ -151,13 +167,6 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     if (gameMode === 'bot-bot') startBotMove();
   }, [gameMode, selectedBot, blackBot, resetBoard, startBotMove]);
 
-  const turn = gameRef.current.turn() === 'w' ? 'white' : 'black';
-  const status = {
-    isCheckmate: gameRef.current.isCheckmate(),
-    isStalemate: gameRef.current.isStalemate(),
-    isRepetition: gameRef.current.isThreefoldRepetition(),
-  };
-
   return (
     <div className="page-container">
       <div className="game-content">
@@ -170,7 +179,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
           <div ref={boardRef} className="cg-wrap" style={{ height: '100%', width: '100%' }} />
         </div>
         
-        <InfoPanel status={status} turn={turn} onReset={resetBoard} />
+        <InfoPanel status={gameState.status} turn={gameState.turn} onReset={resetBoard} />
 
         {/* Combined panel for controls */}
         <div className="bot-panel glass-card">
