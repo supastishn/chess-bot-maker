@@ -138,6 +138,7 @@ const createBotHelper = (gameClient) => {
     hashSize: 256,
     contempt: 0,
     async init(depth = 15) {
+      // Deprecated: No longer needed, kept for compatibility
       if (!stockfishEngine && typeof Worker !== 'undefined') {
         stockfishEngine = new StockfishEngine(depth);
       }
@@ -146,7 +147,23 @@ const createBotHelper = (gameClient) => {
       stockfishEngine?.setOption?.("Contempt", this.contempt);
     },
     async getBestMove(fen, depth = 15) {
-      await this.init(depth);
+      // Handle auto-initialization if not ready
+      if (!stockfishEngine && typeof Worker !== 'undefined') {
+        stockfishEngine = new StockfishEngine(depth);
+      }
+
+      // Wait for initialization to complete if needed
+      if (stockfishEngine && !stockfishEngine.ready) {
+        await new Promise(resolve => {
+          const interval = setInterval(() => {
+            if (stockfishEngine.ready) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, 50);
+        });
+      }
+
       if (stockfishEngine) {
         const analysis = await stockfishEngine.getPositionEvaluation(fen, depth);
         return analysis?.bestMove;

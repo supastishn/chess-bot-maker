@@ -13,25 +13,29 @@ export default class StockfishEngine {
     this.infoHandlers = new Set();
     this.infoListener = null;
 
-    this.engine.onmessage = (event) => {
-      const line = event.data;
+    // Add promise to track initialization
+    this.initialized = new Promise(resolve => {
+      this.engine.onmessage = (event) => {
+        const line = event.data;
 
-      if (line === 'uciok') {
-        this.ready = true;
-        // Set common options after engine is ready
-        Object.entries(COMMON_OPTIONS).forEach(([key, val]) =>
-          this.sendCommand(`setoption name ${key} value ${val}`)
-        );
-      }
-      
-      // Pass the message to any active handlers
-      this.infoHandlers.forEach(handler => {
-        if (typeof handler.callback === 'function') {
-          handler.callback(line);
+        if (line === 'uciok') {
+          this.ready = true;
+          // Set common options after engine is ready
+          Object.entries(COMMON_OPTIONS).forEach(([key, val]) =>
+            this.sendCommand(`setoption name ${key} value ${val}`)
+          );
+          resolve(); // Resolve initialization promise
         }
-      });
-    };
-    
+        
+        // Pass the message to any active handlers
+        this.infoHandlers.forEach(handler => {
+          if (typeof handler.callback === 'function') {
+            handler.callback(line);
+          }
+        });
+      };
+    });
+
     this.engine.postMessage('uci'); // Start UCI communication
   }
 
