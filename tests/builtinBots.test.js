@@ -29,9 +29,9 @@ describe('Built-in Bots', () => {
 
     test('prefers capture moves', () => {
       mockGame.getVerboseMoves.mockReturnValue([
-        { from: 'e2', to: 'e4' },
+        { from: 'e2', to: 'e4', flags: 'n' },
         { from: 'd2', to: 'd4', flags: 'c', captured: 'p' },
-        { from: 'g1', to: 'f3' },
+        { from: 'g1', to: 'f3', flags: 'n' },
       ]);
       expect(aggressiveBot(mockGame)).toBe('d2d4');
     });
@@ -46,9 +46,9 @@ describe('Built-in Bots', () => {
 
     test('plays a random move if no captures are available', () => {
       mockGame.getVerboseMoves.mockReturnValue([
-        { from: 'e2', to: 'e4' },
-        { from: 'd2', to: 'd4' },
-        { from: 'g1', to: 'f3' },
+        { from: 'e2', to: 'e4', flags: 'n' },
+        { from: 'd2', to: 'd4', flags: 'n' },
+        { from: 'g1', to: 'f3', flags: 'n' },
       ]);
       expect(aggressiveBot(mockGame)).toBe('d2d4');
     });
@@ -89,6 +89,7 @@ describe('Built-in Bots', () => {
   describe('guruBot', () => {
     test('uses prioritizeStrategy to select a move', () => {
       const guruBot = getBot('guru-bot');
+      mockGame.getAvailableMoves.mockReturnValue(['e2e4', 'd2d4']);
       mockGame.prioritizeStrategy.mockReturnValue('e2e4');
 
       const move = guruBot(mockGame);
@@ -112,7 +113,7 @@ describe('Built-in Bots', () => {
     test('acts like aggressiveBot on turn 1', () => {
       mockGame.getMoveCount.mockReturnValue(2); // turnNumber 1
       mockGame.getVerboseMoves.mockReturnValue([
-        { from: 'e2', to: 'e4' },
+        { from: 'e2', to: 'e4', flags: 'n' },
         { from: 'd2', to: 'd4', flags: 'c', captured: 'p' },
       ]);
       

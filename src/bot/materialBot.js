@@ -6,10 +6,10 @@ export const materialBot = (game) => {
     try {
       game.move(move);
       if (game.isCheckmate()) {
-        game.undoMove();
+        game.undo();
         return move;
       }
-      game.undoMove();
+      game.undo();
     } catch (e) {
       // ignore illegal move and continue
     }

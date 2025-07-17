@@ -1,9 +1,11 @@
 
+import { Chess } from 'chess.js';
 
 import StockfishEngine from './stockfishEngine.js';
 import getOpeningBook, { getPositionKey } from '../services/openingService.js';
 
 const openingDB = getOpeningBook();
+let stockfishEngine = null;
 
 const USER_BOTS_KEY = 'chess-user-bots';
 const registeredBots = new Map();
@@ -15,20 +17,58 @@ export const getBotSource = (name) => {
 };
 
 const createBotHelper = (gameClient) => {
-  // Helper context for 'this' in advanced methods
   const helper = {};
 
-  // ... (all helper methods as before) ...
+  // Game state methods
+  helper.getAvailableMoves = () => gameClient.moves({ verbose: false });
+  helper.getVerboseMoves = () => gameClient.moves({ verbose: true });
+  helper.getTurn = () => gameClient.turn();
+  helper.isCheckmate = () => gameClient.isCheckmate();
+  helper.isStalemate = () => gameClient.isStalemate();
+  helper.isDraw = () => gameClient.isDraw();
+  helper.isGameOver = () => gameClient.isGameOver();
+  helper.getFEN = () => gameClient.fen();
+  helper.undoMove = () => gameClient.undo();
+  helper.move = (m) => gameClient.move(m);
+  helper.isAttacked = (square, byColor) => gameClient.isAttacked(square, byColor);
+  helper.getMoveCount = () => gameClient.history().length;
 
-  helper.benchmark = (depth = 16) => {
-    if (!gameClient.stockfish?.engine) {
-      return Promise.reject("Stockfish engine not initialized");
+  // --- More advanced helpers ---
+  const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 100 };
+  helper.evaluateMaterial = () => {
+    const board = gameClient.board();
+    let score = 0;
+    for (const row of board) {
+      for (const piece of row) {
+        if (piece) {
+          const value = pieceValues[piece.type] || 0;
+          score += piece.color === 'w' ? value : -value;
+        }
+      }
     }
-    return gameClient.stockfish.runBenchmark(depth);
+    return score;
   };
 
-  // Use a module-level stockfishEngine for all helpers
-  let stockfishEngine = null;
+  helper.lookAhead = (move, depth) => {
+    // This is a simplified implementation for bot compatibility
+    const clientCopy = new Chess(gameClient.fen());
+    const moveResult = clientCopy.move(move);
+    if (!moveResult) return { score: -Infinity };
+    let score = 0;
+    clientCopy.board().forEach(row => row.forEach(piece => {
+      if (!piece) return;
+      score += (pieceValues[piece.type] || 0) * (piece.color === 'w' ? 1 : -1);
+    }));
+    return { score };
+  };
+
+  helper.prioritizeStrategy = (weights) => {
+    const moves = helper.getAvailableMoves();
+    if (moves.length === 0) return null;
+    // This is a placeholder; a real implementation would be more complex
+    return moves[Math.floor(Math.random() * moves.length)];
+  };
+
   helper.stockfish = () => ({
     skillLevel: 20,
     hashSize: 256,
@@ -50,7 +90,13 @@ const createBotHelper = (gameClient) => {
     }
   });
 
-  // Merge gameClient and helper so test mocks work as expected
+  helper.benchmark = (depth = 16) => {
+    if (!gameClient.stockfish?.engine) {
+      return Promise.reject("Stockfish engine not initialized");
+    }
+    return gameClient.stockfish.runBenchmark(depth);
+  };
+
   return { ...gameClient, ...helper };
 };
 
