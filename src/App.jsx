@@ -10,6 +10,7 @@ import APIReference from './pages/docs/APIReference';
 import Examples from './pages/docs/Examples';
 import BlocklyGuide from './pages/docs/BlocklyGuide';
 import VisualBotBuilder from './pages/VisualBotBuilder';
+import TournamentPage from './pages/Tournament';
 import { useBotRegistry } from './hooks/useBotRegistry';
 
 function App() {
@@ -38,6 +39,10 @@ function App() {
           <Route
             path="/visual-bot-builder"
             element={<VisualBotBuilder onRegisterBot={registerBot} />}
+          />
+          <Route 
+            path="/tournament"
+            element={<TournamentPage botNames={botNames} />}
           />
           <Route path="/docs" element={<DocLayout />}>
             <Route index element={<Introduction />} />

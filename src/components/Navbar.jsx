@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTheme } from '../context/useTheme';
-import { Crown, Gamepad2, Zap, FileText, Wrench, Sun, Moon } from 'lucide-react';
+import { Crown, Gamepad2, Zap, FileText, Wrench, Sun, Moon, Trophy } from 'lucide-react';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -32,6 +32,10 @@ const Navbar = () => {
           <NavLink to="/visual-bot-builder" className="nav-link">
             <Wrench className="nav-icon" />
             <span className="nav-text">Visual Builder</span>
+          </NavLink>
+          <NavLink to="/tournament" className="nav-link">
+            <Trophy className="nav-icon" />
+            <span className="nav-text">Tournament</span>
           </NavLink>
           <button
             onClick={toggleTheme}

@@ -1,0 +1,90 @@
+/* src/pages/Tournament.css */
+
+.tournament-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.tournament-setup, .tournament-running {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.bot-selection-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.bot-selection-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--color-bg-tertiary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.bot-selection-item:hover {
+  background: var(--color-bg-card);
+}
+
+.bot-selection-item input {
+  width: 18px;
+  height: 18px;
+}
+
+.tournament-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tournament-running {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.standings-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.standings-table th, .standings-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.standings-table th {
+  font-weight: 600;
+}
+
+.standings-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.match-visualizer .player-name {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .tournament-running {
+    grid-template-columns: 1fr;
+  }
+}
