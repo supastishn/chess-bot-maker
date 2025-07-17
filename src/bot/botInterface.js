@@ -65,8 +65,55 @@ const createBotHelper = (gameClient) => {
   helper.prioritizeStrategy = (weights) => {
     const moves = helper.getAvailableMoves();
     if (moves.length === 0) return null;
-    // This is a placeholder; a real implementation would be more complex
-    return moves[Math.floor(Math.random() * moves.length)];
+
+    const isBlack = gameClient.turn() === 'b';
+    let bestScore = isBlack ? Infinity : -Infinity;
+    let bestMoves = [];
+
+    const mergedWeights = {
+      material: 0.6,
+      development: 0.4,
+      centerControl: 0.5,
+      kingSafety: 0.4,
+      ...weights,
+    };
+
+    const getScore = (client) => {
+      let totalScore = 0;
+      const material = helper.evaluateMaterial();
+      let centerControl = 0;
+      const center = ['e4', 'd4', 'e5', 'd5'];
+      for (const sq of center) {
+        const piece = client.get(sq);
+        if (piece) {
+          centerControl += 0.1 * (piece.color === 'w' ? 1 : -1);
+        }
+      }
+      if (mergedWeights.material) totalScore += mergedWeights.material * material;
+      if (mergedWeights.centerControl) totalScore += mergedWeights.centerControl * centerControl;
+      if (client.isCheck()) {
+        totalScore += (client.turn() === 'w' ? -0.5 : 0.5) * (mergedWeights.kingSafety || 0);
+      }
+      return totalScore;
+    };
+
+    for (const move of moves) {
+      const clientCopy = new Chess(gameClient.fen());
+      if (clientCopy.move(move)) {
+        const score = getScore(clientCopy);
+        if ((isBlack && score < bestScore) || (!isBlack && score > bestScore)) {
+          bestScore = score;
+          bestMoves = [move];
+        } else if (score === bestScore) {
+          bestMoves.push(move);
+        }
+      }
+    }
+
+    if (bestMoves.length === 0) {
+      return moves.length > 0 ? moves[Math.floor(Math.random() * moves.length)] : null;
+    }
+    return bestMoves[Math.floor(Math.random() * bestMoves.length)];
   };
 
   helper.stockfish = () => ({

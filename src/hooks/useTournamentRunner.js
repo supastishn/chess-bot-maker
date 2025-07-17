@@ -35,13 +35,18 @@ const useTournamentRunner = () => {
         }
       }
 
-      let result;
+      let winner = null;
       if (game.isCheckmate()) {
-        result = game.turn() === 'b' ? 'white' : 'black';
-      } else {
-        result = 'draw';
+        winner = game.turn() === 'b' ? 'white' : 'black';
+      } else if (!game.isGameOver()) {
+        // Game loop was broken by bot error, null move, or move limit.
+        // Award loss to the current player.
+        winner = game.turn() === 'w' ? 'black' : 'white';
       }
-      resolve({ result, winner: result === 'draw' ? null : result });
+      // Otherwise, it's a draw (stalemate, repetition, etc.), so winner remains null.
+
+      const result = winner || 'draw';
+      resolve({ result, winner });
     });
   };
 
