@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { getBotNames as getBotNamesFromInterface, registerBot as registerBotInInterface } from '../bot/botInterface';
+import { getBotNames as getBotNamesFromInterface, registerUserBot } from '../bot/botInterface';
 
 export const useBotRegistry = () => {
   const [botNames, setBotNames] = useState(getBotNamesFromInterface());
 
-  const registerBot = (name, code) => {
+  const registerBot = (name, code, source) => {
     if (!name || !code) {
       alert('Please provide bot name and code');
       return false;
     }
     try {
-      registerBotInInterface(name, new Function('gameClient', `return ${code};`)());
+      registerUserBot(name, new Function('game', `return ${code};`)(), source);
       setBotNames(getBotNamesFromInterface());
       return true;
     } catch (e) {

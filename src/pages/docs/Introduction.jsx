@@ -18,6 +18,11 @@ const Introduction = () => {
           </pre>
         </div>
       </div>
+
+      <div className="docs-card glass-card">
+        <h2>Persistence</h2>
+        <p>Bots you create via the "Create Bot" or "Visual Bot Builder" pages are automatically saved in your browser's local storage. They will be available whenever you revisit the site from the same browser.</p>
+      </div>
     </div>
   );
 };

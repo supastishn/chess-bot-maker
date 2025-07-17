@@ -30,6 +30,16 @@ const APIReference = () => {
             <pre>const score = game.lookAhead('e2e4', 3).score;</pre>
           </div>
           <div className="method-item">
+            <h3><code>isCheckmate(): boolean</code></h3>
+            <p>Returns true if the current player is in checkmate.</p>
+            <pre>if (game.isCheckmate()) { return null; /* Resign */ }</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>getPositionScore(): number</code></h3>
+            <p>Returns a score for the current position (material + center control).</p>
+            <pre>const score = game.getPositionScore();</pre>
+          </div>
+          <div className="method-item">
             <h3><code>getGamePhase(): 'opening' | 'middlegame' | 'endgame'</code></h3>
             <pre>if (game.getGamePhase() === 'endgame') {/* King activation logic */}</pre>
           </div>

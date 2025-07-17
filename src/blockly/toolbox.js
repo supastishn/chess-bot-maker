@@ -20,6 +20,15 @@ const toolbox = `
     <block type="undo_move"></block>
     <block type="is_in_check"></block>
     <block type="get_game_phase"></block>
+    <block type="is_checkmate"></block>
+    <block type="get_position_score"></block>
+    <block type="get_threatened_squares">
+      <value name="COLOR">
+        <shadow type="text">
+          <field name="TEXT">w</field>
+        </shadow>
+      </value>
+    </block>
     <block type="look_ahead">
       <value name="DEPTH">
         <block type="math_number">

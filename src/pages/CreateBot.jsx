@@ -27,7 +27,7 @@ const CreateBot = ({ onRegisterBot }) => {
     }
     const success = onRegisterBot(
       customBotName,
-      `(gameClient) => {\n${customBotCode}\n}`,
+      customBotCode,
       customBotCode
     );
     if (success) {

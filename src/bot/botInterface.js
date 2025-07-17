@@ -5,6 +5,7 @@ import getOpeningBook, { getPositionKey } from '../services/openingService';
 
 const openingDB = getOpeningBook();
 
+const USER_BOTS_KEY = 'chess-user-bots';
 const registeredBots = new Map();
 const botSources = new Map();
 const DEFAULT_BOT_NAME = 'starter-bot';
@@ -304,6 +305,25 @@ export const registerBot = (name, botFunction, source) => {
   );
 };
 
+export const registerUserBot = (name, botFunction, source) => {
+  registerBot(name, botFunction, source); // Register in-memory for the current session
+
+  try {
+    const userBots = JSON.parse(localStorage.getItem(USER_BOTS_KEY) || '[]');
+    const botIndex = userBots.findIndex(b => b.name === name);
+    const newBot = { name, source };
+
+    if (botIndex > -1) {
+      userBots[botIndex] = newBot;
+    } else {
+      userBots.push(newBot);
+    }
+    localStorage.setItem(USER_BOTS_KEY, JSON.stringify(userBots));
+  } catch (e) {
+    console.error("Failed to save user bot to localStorage:", e);
+  }
+};
+
 const stockfishBotFn = async (game) => {
   const fen = game.getFEN ? game.getFEN() : game.fen();
   return game.stockfish.getBestMove(fen);
@@ -415,3 +435,22 @@ const randomBotFn = (game) => {
 };
 registerBot('random-bot', randomBotFn, randomBotFn.toString());
 registerBot('starter-bot', randomBotFn, randomBotFn.toString());
+
+const loadUserBots = () => {
+  try {
+    const userBots = JSON.parse(localStorage.getItem(USER_BOTS_KEY) || '[]');
+    userBots.forEach(({ name, source }) => {
+      if (registeredBots.has(name)) return; // Avoid re-registering
+      try {
+        const botFunction = new Function('game', `return ${source};`)();
+        registerBot(name, botFunction, source);
+      } catch (e) {
+        console.error(`Error loading bot "${name}" from localStorage:`, e);
+      }
+    });
+  } catch (e) {
+    console.error("Failed to load user bots from localStorage:", e);
+  }
+};
+
+loadUserBots();

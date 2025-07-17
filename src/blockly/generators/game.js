@@ -37,6 +37,14 @@ javascriptGenerator['is_in_check'] = function() {
   return ['game.isInCheck()', javascriptGenerator.ORDER_FUNCTION_CALL];
 };
 
+javascriptGenerator['is_checkmate'] = function() {
+  return ['game.isCheckmate()', javascriptGenerator.ORDER_FUNCTION_CALL];
+};
+
+javascriptGenerator['get_position_score'] = function() {
+  return ['game.getPositionScore()', javascriptGenerator.ORDER_FUNCTION_CALL];
+};
+
 javascriptGenerator['look_ahead'] = function(block) {
   const move = javascriptGenerator.valueToCode(block, 'MOVE', 
     javascriptGenerator.ORDER_NONE) || "''";
@@ -47,6 +55,11 @@ javascriptGenerator['look_ahead'] = function(block) {
 
 javascriptGenerator['get_game_phase'] = function() {
   return ['game.getGamePhase()', javascriptGenerator.ORDER_FUNCTION_CALL];
+};
+
+javascriptGenerator['get_threatened_squares'] = function(block) {
+  const color = javascriptGenerator.valueToCode(block, 'COLOR', javascriptGenerator.ORDER_NONE) || "'w'";
+  return [`game.getThreatenedSquares(${color})`, javascriptGenerator.ORDER_FUNCTION_CALL];
 };
 
 // --- Stockfish Generator ---
