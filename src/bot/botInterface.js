@@ -1,6 +1,6 @@
 
 
-import StockfishEngine from './stockfishEngine';
+import StockfishEngine from './stockfishEngine.js';
 import getOpeningBook, { getPositionKey } from '../services/openingService';
 
 const openingDB = getOpeningBook();

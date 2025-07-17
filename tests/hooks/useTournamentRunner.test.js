@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { Chess } from 'chess.js';
-import { useTournamentRunner } from '../../src/hooks/useTournamentRunner';
+import useTournamentRunner from '../../src/hooks/useTournamentRunner';
 
 vi.mock('chess.js');
 

@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-export const mockGameClient = () => ({
+export const mockGameClient = (overrides = {}) => ({
   getAvailableMoves: vi.fn(),
   getVerboseMoves: vi.fn(() => []),
   move: vi.fn(),
@@ -10,7 +10,9 @@ export const mockGameClient = () => ({
   getStatus: vi.fn(),
   getTurn: vi.fn(),
   isInCheck: vi.fn(),
+  isCheckmate: vi.fn(),
   isAttacked: vi.fn(() => false),
   getThreatenedSquares: vi.fn(),
-  lookAhead: vi.fn()
+  lookAhead: vi.fn(),
+  ...overrides
 });
