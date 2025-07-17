@@ -4,7 +4,7 @@ import { Zap } from 'lucide-react';
 import useBotTester from '../hooks/useBotTester.js';
 import BotPerformanceWidget from '../components/BotPerformanceWidget';
 import BotLibrary from '../components/BotLibrary';
-import { getBotSource } from '../bot/botInterface';
+import { getBotSource, getBotType } from '../bot/botInterface';
 
 const CUSTOM_BOT_PLACEHOLDER = `(game) => {
   // Returns UCI string: 'e2e4' or 'e7e8q'
@@ -22,10 +22,15 @@ const CreateBot = ({ onRegisterBot, onDeleteBot }) => {
   const [showLibrary, setShowLibrary] = useState(false);
 
   const handleEditBot = (botName) => {
-    const source = getBotSource(botName);
-    setCustomBotName(botName);
-    setCustomBotCode(source);
-    setShowLibrary(false);
+    const type = getBotType(botName);
+    if (type === 'blockly') {
+      navigate('/visual-bot-builder', { state: { botName } });
+    } else {
+      const source = getBotSource(botName);
+      setCustomBotName(botName);
+      setCustomBotCode(source);
+      setShowLibrary(false);
+    }
   };
 
   const handleDeleteBot = (botName) => {

@@ -11,11 +11,16 @@ const USER_BOTS_KEY = 'chess-user-bots';
 const userBotNames = new Set();
 const registeredBots = new Map();
 const botSources = new Map();
+const botBlocklyXml = new Map();
+const botTypes = new Map();
 const DEFAULT_BOT_NAME = 'starter-bot';
 
 export const getBotSource = (name) => {
   return botSources.get(name) || "// No source code available";
 };
+
+export const getBotBlocklyXml = (name) => botBlocklyXml.get(name);
+export const getBotType = (name) => botTypes.get(name) || 'code';
 
 const createBotHelper = (gameClient) => {
   const helper = Object.create(gameClient);
@@ -183,7 +188,7 @@ const createBotHelper = (gameClient) => {
   return helper;
 };
 
-export const registerBot = (name, botFunction, source) => {
+export const registerBot = (name, botFunction, source, blocklyXml = null) => {
   console.log(`[Bot] Registering bot: ${name}`);
   if (typeof botFunction !== 'function') {
     throw new Error('Bot must be a function');
@@ -191,19 +196,25 @@ export const registerBot = (name, botFunction, source) => {
   if (source) {
     botSources.set(name, source);
   }
+  if (blocklyXml) {
+    botBlocklyXml.set(name, blocklyXml);
+    botTypes.set(name, 'blockly');
+  } else {
+    botTypes.set(name, 'code');
+  }
   // Wrap the botFunction to provide the helper API
   registeredBots.set(name, (gameClient) =>
     botFunction(createBotHelper(gameClient))
   );
 };
 
-export const registerUserBot = (name, botFunction, source) => {
-  registerBot(name, botFunction, source); // Register in-memory for the current session
+export const registerUserBot = (name, botFunction, source, blocklyXml = null) => {
+  registerBot(name, botFunction, source, blocklyXml); // Register in-memory for the current session
 
   try {
     const userBots = JSON.parse(localStorage.getItem(USER_BOTS_KEY) || '[]');
     const botIndex = userBots.findIndex(b => b.name === name);
-    const newBot = { name, source };
+    const newBot = { name, source, blocklyXml };
 
     if (botIndex > -1) {
       userBots[botIndex] = newBot;
@@ -332,12 +343,12 @@ registerBot('starter-bot', randomBotFn, randomBotFn.toString());
 const loadUserBots = () => {
   try {
     const userBots = JSON.parse(localStorage.getItem(USER_BOTS_KEY) || '[]');
-    userBots.forEach(({ name, source }) => {
+    userBots.forEach(({ name, source, blocklyXml }) => {
       if (registeredBots.has(name)) return; // Avoid re-registering
       try {
         userBotNames.add(name);
         const botFunction = new Function('game', `return ${source};`)();
-        registerBot(name, botFunction, source);
+        registerBot(name, botFunction, source, blocklyXml);
       } catch (e) {
         console.error(`Error loading bot "${name}" from localStorage:`, e);
       }
@@ -355,6 +366,8 @@ export const deleteUserBot = (name) => {
   try {
     registeredBots.delete(name);
     botSources.delete(name);
+    botBlocklyXml.delete(name);
+    botTypes.delete(name);
     userBotNames.delete(name);
 
     const userBots = JSON.parse(localStorage.getItem(USER_BOTS_KEY) || '[]');

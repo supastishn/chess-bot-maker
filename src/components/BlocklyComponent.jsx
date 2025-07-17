@@ -11,7 +11,7 @@ import '../blockly/generators/game';
 
 Blockly.setLocale(En);
 
-const BlocklyComponent = forwardRef(({ onCodeChange }, ref) => {
+const BlocklyComponent = forwardRef(({ onCodeChange, initialXml }, ref) => {
   const blocklyDiv = useRef(null);
   const workspace = useRef(null);
 
@@ -33,6 +33,11 @@ const BlocklyComponent = forwardRef(({ onCodeChange }, ref) => {
       }
     });
 
+    if (initialXml) {
+      const xmlDom = Blockly.Xml.textToDom(initialXml);
+      Blockly.Xml.domToWorkspace(xmlDom, workspace.current);
+    }
+
     javascriptGenerator.addReservedWords('game');
     workspace.current.addChangeListener(() => {
       const code = javascriptGenerator.workspaceToCode(workspace.current);
@@ -43,10 +48,14 @@ const BlocklyComponent = forwardRef(({ onCodeChange }, ref) => {
     return () => {
       workspace.current?.dispose();
     };
-  }, [onCodeChange]);
+  }, [onCodeChange, initialXml]);
 
   useImperativeHandle(ref, () => ({
-    workspaceToCode: () => javascriptGenerator.workspaceToCode(workspace.current)
+    workspaceToCode: () => javascriptGenerator.workspaceToCode(workspace.current),
+    workspaceToXml: () => {
+      const xml = Blockly.Xml.workspaceToDom(workspace.current);
+      return Blockly.Xml.domToText(xml);
+    },
   }));
 
   return <div ref={blocklyDiv} style={{
