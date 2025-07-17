@@ -384,7 +384,8 @@ export const registerUserBot = (name, botFunction, source) => {
 
 const stockfishBotFn = async (game) => {
   const fen = game.getFEN ? game.getFEN() : game.fen();
-  return game.stockfish.getBestMove(fen);
+  // Correctly call the stockfish helper to get the API object
+  return game.stockfish().getBestMove(fen);
 };
 registerBot('stockfish-bot', stockfishBotFn, stockfishBotFn.toString());
 
