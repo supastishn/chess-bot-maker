@@ -1,12 +1,15 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import * as Blockly from 'blockly/core';
 import { javascriptGenerator } from 'blockly/javascript';
+import * as En from 'blockly/msg/en';
 import 'blockly/blocks';
 import toolbox from '../blockly/toolbox';
 
 // Load custom blocks & generators
 import '../blockly/blocks/game';
 import '../blockly/generators/game';
+
+Blockly.setLocale(En);
 
 const BlocklyComponent = forwardRef(({ onCodeChange }, ref) => {
   const blocklyDiv = useRef(null);

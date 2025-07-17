@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react-swc'
 import commonjs from 'vite-plugin-commonjs'
 
 export default defineConfig({
-  base: './',
+  base: '/chess-bot-maker/',
   plugins: [
     react(),
     commonjs()
