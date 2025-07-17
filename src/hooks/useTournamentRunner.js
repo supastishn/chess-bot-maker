@@ -67,37 +67,43 @@ const useTournamentRunner = () => {
     }
     setMatches(newMatches);
 
-    // Run matches sequentially
-    for (const match of newMatches) {
-      if (!isRunningRef.current) break;
-      setCurrentMatch(match);
-      const { winner } = await runGame(match.white, match.black);
-      
-      setStandings(prevStandings => {
-        const newStandings = [...prevStandings];
-        const whiteIndex = newStandings.findIndex(s => s.name === match.white);
-        const blackIndex = newStandings.findIndex(s => s.name === match.black);
-        
-        if (winner === 'white') {
-          newStandings[whiteIndex].w++;
-          newStandings[whiteIndex].p++;
-          newStandings[blackIndex].l++;
-        } else if (winner === 'black') {
-          newStandings[blackIndex].w++;
-          newStandings[blackIndex].p++;
-          newStandings[whiteIndex].l++;
-        } else {
-          newStandings[whiteIndex].d++;
-          newStandings[blackIndex].d++;
-          newStandings[whiteIndex].p += 0.5;
-          newStandings[blackIndex].p += 0.5;
-        }
-        return newStandings;
-      });
-    }
+    // Asynchronous match runner to avoid UI blocking
+    const runMatches = async () => {
+      for (const match of newMatches) {
+        if (!isRunningRef.current) break;
+        setCurrentMatch(match);
+        const { winner } = await runGame(match.white, match.black);
 
-    setStatus('complete');
-    isRunningRef.current = false;
+        setStandings(prevStandings => {
+          const newStandings = [...prevStandings];
+          const whiteIndex = newStandings.findIndex(s => s.name === match.white);
+          const blackIndex = newStandings.findIndex(s => s.name === match.black);
+
+          if (winner === 'white') {
+            newStandings[whiteIndex].w++;
+            newStandings[whiteIndex].p++;
+            newStandings[blackIndex].l++;
+          } else if (winner === 'black') {
+            newStandings[blackIndex].w++;
+            newStandings[blackIndex].p++;
+            newStandings[whiteIndex].l++;
+          } else {
+            newStandings[whiteIndex].d++;
+            newStandings[blackIndex].d++;
+            newStandings[whiteIndex].p += 0.5;
+            newStandings[blackIndex].p += 0.5;
+          }
+          return newStandings;
+        });
+        // Yield to UI thread after each match
+        await new Promise(res => setTimeout(res, 0));
+      }
+      setStatus('complete');
+      isRunningRef.current = false;
+    };
+
+    // Start matches asynchronously to yield to UI thread
+    setTimeout(runMatches, 0);
   };
 
   const stopTournament = () => {
