@@ -12,6 +12,7 @@ const useTournamentRunner = () => {
 
   const runGame = async (whiteBotName, blackBotName) => {
     return new Promise(async (resolve) => {
+      console.log(`[Tournament] Starting game: ${whiteBotName} (W) vs ${blackBotName} (B)`);
       const game = new Chess();
       const whiteBot = getBot(whiteBotName);
       const blackBot = getBot(blackBotName);
@@ -20,15 +21,18 @@ const useTournamentRunner = () => {
         if (!isRunningRef.current) break;
 
         const bot = game.turn() === 'w' ? whiteBot : blackBot;
+        const botName = game.turn() === 'w' ? whiteBotName : blackBotName;
         try {
           // Give the bot a copy of the game to prevent state corruption
           const gameCopy = new Chess(game.fen());
           const move = await bot(gameCopy);
           if (move) {
+            console.log(`[Tournament] ${botName} plays ${typeof move === 'object' ? JSON.stringify(move) : move}`);
             game.move(move);
             setCurrentGameState({ fen: game.fen(), white: whiteBotName, black: blackBotName });
             await new Promise(res => setTimeout(res, 50)); // Yield to UI thread
           } else {
+            console.log(`[Tournament] ${botName} returned a null move.`);
             break; // Bot returned null, game ends
           }
         } catch (e) {
@@ -40,10 +44,22 @@ const useTournamentRunner = () => {
       let winner = null;
       if (game.isCheckmate()) {
         winner = game.turn() === 'b' ? 'white' : 'black';
+        const winnerName = winner === 'white' ? whiteBotName : blackBotName;
+        console.log(`[Tournament] ${winnerName} won by checkmate.`);
       } else if (!game.isGameOver()) {
         // Game loop was broken by bot error, null move, or move limit.
         // Award loss to the current player.
         winner = game.turn() === 'w' ? 'black' : 'white';
+        const winnerName = winner === 'white' ? whiteBotName : blackBotName;
+        const loserName = game.turn() === 'w' ? whiteBotName : blackBotName;
+        console.log(`[Tournament] ${winnerName} won as ${loserName} erred or hit move limit.`);
+      } else {
+        // Otherwise, it's a draw (stalemate, repetition, etc.)
+        let reason = 'a draw';
+        if (game.isStalemate()) reason = 'draw by stalemate';
+        else if (game.isThreefoldRepetition()) reason = 'draw by repetition';
+        else if (game.isInsufficientMaterial()) reason = 'draw by insufficient material';
+        console.log(`[Tournament] Game ended in ${reason}.`);
       }
       // Otherwise, it's a draw (stalemate, repetition, etc.), so winner remains null.
 
