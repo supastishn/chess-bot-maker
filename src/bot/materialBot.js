@@ -2,20 +2,24 @@ export const materialBot = (game) => {
   const moves = game.getAvailableMoves?.() || [];
   if (moves.length === 0) return null;
 
+  // --- Check for immediate checkmate ---
   for (const move of moves) {
     try {
       game.move(move);
-      if (game.isCheckmate()) {
-        game.undo();
-        return move;
-      }
-      game.undo();
     } catch (e) {
-      // ignore illegal move and continue
+      // This move is illegal for some reason, so we skip it.
+      continue;
+    }
+    
+    const isMate = game.isCheckmate();
+    game.undo(); // Crucial: undo the move to restore state for the next loop iteration.
+
+    if (isMate) {
+      return move; // Found a checkmate.
     }
   }
 
-  // Material evaluation
+  // --- Material evaluation ---
   const isBlack = game.getTurn() === 'b';
   let bestScore = isBlack ? Infinity : -Infinity;
   let bestMoves = [];
@@ -23,22 +27,25 @@ export const materialBot = (game) => {
   for (const move of moves) {
     try {
       game.move(move);
-      const score = game.evaluateMaterial();
-      game.undo();
-
-      if ((isBlack && score < bestScore) || (!isBlack && score > bestScore)) {
-        bestScore = score;
-        bestMoves = [move];
-      } else if (score === bestScore) {
-        bestMoves.push(move);
-      }
     } catch (e) {
-      // ignore illegal move and continue
+      // This move is illegal for some reason, so we skip it.
+      continue;
+    }
+
+    const score = game.evaluateMaterial();
+    game.undo(); // Crucial: undo after evaluation.
+
+    if ((isBlack && score < bestScore) || (!isBlack && score > bestScore)) {
+      bestScore = score;
+      bestMoves = [move];
+    } else if (score === bestScore) {
+      bestMoves.push(move);
     }
   }
 
   if (bestMoves.length === 0) {
-    return null;
+    // This should not happen if `moves` is not empty, but it's a safe fallback.
+    return moves[Math.floor(Math.random() * moves.length)];
   }
 
   return bestMoves[Math.floor(Math.random() * bestMoves.length)];
