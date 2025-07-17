@@ -8,9 +8,10 @@ const useBotTester = () => {
   const runBotTests = useCallback(async (botName, botCode) => {
     setIsTesting(true);
     
-    // Temporary registration for testing
-    registerBot(`__temp_test_bot`, new Function('game', `return (${botCode});`)());
-    const testBot = getBot(`__temp_test_bot`);
+    // Temporary registration for testing with a unique name
+    const tempTestBotName = `__temp_test_bot_${Date.now()}`;
+    registerBot(tempTestBotName, new Function('game', `return (${botCode});`)(), null);
+    const testBot = getBot(tempTestBotName);
     
     const opponents = [
       'starter-bot',
@@ -22,56 +23,66 @@ const useBotTester = () => {
     const results = { wins: 0, losses: 0, draws: 0, matchResults: [] };
     
     for (const opponentName of opponents) {
-      const result = await runBotMatch(testBot, getBot(opponentName));
-      results[result.result]++;
+      // Pass bot names to the match runner for correct result tracking
+      const result = await runBotMatch(testBot, getBot(opponentName), botName, opponentName);
+      if (result.result === 'win') results.wins++;
+      else if (result.result === 'loss') results.losses++;
+      else results.draws++;
       results.matchResults.push(result);
     }
     
-    const winPercent = results.wins / results.matchResults.length;
-    results.rating = Math.round(800 + (winPercent * 1200));
+    const totalMatches = results.matchResults.length;
+    if (totalMatches > 0) {
+      // Elo calculation should account for draws
+      const winPercent = (results.wins + results.draws * 0.5) / totalMatches;
+      results.rating = Math.round(800 + (winPercent * 1200));
+    } else {
+      results.rating = 800; // Default rating
+    }
     
     setIsTesting(false);
     return results;
   }, []);
   
-  const runBotMatch = async (bot1, bot2) => {
+  const runBotMatch = async (bot1, bot2, bot1Name, bot2Name) => {
     const game = new Chess();
     let moves = 0;
-    let result = 'draw';
-    
+    let loopBroken = false;
+
     while (!game.isGameOver() && moves < 100) {
       try {
-        moves++;
-        const move = moves % 2 === 1 
-          ? bot1(game) 
-          : bot2(game);
-        
-        if (!move) break;
-        
-        if (typeof move === 'string') {
-          game.move({
-            from: move.slice(0, 2),
-            to: move.slice(2, 4),
-            promotion: move[4] || 'q'
-          });
-        } else {
-          game.move(move);
+        const currentBot = game.turn() === 'w' ? bot1 : bot2;
+        // Give the bot a copy of the game to prevent state corruption
+        const gameCopy = new Chess(game.fen());
+        const move = await currentBot(gameCopy);
+
+        if (!move) {
+          loopBroken = true;
+          break;
         }
+        game.move(move);
+        moves++;
       } catch (e) {
+        console.error(`Bot error during testing match for ${game.turn() === 'w' ? bot1Name : bot2Name}`, e);
+        loopBroken = true;
         break;
       }
     }
-    
+
+    let result; // 'win', 'loss', or 'draw' from bot1's perspective
     if (game.isCheckmate()) {
-      result = moves % 2 === 0 ? 'win' : 'loss';
-    } else if (game.isDraw()) {
+      result = game.turn() === 'b' ? 'win' : 'loss';
+    } else if (loopBroken) {
+      // The player whose turn it was is at fault for breaking the loop
+      result = game.turn() === 'w' ? 'loss' : 'win';
+    } else {
       result = 'draw';
     }
     
-    return { 
-      opponent: moves % 2 === 1 ? bot2.name : bot1.name, 
-      result, 
-      moves 
+    return {
+      opponent: bot2Name,
+      result,
+      moves,
     };
   };
   

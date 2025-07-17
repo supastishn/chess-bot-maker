@@ -21,7 +21,9 @@ const useTournamentRunner = () => {
 
         const bot = game.turn() === 'w' ? whiteBot : blackBot;
         try {
-          const move = await bot(game);
+          // Give the bot a copy of the game to prevent state corruption
+          const gameCopy = new Chess(game.fen());
+          const move = await bot(gameCopy);
           if (move) {
             game.move(move);
             setCurrentGameState({ fen: game.fen(), white: whiteBotName, black: blackBotName });
