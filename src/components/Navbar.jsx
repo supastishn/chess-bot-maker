@@ -4,6 +4,14 @@ import { useTheme } from '../context/useTheme';
 import { Crown, Gamepad2, Zap, FileText, Wrench, Sun, Moon, Trophy } from 'lucide-react';
 import './Navbar.css';
 
+const navLinks = [
+  { path: "/", icon: Gamepad2, text: "Play" },
+  { path: "/create-bot", icon: Zap, text: "Create Bot" },
+  { path: "/docs", icon: FileText, text: "Docs" },
+  { path: "/visual-bot-builder", icon: Wrench, text: "Visual Builder" },
+  { path: "/tournament", icon: Trophy, text: "Tournament" }
+];
+
 const Navbar = () => {
   const { isDark, toggleTheme } = useTheme();
 
@@ -17,31 +25,18 @@ const Navbar = () => {
           </NavLink>
         </div>
         <div className="navbar-menu">
-          <NavLink to="/" className="nav-link" end>
-            <Gamepad2 className="nav-icon" />
-            <span className="nav-text">Play</span>
-          </NavLink>
-          <NavLink to="/create-bot" className="nav-link">
-            <Zap className="nav-icon" />
-            <span className="nav-text">Create Bot</span>
-          </NavLink>
-          <NavLink to="/docs" className="nav-link">
-            <FileText className="nav-icon" />
-            <span className="nav-text">Docs</span>
-          </NavLink>
-          <NavLink to="/visual-bot-builder" className="nav-link">
-            <Wrench className="nav-icon" />
-            <span className="nav-text">Visual Builder</span>
-          </NavLink>
-          <NavLink to="/tournament" className="nav-link">
-            <Trophy className="nav-icon" />
-            <span className="nav-text">Tournament</span>
-          </NavLink>
-          <button
-            onClick={toggleTheme}
-            className="theme-toggle"
-            aria-label="Toggle theme"
-          >
+          {navLinks.map((link) => (
+            <NavLink 
+              key={link.path}
+              to={link.path}
+              className="nav-link"
+              end
+            >
+              <link.icon className="nav-icon" />
+              <span className="nav-text">{link.text}</span>
+            </NavLink>
+          ))}
+          <button onClick={toggleTheme} className="theme-toggle">
             {isDark ? <Sun className="theme-icon" /> : <Moon className="theme-icon" />}
           </button>
         </div>

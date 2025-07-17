@@ -42,24 +42,23 @@ const CreateBot = ({ onRegisterBot }) => {
     setIsTesting(false);
   };
 
+  const isLibraryTab = showLibrary === true;
+
   return (
     <div className="page-container">
       <div className="create-bot-content fade-in">
         <div className="tabs">
-          <button 
-            className={`btn ${!showLibrary ? 'primary-button' : ''}`}
-            onClick={() => setShowLibrary(false)}
-          >
-            Create New Bot
-          </button>
-          <button 
-            className={`btn ${showLibrary ? 'primary-button' : ''}`}
-            onClick={() => setShowLibrary(true)}
-          >
-            Bot Library
-          </button>
+          {['Create New Bot', 'Bot Library'].map((tab, index) => (
+            <button 
+              key={tab}
+              className={`btn ${isLibraryTab === !!index ? 'primary-button' : ''}`}
+              onClick={() => setShowLibrary(!!index)}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
-        {showLibrary ? (
+        {isLibraryTab ? (
           <BotLibrary />
         ) : (
           <>

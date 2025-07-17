@@ -2,10 +2,8 @@ import React from 'react';
 import { getBotNames, getBotSource } from '../bot/botInterface';
 
 const BotLibrary = () => {
-  const botNames = getBotNames().filter(name =>
-    !name.startsWith('__temp')
-  );
-  const [selectedBot, setSelectedBot] = React.useState(botNames[0]);
+  const botNames = getBotNames().filter(name => !name.startsWith('__temp'));
+  const [selectedBot, setSelectedBot] = React.useState(botNames[0] ?? '');
 
   return (
     <div className="bot-library glass-card">
