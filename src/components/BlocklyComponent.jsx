@@ -13,6 +13,9 @@ const BlocklyComponent = forwardRef(({ onCodeChange }, ref) => {
   const workspace = useRef(null);
 
   useEffect(() => {
+    // Guard against the ref not being ready.
+    if (!blocklyDiv.current) return;
+
     workspace.current = Blockly.inject(blocklyDiv.current, {
       toolbox: toolbox,
       trashcan: true,
@@ -32,6 +35,11 @@ const BlocklyComponent = forwardRef(({ onCodeChange }, ref) => {
       const code = javascriptGenerator.workspaceToCode(workspace.current);
       if (onCodeChange) onCodeChange(code);
     });
+
+    // Cleanup function to dispose of the workspace on unmount.
+    return () => {
+      workspace.current?.dispose();
+    };
   }, [onCodeChange]);
 
   useImperativeHandle(ref, () => ({
