@@ -74,12 +74,12 @@ const createBotHelper = (gameClient) => {
     hashSize: 256,
     contempt: 0,
     async init(depth = 15) {
-      if (!stockfishEngine) {
+      if (!stockfishEngine && typeof Worker !== 'undefined') {
         stockfishEngine = new StockfishEngine(depth);
       }
-      stockfishEngine.setOption?.("Skill Level", this.skillLevel);
-      stockfishEngine.setOption?.("Hash", this.hashSize);
-      stockfishEngine.setOption?.("Contempt", this.contempt);
+      stockfishEngine?.setOption?.("Skill Level", this.skillLevel);
+      stockfishEngine?.setOption?.("Hash", this.hashSize);
+      stockfishEngine?.setOption?.("Contempt", this.contempt);
     },
     async getBestMove(fen, depth = 15) {
       await this.init(depth);
@@ -97,7 +97,7 @@ const createBotHelper = (gameClient) => {
     return gameClient.stockfish.runBenchmark(depth);
   };
 
-  return { ...gameClient, ...helper };
+  return { ...helper, ...gameClient };
 };
 
 export const registerBot = (name, botFunction, source) => {

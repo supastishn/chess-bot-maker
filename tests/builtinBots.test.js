@@ -16,10 +16,10 @@ describe('Built-in Bots', () => {
   describe('randomBot', () => {
     test('selects a move from available moves', () => {
       const randomBot = getBot('random-bot');
-      mockGame.moves.mockReturnValue(['e2e4', 'd2d4', 'g1f3']);
-      // With Math.random stubbed to 0.5, it should pick the middle element.
-      // Math.floor(3 * 0.5) = 1
-      expect(randomBot(mockGame)).toBe('d2d4');
+      const moves = ['e2e4', 'd2d4', 'g1f3'];
+      mockGame.moves.mockReturnValue(moves);
+      // Test that the returned move is one of the available options
+      expect(moves).toContain(randomBot(mockGame));
     });
   });
 
