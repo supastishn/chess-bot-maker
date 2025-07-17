@@ -1,5 +1,4 @@
 const COMMON_OPTIONS = {
-  'Skill Level': 20,
   'Hash': 256,
   'Contempt': 0
 };
@@ -36,6 +35,23 @@ export default class StockfishEngine {
     });
 
     this.engine.postMessage('uci'); // Start UCI communication
+  }
+
+  setOption(name, value) {
+    this.sendCommand(`setoption name ${name} value ${value}`);
+  }
+
+  setElo(elo) {
+    if (!this.ready || elo < 1320 || elo > 3190) return false;
+    this.setOption('UCI_LimitStrength', true);
+    this.setOption('UCI_Elo', elo);
+    return true;
+  }
+
+  disableEloLimit() {
+    if (!this.ready) return false;
+    this.setOption('UCI_LimitStrength', false);
+    return true;
   }
 
   sendCommand(cmd) {

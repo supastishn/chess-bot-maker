@@ -42,6 +42,23 @@ const createBotHelper = (gameClient) => {
   if (gameClient.isAttacked === undefined) helper.isAttacked = (square, byColor) => gameClient.isAttacked(square, byColor);
   if (gameClient.getMoveCount === undefined) helper.getMoveCount = () => gameClient.history().length;
 
+  if (gameClient.setElo === undefined) helper.setElo = (elo) => {
+    if (!stockfishEngine) stockfishEngine = new StockfishEngine();
+    stockfishEngine.initialized.then(() => stockfishEngine.setElo(elo));
+  };
+  if (gameClient.disableEloLimit === undefined) helper.disableEloLimit = () => {
+    if (!stockfishEngine) stockfishEngine = new StockfishEngine();
+    stockfishEngine.initialized.then(() => stockfishEngine.disableEloLimit());
+  };
+  if (gameClient.setHashSize === undefined) helper.setHashSize = (size) => {
+    if (!stockfishEngine) stockfishEngine = new StockfishEngine();
+    stockfishEngine.initialized.then(() => stockfishEngine.setOption('Hash', size));
+  };
+  if (gameClient.setContempt === undefined) helper.setContempt = (value) => {
+    if (!stockfishEngine) stockfishEngine = new StockfishEngine();
+    stockfishEngine.initialized.then(() => stockfishEngine.setOption('Contempt', value));
+  };
+
   // --- Opening Book helpers ---
   if (gameClient.getBookMoves === undefined) helper.getBookMoves = () => {
     const key = getPositionKey(gameClient.fen());
@@ -140,17 +157,22 @@ const createBotHelper = (gameClient) => {
   };
 
   if (gameClient.stockfish === undefined) helper.stockfish = () => ({
-    skillLevel: 20,
+    elo: 3190,
     hashSize: 256,
     contempt: 0,
-    async init(depth = 15) {
-      // Deprecated: No longer needed, kept for compatibility
+    async init() {
       if (!stockfishEngine && typeof Worker !== 'undefined') {
         stockfishEngine = new StockfishEngine();
       }
-      stockfishEngine?.setOption?.("Skill Level", this.skillLevel);
-      stockfishEngine?.setOption?.("Hash", this.hashSize);
-      stockfishEngine?.setOption?.("Contempt", this.contempt);
+      await stockfishEngine.initialized;
+
+      if (this.elo >= 3190) {
+        stockfishEngine.disableEloLimit();
+      } else {
+        stockfishEngine.setElo(this.elo);
+      }
+      stockfishEngine.setOption("Hash", this.hashSize);
+      stockfishEngine.setOption("Contempt", this.contempt);
     },
     async getBestMove(fen, depth = 15) {
       // Auto-initialize on first call in a compatible environment

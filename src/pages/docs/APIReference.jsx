@@ -173,14 +173,27 @@ game.prioritizeStrategy({
         <h2><Bot size={20} /> Stockfish API</h2>
         <div className="method-list">
           <div className="method-item">
+            <h3><code>await stockfish.init()</code></h3>
+            <p>Initializes the Stockfish engine and applies settings like Elo, Hash, and Contempt from the current <code>stockfish</code> object instance. Should be called before <code>getBestMove</code> if custom settings are desired.</p>
+            <pre>{`const sf = game.stockfish();
+sf.elo = 1800;
+await sf.init();
+const bestMove = await sf.getBestMove(game.getFEN(), 10);`}</pre>
+          </div>
+          <div className="method-item">
             <h3><code>await stockfish.getBestMove(fen, depth): string</code></h3>
             <p>Asynchronously gets the best move from the Stockfish engine.</p>
             <pre>const bestMove = await game.stockfish.getBestMove(game.getFEN(), 15);</pre>
           </div>
           <div className="method-item">
-            <h3><code>setSkillLevel(level: number)</code></h3>
-            <p>Sets Stockfish's skill level (0-20). Lower values induce more errors.</p>
-            <pre>game.setSkillLevel(10);</pre>
+            <h3><code>setElo(elo: number)</code></h3>
+            <p>Enables strength limitation and sets Stockfish's Elo rating (range: 1320 to 3190).</p>
+            <pre>game.setElo(2000);</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>disableEloLimit()</code></h3>
+            <p>Disables strength limitation, allowing Stockfish to play at full strength.</p>
+            <pre>game.disableEloLimit();</pre>
           </div>
           <div className="method-item">
             <h3><code>await getPositionEvaluation(fen): object</code></h3>
