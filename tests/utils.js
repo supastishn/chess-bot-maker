@@ -18,6 +18,7 @@ export const mockGameClient = (overrides = {}) => ({
   turn: vi.fn().mockReturnValue('w'),
   undo: vi.fn(),
   move: vi.fn(),
+  fen: vi.fn(() => 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'),
   getGameResult: vi.fn(() => 'ongoing'),
   evaluateMaterial: vi.fn(() => 0),
   getStatus: vi.fn(),

@@ -16,7 +16,7 @@ describe('Built-in Bots', () => {
   describe('randomBot', () => {
     test('selects a move from available moves', () => {
       const randomBot = getBot('random-bot');
-      mockGame.getAvailableMoves.mockReturnValue(['e2e4', 'd2d4', 'g1f3']);
+      mockGame.moves.mockReturnValue(['e2e4', 'd2d4', 'g1f3']);
       // With Math.random stubbed to 0.5, it should pick the middle element.
       // Math.floor(3 * 0.5) = 1
       expect(randomBot(mockGame)).toBe('d2d4');
@@ -28,7 +28,7 @@ describe('Built-in Bots', () => {
     const aggressiveBot = getBot('aggressive-bot');
 
     test('prefers capture moves', () => {
-      mockGame.getVerboseMoves.mockReturnValue([
+      mockGame.moves.mockReturnValue([
         { from: 'e2', to: 'e4', flags: 'n' },
         { from: 'd2', to: 'd4', flags: 'c', captured: 'p' },
         { from: 'g1', to: 'f3', flags: 'n' },
@@ -37,7 +37,7 @@ describe('Built-in Bots', () => {
     });
 
     test('prefers capturing a more valuable piece', () => {
-      mockGame.getVerboseMoves.mockReturnValue([
+      mockGame.moves.mockReturnValue([
         { from: 'd2', to: 'd4', flags: 'c', captured: 'p' }, // Pawn, value 1
         { from: 'e2', to: 'e5', flags: 'c', captured: 'r' }, // Rook, value 5
       ]);
@@ -45,7 +45,7 @@ describe('Built-in Bots', () => {
     });
 
     test('plays a random move if no captures are available', () => {
-      mockGame.getVerboseMoves.mockReturnValue([
+      mockGame.moves.mockReturnValue([
         { from: 'e2', to: 'e4', flags: 'n' },
         { from: 'd2', to: 'd4', flags: 'n' },
         { from: 'g1', to: 'f3', flags: 'n' },
@@ -59,8 +59,8 @@ describe('Built-in Bots', () => {
     const defensiveBot = getBot('defensive-bot');
 
     test('prefers moves to safe squares', () => {
-      mockGame.getTurn.mockReturnValue('w'); // Bot is white, opponent is black
-      mockGame.getAvailableMoves.mockReturnValue(['a2a3', 'b2b3', 'c2c3']);
+      mockGame.turn.mockReturnValue('w'); // Bot is white, opponent is black
+      mockGame.moves.mockReturnValue(['a2a3', 'b2b3', 'c2c3']);
       // Mock 'b2b3' as a move to an attacked square
       mockGame.isAttacked.mockImplementation((square, byColor) => square === 'b3' && byColor === 'b');
 
@@ -74,7 +74,7 @@ describe('Built-in Bots', () => {
   describe('positionalBot', () => {
     test('chooses move with the highest lookAhead score', () => {
       const positionalBot = getBot('positional-bot');
-      mockGame.getAvailableMoves.mockReturnValue(['e2e4', 'd2d4', 'g1f3']);
+      mockGame.moves.mockReturnValue(['e2e4', 'd2d4', 'g1f3']);
       // Scores for e2e4, d2d4, g1f3 respectively
       mockGame.lookAhead
         .mockReturnValueOnce({ score: 5 })
@@ -89,7 +89,7 @@ describe('Built-in Bots', () => {
   describe('guruBot', () => {
     test('uses prioritizeStrategy to select a move', () => {
       const guruBot = getBot('guru-bot');
-      mockGame.getAvailableMoves.mockReturnValue(['e2e4', 'd2d4']);
+      mockGame.moves.mockReturnValue(['e2e4', 'd2d4']);
       mockGame.prioritizeStrategy.mockReturnValue('e2e4');
 
       const move = guruBot(mockGame);
@@ -103,16 +103,16 @@ describe('Built-in Bots', () => {
     const toggleBot = getBot('toggle-bot');
     
     test('acts like materialBot on turn 0', () => {
-      mockGame.getMoveCount.mockReturnValue(0);
-      mockGame.isCheckmate.mockReturnValueOnce(true); // materialBot prefers checkmate
-      mockGame.getAvailableMoves.mockReturnValue(['e2e4', 'd2d4']);
+      mockGame.history.mockReturnValue([]);
+      mockGame.isCheckmate.mockReturnValue(true); // materialBot prefers checkmate
+      mockGame.moves.mockReturnValue(['e2e4', 'd2d4']);
       
       expect(toggleBot(mockGame)).toBe('e2e4');
     });
     
     test('acts like aggressiveBot on turn 1', () => {
-      mockGame.getMoveCount.mockReturnValue(2); // turnNumber 1
-      mockGame.getVerboseMoves.mockReturnValue([
+      mockGame.history.mockReturnValue(['e2e4', 'e7e5']); // turnNumber 1
+      mockGame.moves.mockReturnValue([
         { from: 'e2', to: 'e4', flags: 'n' },
         { from: 'd2', to: 'd4', flags: 'c', captured: 'p' },
       ]);
@@ -121,8 +121,8 @@ describe('Built-in Bots', () => {
     });
     
     test('acts like positionalBot on turn 2', () => {
-      mockGame.getMoveCount.mockReturnValue(4); // turnNumber 2
-      mockGame.getAvailableMoves.mockReturnValue(['e2e4', 'd2d4']);
+      mockGame.history.mockReturnValue(['w', 'b', 'w', 'b']); // turnNumber 2
+      mockGame.moves.mockReturnValue(['e2e4', 'd2d4']);
       mockGame.lookAhead
         .mockReturnValueOnce({ score: 1 })
         .mockReturnValueOnce({ score: 5 });
