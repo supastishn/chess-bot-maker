@@ -146,35 +146,32 @@ const createBotHelper = (gameClient) => {
     async init(depth = 15) {
       // Deprecated: No longer needed, kept for compatibility
       if (!stockfishEngine && typeof Worker !== 'undefined') {
-        stockfishEngine = new StockfishEngine(depth);
+        stockfishEngine = new StockfishEngine();
       }
       stockfishEngine?.setOption?.("Skill Level", this.skillLevel);
       stockfishEngine?.setOption?.("Hash", this.hashSize);
       stockfishEngine?.setOption?.("Contempt", this.contempt);
     },
     async getBestMove(fen, depth = 15) {
-      // Handle auto-initialization if not ready
+      // Auto-initialize on first call in a compatible environment
       if (!stockfishEngine && typeof Worker !== 'undefined') {
-        stockfishEngine = new StockfishEngine(depth);
+        stockfishEngine = new StockfishEngine();
       }
 
-      // Wait for initialization to complete if needed
-      if (stockfishEngine && !stockfishEngine.ready) {
-        await new Promise(resolve => {
-          const interval = setInterval(() => {
-            if (stockfishEngine.ready) {
-              clearInterval(interval);
-              resolve();
-            }
-          }, 50);
-        });
+      if (!stockfishEngine) {
+        throw new Error("Stockfish engine is not available in this environment.");
       }
+      
+      // Wait for the engine to confirm it's ready
+      await stockfishEngine.initialized;
 
-      if (stockfishEngine) {
+      if (stockfishEngine.ready) {
         const analysis = await stockfishEngine.getPositionEvaluation(fen, depth);
         return analysis?.bestMove;
       }
-      throw new Error("Stockfish engine initialization failed");
+      
+      // This path should ideally not be reached if initialized promise resolves
+      throw new Error("Stockfish engine failed to initialize.");
     }
   });
 

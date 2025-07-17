@@ -5,9 +5,8 @@ const COMMON_OPTIONS = {
 };
 
 export default class StockfishEngine {
-  constructor(depth = 15) {
-    this.depth = depth;
-    this.engine = new Worker('/stockfish.js');
+  constructor() {
+    this.engine = new Worker(`${import.meta.env.BASE_URL}stockfish.js`);
     this.evalInProgress = false;
     this.ready = false;
     this.infoHandlers = new Set();
