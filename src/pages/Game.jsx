@@ -44,6 +44,7 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
     try {
       const result = gameRef.current.move({ from, to, promotion: 'q' });
       if (result) {
+        console.log(`[Play] Human plays ${result.san}`);
         updateBoardRef.current();
         startBotMoveRef.current();
       }
@@ -55,13 +56,32 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   // 3. Replace updateBoard to use setFen and stable dependencies
   const updateBoard = useCallback(() => {
     if (cgRef.current) {
-      const newFen = gameRef.current.fen();
-      const turnColor = gameRef.current.turn() === 'w' ? 'white' : 'black';
+      const game = gameRef.current;
+      const newFen = game.fen();
+      const turnColor = game.turn() === 'w' ? 'white' : 'black';
       const newStatus = {
-        isCheckmate: gameRef.current.isCheckmate(),
-        isStalemate: gameRef.current.isStalemate(),
-        isRepetition: gameRef.current.isThreefoldRepetition(),
+        isCheckmate: game.isCheckmate(),
+        isStalemate: game.isStalemate(),
+        isRepetition: game.isThreefoldRepetition(),
       };
+
+      if (game.isGameOver()) {
+        let reason = "game over";
+        if (newStatus.isCheckmate) {
+          const winner = turnColor === 'white' ? 'Black' : 'White';
+          reason = `${winner} won by checkmate.`;
+        } else if (newStatus.isStalemate) {
+          reason = 'Draw by stalemate.';
+        } else if (newStatus.isRepetition) {
+          reason = 'Draw by threefold repetition.';
+        } else if (game.isInsufficientMaterial()) {
+          reason = 'Draw by insufficient material.';
+        } else if (game.isDraw()) {
+          reason = 'Draw by 50-move rule.';
+        }
+        console.log(`[Play] Game over: ${reason}`);
+      }
+
       setGameState({ turn: turnColor, status: newStatus });
       cgRef.current.set({
         fen: newFen,
@@ -89,13 +109,17 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
       const isBotTurn = (gameMode === 'bot-human' && turn === 'b') || gameMode === 'bot-bot';
 
       if (isBotTurn) {
-        const bot = turn === 'w' ? getBot(selectedBot) : getBot(blackBot);
+        const botName = (gameMode === 'bot-bot')
+          ? (turn === 'w' ? selectedBot : blackBot)
+          : selectedBot;
+        const bot = getBot(botName);
         if (!bot) return;
 
         try {
           const move = await bot(gameRef.current);
 
           if (move) {
+            console.log(`[Play] ${botName} plays ${typeof move === 'object' ? JSON.stringify(move) : move}`);
             gameRef.current.move(move);
             updateBoardRef.current(); // Use the ref here
 
@@ -103,6 +127,8 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
             if (gameMode === 'bot-bot' && !gameRef.current.isGameOver()) {
               setTimeout(makeBotMove, 200);
             }
+          } else {
+            console.log(`[Play] ${botName} returned a null move.`);
           }
         } catch (e) {
           console.error("Bot execution error:", e);
@@ -164,7 +190,12 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
   // Reset when mode or bots change
   useEffect(() => {
     resetBoard();
-    if (gameMode === 'bot-bot') startBotMove();
+    if (gameMode === 'bot-bot') {
+      console.log(`[Play] Starting game: ${selectedBot} (W) vs ${blackBot} (B)`);
+      startBotMove();
+    } else {
+      console.log(`[Play] Starting game: Human (W) vs ${selectedBot} (B)`);
+    }
   }, [gameMode, selectedBot, blackBot, resetBoard, startBotMove]);
 
   return (
