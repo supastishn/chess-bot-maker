@@ -189,28 +189,92 @@ const createBotHelper = (gameClient) => {
     return score;
   };
 
-  // Future move simulation (basic minimax)
-  helper.lookAhead = (move, depth = 2) => {
+  // Future move simulation (multi-topic evaluation)
+  helper.lookAhead = (move, depth = 2, topics = ['all']) => {
     gameClient.move(move);
     let result;
     if (depth <= 0) {
-      result = { score: helper.getPositionScore() };
+      result = { score: helper.evaluatePosition(topics) };
     } else {
       const nextMoves = helper.getAvailableMoves();
       if (nextMoves.length === 0) {
-        result = { score: helper.getPositionScore() };
+        result = { score: helper.evaluatePosition(topics) };
       } else {
-        // Calculate maximum opponent score at reduced depth
         const opponentScores = nextMoves.map(m => {
-          const outcome = helper.lookAhead(m, depth - 1);
+          const outcome = helper.lookAhead(m, depth - 1, topics);
           return outcome.score;
         });
         const maxScore = Math.max(...opponentScores);
-        result = { score: helper.getPositionScore() - maxScore };
+        result = { score: helper.evaluatePosition(topics) - maxScore };
       }
     }
     gameClient.undo();
     return result;
+  };
+
+  // Multi-topic evaluation function
+  helper.evaluatePosition = (topics) => {
+    let score = 0;
+    const includeAll = topics.includes('all');
+
+    if (includeAll || topics.includes('material')) {
+      score += helper.evaluateMaterial();
+    }
+
+    if (includeAll || topics.includes('positioning')) {
+      // Positional advantage evaluation
+      const piecePositions = helper.getBoardState();
+      piecePositions.forEach(square => {
+        if (square.piece && square.piece.side === helper.getTurn()) {
+          // Center control bonus
+          if (['d4','d5','e4','e5'].includes(square.file + square.rank)) {
+            score += 0.3;
+          }
+          // Developed pieces bonus
+          if (helper.getGamePhase() === 'opening' &&
+              ['knight','bishop'].includes(square.piece.type)) {
+            score += 0.2;
+          }
+        }
+      });
+    }
+
+    if (includeAll || topics.includes('control')) {
+      // Controlled squares evaluation
+      const opponentColor = helper.getTurn() === 'w' ? 'b' : 'w';
+      const controlledSquares = helper.getThreatenedSquares(opponentColor);
+      score += controlledSquares.length * 0.05;
+    }
+
+    if (includeAll || topics.includes('safety')) {
+      // King safety evaluation
+      if (helper.isInCheck()) {
+        score -= 1.0;
+      } else {
+        const kingPosition = helper.getKingPosition();
+        if (kingPosition) {
+          const attackSquares = helper.getThreatenedSquares(
+            helper.getTurn() === 'w' ? 'b' : 'w'
+          );
+          if (attackSquares.includes(kingPosition)) {
+            score -= 0.5;
+          }
+        }
+      }
+    }
+
+    return score;
+  };
+
+  // Helper to get king position
+  helper.getKingPosition = () => {
+    const board = helper.getBoardState();
+    const king = board.find(sq =>
+      sq.piece &&
+      sq.piece.side === helper.getTurn() &&
+      sq.piece.type === 'king'
+    );
+    return king ? king.file + king.rank : null;
   };
 
   // FEN helper
