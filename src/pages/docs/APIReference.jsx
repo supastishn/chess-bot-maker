@@ -30,7 +30,7 @@ const APIReference = () => {
             <p>Returns all legal moves for the current player in UCI format.</p>
             <pre>const moves = game.getAvailableMoves();</pre>
           </div>
-           <div className="method-item">
+          <div className="method-item">
             <h3><code>getVerboseMoves(): object[]</code></h3>
             <p>Returns all legal moves as detailed objects.</p>
             <pre>const verboseMoves = game.getVerboseMoves();</pre>
@@ -45,7 +45,7 @@ const APIReference = () => {
             <p>Returns the game status: 'checkmate', 'stalemate', 'repetition', or 'ongoing'.</p>
             <pre>if (game.getGameResult() === 'checkmate') ...</pre>
           </div>
-           <div className="method-item">
+          <div className="method-item">
             <h3><code>isInCheck(): boolean</code></h3>
             <p>Returns true if the current player is in check.</p>
             <pre>if (game.isInCheck()) ...</pre>
@@ -65,7 +65,7 @@ const APIReference = () => {
             <p>Returns all squares attacked by the current player. Note: you must pass the opponent's color.</p>
             <pre>{`const opponent = game.getTurn() === 'w' ? 'b' : 'w';\nconst attacks = game.getThreatenedSquares(opponent);`}</pre>
           </div>
-           <div className="method-item">
+          <div className="method-item">
             <h3><code>getMoveCount(): number</code></h3>
             <p>Returns the number of half-moves (plies) made in the game.</p>
             <pre>const ply = game.getMoveCount();</pre>
@@ -83,6 +83,26 @@ const APIReference = () => {
             <h3><code>lookAhead(move: string, depth: number): {"{ score: number }"}</code></h3>
             <p>Simulates a move and evaluates position up to 'depth' plies ahead.</p>
             <pre>const score = game.lookAhead('e2e4', 3).score;</pre>
+          </div>
+
+          {/* New methods */}
+          <div className="method-item">
+            <h3><code>getBoardState(): Square[]</code></h3>
+            <p>Returns 64-square board representation with file, rank and piece details.</p>
+            <pre>{`const board = game.getBoardState();
+// Example output:
+// [ { file: 'a', rank: 1, piece: { type: 'rook', side: 'w' } }, ... ]`}</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>getFEN(): string</code></h3>
+            <p>Returns current position in Forsyth-Edwards Notation.</p>
+            <pre>const fen = game.getFEN();</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>getPositionAfterMove(move: string): PositionData</code></h3>
+            <p>Simulates a move and returns resulting board state without altering game state.</p>
+            <pre>{`const pos = game.getPositionAfterMove('e2e4');
+// Returns { piecePosition: 'e4', allPositions: [...] }`}</pre>
           </div>
         </div>
       </div>
@@ -166,6 +186,28 @@ game.prioritizeStrategy({
             <h3><code>await getPositionEvaluation(fen): object</code></h3>
             <p>Asynchronously gets a detailed evaluation from Stockfish.</p>
             <pre>const eval = await game.getPositionEvaluation();</pre>
+          </div>
+
+          {/* New Stockfish methods */}
+          <div className="method-item">
+            <h3><code>setHashSize(size: number)</code></h3>
+            <p>Configures memory allocation for engine in MB. Higher values enable deeper analysis.</p>
+            <pre>game.setHashSize(512); // 512 MB allocation</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>setContempt(value: number)</code></h3>
+            <p>Adjusts behavioral bias (range: -100 to 100). Positive values encourage aggression.</p>
+            <pre>game.setContempt(24); // More aggressive play</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>await analyzeGame(pgn: string): object</code></h3>
+            <p>Provides detailed move-by-move analysis of complete PGN games.</p>
+            <pre>{`const analysis = await game.analyzeGame('[Event \"Tournament Game\"] ...');`}</pre>
+          </div>
+          <div className="method-item">
+            <h3><code>await benchmark(depth: number): object</code></h3>
+            <p>Runs engine performance diagnostics at specified depth.</p>
+            <pre>const stats = await game.benchmark(16);</pre>
           </div>
         </div>
       </div>
