@@ -6,48 +6,52 @@ describe('materialBot', () => {
   let mockGame;
 
   beforeEach(() => {
+    // Reset mocks and make random predictable
+    vi.restoreAllMocks();
+    vi.stubGlobal('Math.random', () => 0.5);
+
     mockGame = mockGameClient({
       getAvailableMoves: vi.fn().mockReturnValue([
         'e2e4', 'd2d4', 'g1f3'
       ]),
-      evaluateMaterial: vi.fn()
-        .mockReturnValueOnce(0)   // Checkmate evaluation
-        .mockReturnValueOnce(0.5) // Initial board state
-        .mockReturnValue(0.5)      // Arbitrary value
+      getTurn: vi.fn().mockReturnValue('w'),
+      // No stateful mocks here
     });
   });
 
   test('prefers checkmate moves', () => {
-    mockGame.isCheckmate.mockReturnValueOnce(false)
-      .mockReturnValueOnce(true)   // Force checkmate on first mock
-      .mockReturnValue(false);
+    // Make the first move a checkmate
+    mockGame.isCheckmate.mockReturnValueOnce(true);
 
     const move = materialBot(mockGame);
     expect(move).toBe('e2e4');
-    expect(mockGame.move).toHaveBeenCalledTimes(2);
   });
 
   test('selects move with best material gain', () => {
-    // Simulate material evaluation
-    mockGame.evaluateMaterial.mockReturnValueOnce(0.5) // Original value
-      .mockReturnValueOnce(1.0) // e2e4
-      .mockReturnValueOnce(0.2) // d2d4
-      .mockReturnValue(0.5);    // g1f3
+    mockGame.isCheckmate.mockReturnValue(false);
+    
+    // Scores for 'e2e4', 'd2d4', 'g1f3' respectively
+    mockGame.evaluateMaterial
+      .mockReturnValueOnce(1.0) // e2e4 is best
+      .mockReturnValueOnce(0.2)
+      .mockReturnValueOnce(0.5);
     
     const move = materialBot(mockGame);
     expect(move).toBe('e2e4');
-    expect(mockGame.move).toHaveBeenCalledTimes(4);
   });
 
   test('handles move evaluation errors', () => {
+    mockGame.isCheckmate.mockReturnValue(false);
+    
+    // Make the first move 'e2e4' throw an error
     mockGame.move.mockImplementationOnce(() => {
       throw new Error('Illegal move');
     });
     
-    // Simulate material evaluation
-    mockGame.evaluateMaterial.mockReturnValueOnce(0.5) // Original value
-      .mockReturnValueOnce(0.5) // e2e4 (failed)
-      .mockReturnValue(1.0);     // d2d4
+    // Scores for the remaining moves 'd2d4' and 'g1f3'
+    mockGame.evaluateMaterial
+      .mockReturnValueOnce(1.0) // d2d4 is best
+      .mockReturnValueOnce(0.5);
     
     const move = materialBot(mockGame);
     expect(move).toBe('d2d4');

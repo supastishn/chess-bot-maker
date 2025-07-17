@@ -1,11 +1,11 @@
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { Chess } from 'chess.js';
-import useTournamentRunner from '../../src/hooks/useTournamentRunner';
+import useTournamentRunner from '../../src/hooks/useTournamentRunner.js';
 
 vi.mock('chess.js');
 
-vi.mock('../../src/bot/botInterface', () => ({
+vi.mock('../../src/bot/botInterface.js', () => ({
   getBot: vi.fn()
 }));
 
@@ -30,7 +30,7 @@ describe('useTournamentRunner', () => {
   });
 
   it('runs matches correctly', async () => {
-    const { getBot } = require('../../src/bot/botInterface');
+    const { getBot } = require('../../src/bot/botInterface.js');
     getBot.mockImplementation(() => () => 'e2e4');
 
     const chessMock = {
@@ -58,7 +58,7 @@ describe('useTournamentRunner', () => {
   });
 
   it('handles premature termination', async () => {
-    const { getBot } = require('../../src/bot/botInterface');
+    const { getBot } = require('../../src/bot/botInterface.js');
     getBot.mockImplementation(() => () => 'e2e4');
 
     const { result } = renderHook(() => useTournamentRunner());

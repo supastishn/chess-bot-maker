@@ -1,7 +1,7 @@
 
 
 import StockfishEngine from './stockfishEngine.js';
-import getOpeningBook, { getPositionKey } from '../services/openingService';
+import getOpeningBook, { getPositionKey } from '../services/openingService.js';
 
 const openingDB = getOpeningBook();
 
@@ -396,7 +396,7 @@ export const getBot = (name) => {
 export const getBotNames = () => Array.from(registeredBots.keys());
 
  // Register built-in bots
-import { materialBot } from './materialBot';
+import { materialBot } from './materialBot.js';
 
 const guruBotFn = (game) => {
   const moves = game.getAvailableMoves();
