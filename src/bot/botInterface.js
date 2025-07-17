@@ -184,10 +184,10 @@ const aggressiveBotFn = (game) => {
       : bestCapture.from + bestCapture.to;
   }
   
-  const randomMove = moves[Math.floor(Math.random() * moves.length)];
-  return randomMove.promotion 
-    ? randomMove.from + randomMove.to + randomMove.promotion
-    : randomMove.from + randomMove.to;
+  // Fallback to a random move from available moves, consistent with randomBot
+  const availableMoves = game.getAvailableMoves();
+  if (!availableMoves.length) return null;
+  return availableMoves[Math.floor(Math.random() * availableMoves.length)];
 };
 registerBot('aggressive-bot', aggressiveBotFn, aggressiveBotFn.toString());
 
