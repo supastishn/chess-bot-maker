@@ -24,7 +24,7 @@ export const materialBot = (game) => {
     try {
       game.move(move);
       const score = game.evaluateMaterial();
-      game.undoMove();
+      game.undo();
 
       if ((isBlack && score < bestScore) || (!isBlack && score > bestScore)) {
         bestScore = score;
