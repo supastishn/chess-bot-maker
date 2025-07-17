@@ -12,9 +12,27 @@ export default class StockfishEngine {
     this.ready = false;
     this.infoHandlers = new Set();
     this.infoListener = null;
-    Object.entries(COMMON_OPTIONS).forEach(([key, val]) =>
-      this.sendCommand(`setoption name ${key} value ${val}`)
-    );
+
+    this.engine.onmessage = (event) => {
+      const line = event.data;
+
+      if (line === 'uciok') {
+        this.ready = true;
+        // Set common options after engine is ready
+        Object.entries(COMMON_OPTIONS).forEach(([key, val]) =>
+          this.sendCommand(`setoption name ${key} value ${val}`)
+        );
+      }
+      
+      // Pass the message to any active handlers
+      this.infoHandlers.forEach(handler => {
+        if (typeof handler.callback === 'function') {
+          handler.callback(line);
+        }
+      });
+    };
+    
+    this.engine.postMessage('uci'); // Start UCI communication
   }
 
   sendCommand(cmd) {
@@ -26,41 +44,42 @@ export default class StockfishEngine {
   // Analyze the current position only
   getPositionEvaluation(fen, depth = 15) {
     if (!this.ready) return Promise.reject("Engine not initialized");
-    
+    if (this.evalInProgress) return Promise.reject("Evaluation already in progress");
+
     return new Promise((resolve) => {
       let analysis = {};
       this.evalInProgress = true;
       
-      // Prepare to receive engine info
-      const tempId = Date.now().toString();
+      const tempId = `eval-${Date.now()}`;
       const callback = (line) => {
-        if (line.startsWith(`info depth ${depth} `)) {
+        if (typeof line !== 'string') return;
+
+        if (line.startsWith('info depth')) {
           const scoreMatch = line.match(/score (cp|mate) ([-+]?\d+)/);
           if (scoreMatch) {
             analysis.scoreType = scoreMatch[1];
             analysis.scoreValue = parseInt(scoreMatch[2]);
           }
-          
-          const pvMatch = line.match(/pv (\S+)/);
-          if (pvMatch) analysis.bestMove = pvMatch[1];
+        }
+
+        if (line.startsWith('bestmove')) {
+          const bestMoveMatch = line.match(/bestmove\s(\S+)/);
+          if (bestMoveMatch) {
+            analysis.bestMove = bestMoveMatch[1];
+          }
+          // Clean up this handler and resolve
+          this.infoHandlers.forEach(h => {
+            if (h.id === tempId) this.infoHandlers.delete(h);
+          });
+          this.evalInProgress = false;
+          resolve(analysis);
         }
       };
       
-      this.infoHandlers.add({
-        id: tempId,
-        callback
-      });
+      this.infoHandlers.add({ id: tempId, callback });
       
-      // Send analysis command with fixed depth
-      this.engine.postMessage(`position fen ${fen}`);
-      this.engine.postMessage(`go depth ${depth}`);
-      
-      // Complete after evaluation
-      setTimeout(() => {
-        this.infoHandlers.delete(tempId);
-        this.evalInProgress = false;
-        resolve(analysis);
-      }, depth * 100); // Timeout based on depth
+      this.sendCommand(`position fen ${fen}`);
+      this.sendCommand(`go depth ${depth}`);
     });
   }
 }

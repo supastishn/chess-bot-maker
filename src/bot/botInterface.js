@@ -131,7 +131,8 @@ const createBotHelper = (gameClient) => {
     async getBestMove(fen, depth = 15) {
       await this.init(depth);
       if (stockfishEngine) {
-        return stockfishEngine.evaluatePosition(fen, depth);
+        const analysis = await stockfishEngine.getPositionEvaluation(fen, depth);
+        return analysis?.bestMove;
       }
       throw new Error("Stockfish engine initialization failed");
     }
