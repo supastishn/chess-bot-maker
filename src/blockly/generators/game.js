@@ -18,17 +18,13 @@ javascriptGenerator['get_turn'] = function() {
   return ['game.getTurn()', javascriptGenerator.ORDER_FUNCTION_CALL];
 };
 
-javascriptGenerator['move_action'] = function(block) {
-  const moveCode = javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_NONE) || "''";
-  return `game.move(${moveCode});\n`;
+javascriptGenerator['return_move'] = function(block) {
+  const moveCode = javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_NONE) || 'null';
+  return `return ${moveCode};\n`;
 };
 
 javascriptGenerator['evaluate_material'] = function() {
   return ['game.evaluateMaterial()', javascriptGenerator.ORDER_FUNCTION_CALL];
-};
-
-javascriptGenerator['undo_move'] = function() {
-  return 'game.undoMove();\n';
 };
 
 // --- Advanced Generators ---

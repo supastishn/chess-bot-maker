@@ -11,13 +11,7 @@ const toolbox = `
   <category name="Game API" colour="#A65C81">
     <block type="get_available_moves"></block>
     <block type="get_turn"></block>
-    <block type="move_action">
-      <value name="MOVE">
-        <block type="text"></block>
-      </value>
-    </block>
     <block type="evaluate_material"></block>
-    <block type="undo_move"></block>
     <block type="is_in_check"></block>
     <block type="get_game_phase"></block>
     <block type="is_checkmate"></block>
@@ -34,6 +28,13 @@ const toolbox = `
         <block type="math_number">
           <field name="NUM">2</field>
         </block>
+      </value>
+    </block>
+    <block type="return_move">
+      <value name="MOVE">
+        <shadow type="text">
+          <field name="TEXT">e2e4</field>
+        </shadow>
       </value>
     </block>
   </category>

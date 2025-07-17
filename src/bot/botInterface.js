@@ -20,7 +20,10 @@ const createBotHelper = (gameClient) => {
   const helper = Object.create(gameClient);
 
   // Game state methods
-  helper.getAvailableMoves = () => gameClient.moves({ verbose: false });
+  helper.getAvailableMoves = () => {
+    const verboseMoves = gameClient.moves({ verbose: true });
+    return verboseMoves.map(move => move.from + move.to + (move.promotion || ''));
+  };
   helper.getVerboseMoves = () => gameClient.moves({ verbose: true });
   helper.getTurn = () => gameClient.turn();
   helper.isCheckmate = () => gameClient.isCheckmate();
@@ -32,6 +35,20 @@ const createBotHelper = (gameClient) => {
   helper.move = (m) => gameClient.move(m);
   helper.isAttacked = (square, byColor) => gameClient.isAttacked(square, byColor);
   helper.getMoveCount = () => gameClient.history().length;
+
+  // --- Opening Book helpers ---
+  helper.getBookMoves = () => {
+    const key = getPositionKey(gameClient.fen());
+    return openingDB[key] || [];
+  };
+
+  helper.playBookMove = () => {
+    const bookMoves = helper.getBookMoves();
+    if (bookMoves.length > 0) {
+      return bookMoves[Math.floor(Math.random() * bookMoves.length)];
+    }
+    return null;
+  };
 
   // --- More advanced helpers ---
   const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 100 };

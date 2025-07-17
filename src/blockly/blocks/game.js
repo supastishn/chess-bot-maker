@@ -26,23 +26,14 @@ Blockly.Blocks['play_book_move'] = {
   }
 };
 
-// Statement blocks
-Blockly.Blocks['move_action'] = {
+ // Statement blocks
+Blockly.Blocks['return_move'] = {
   init() {
     this.appendValueInput("MOVE").setCheck("String")
-      .appendField("move");
+      .appendField("return move");
     this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setColour('#888888');
-  }
-};
-
-Blockly.Blocks['undo_move'] = {
-  init() {
-    this.appendDummyInput().appendField("undoMove");
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setColour('#888888');
+    this.setNextStatement(false); // This is a terminal block.
+    this.setColour('#5C81A6'); // Use a color that indicates a return/end action.
   }
 };
 
