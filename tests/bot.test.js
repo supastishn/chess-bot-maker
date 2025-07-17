@@ -44,8 +44,10 @@ describe('materialBot', () => {
     mockGame.isCheckmate.mockReturnValue(false);
     
     // Make the first move 'e2e4' throw an error
-    mockGame.move.mockImplementationOnce(() => {
-      throw new Error('Illegal move');
+    mockGame.move.mockImplementation((move) => {
+      if (move === 'e2e4') {
+        throw new Error('Illegal move');
+      }
     });
     
     // Scores for the remaining moves 'd2d4' and 'g1f3'
