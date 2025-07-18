@@ -6,9 +6,9 @@ import 'blockly/blocks';
 import toolbox from '../blockly/toolbox';
 import { useTheme } from '../context/useTheme';
 
-// Load custom blocks & generators
 import '../blockly/blocks/game';
-import '../blockly/generators/game';
+// Import the exported generators object
+import { gameGenerators } from '../blockly/generators/game';
 
 Blockly.setLocale(En);
 
@@ -20,6 +20,9 @@ const BlocklyComponent = forwardRef(({ onCodeChange, initialXml }, ref) => {
   useEffect(() => {
     // Guard against the ref not being ready.
     if (!blocklyDiv.current) return;
+
+    // Register all custom game generators explicitly.
+    Object.assign(javascriptGenerator, gameGenerators);
 
     workspace.current = Blockly.inject(blocklyDiv.current, {
       toolbox: toolbox,

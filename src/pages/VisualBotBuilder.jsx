@@ -34,7 +34,8 @@ const VisualBotBuilder = ({ onRegisterBot }) => {
   };
 
   const handleRegister = () => {
-    const wrapped = `(game) => {\n${code}\n}`;
+    const isAsync = code.includes('await');
+    const wrapped = `${isAsync ? 'async' : ''} (game) => {\n${code}\n}`;
     if (onRegisterBot(botName, wrapped, wrapped, xml)) {
       navigate('/create-bot');
     }
