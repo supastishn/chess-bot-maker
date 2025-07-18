@@ -4,6 +4,7 @@ import { javascriptGenerator } from 'blockly/javascript';
 import * as En from 'blockly/msg/en';
 import 'blockly/blocks';
 import toolbox from '../blockly/toolbox';
+import { useTheme } from '../context/useTheme';
 
 // Load custom blocks & generators
 import '../blockly/blocks/game';
@@ -14,6 +15,7 @@ Blockly.setLocale(En);
 const BlocklyComponent = forwardRef(({ onCodeChange, initialXml }, ref) => {
   const blocklyDiv = useRef(null);
   const workspace = useRef(null);
+  const { isDark } = useTheme();
 
   useEffect(() => {
     // Guard against the ref not being ready.
@@ -58,11 +60,18 @@ const BlocklyComponent = forwardRef(({ onCodeChange, initialXml }, ref) => {
     },
   }));
 
-  return <div ref={blocklyDiv} style={{
-    height: '50vh',
-    minHeight: '300px',
-    width: '100%'
-  }} />;
+  return (
+    <div
+      ref={blocklyDiv}
+      className={`blockly-container ${isDark ? 'dark' : 'light'}`}
+      style={{
+        height: '50vh',
+        minHeight: '300px',
+        width: '100%',
+        position: 'relative'
+      }}
+    />
+  );
 });
 
 export default BlocklyComponent;

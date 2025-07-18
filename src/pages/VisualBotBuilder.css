@@ -1,0 +1,21 @@
+/* Add to bottom of file */
+.blockly-container.dark {
+  background-color: var(--color-bg-tertiary);
+}
+
+.blockly-container.light {
+  background-color: var(--color-bg-glass);
+}
+
+.blocklyToolboxDiv {
+  background: var(--color-bg-input) !important;
+  border-right: 1px solid var(--color-border) !important;
+}
+
+.blocklyTreeRow {
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+.blocklyTreeRow:hover {
+  background-color: var(--color-bg-card) !important;
+}

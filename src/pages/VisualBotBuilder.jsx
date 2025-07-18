@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BlocklyComponent from '../components/BlocklyComponent';
 import { getBotBlocklyXml } from '../bot/botInterface';
+import { useTheme } from '../context/useTheme';
 
 const VisualBotBuilder = ({ onRegisterBot }) => {
   const [botName, setBotName] = useState('');
@@ -11,6 +12,7 @@ const VisualBotBuilder = ({ onRegisterBot }) => {
   const workspaceRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const { isDark } = useTheme();
 
   useEffect(() => {
     if (location.state?.botName) {
@@ -52,13 +54,13 @@ const VisualBotBuilder = ({ onRegisterBot }) => {
         />
         
         {code ? (
-          // Show ONLY generated code and action buttons
-          <>
+          <div className={`form-textarea ${isDark ? 'dark' : 'light'}`}>
             <textarea
               className="form-textarea"
               readOnly
               rows={10}
               value={code}
+              style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%' }}
             />
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
               <button onClick={handleRegister} className="btn primary-button">
@@ -71,15 +73,18 @@ const VisualBotBuilder = ({ onRegisterBot }) => {
                 Return to Editor
               </button>
             </div>
-          </>
+          </div>
         ) : (
-          // Show ONLY Blockly and Generate button
-          <>
+          <div className={`blockly-container ${isDark ? 'dark' : 'light'}`} style={{ position: 'relative' }}>
             <BlocklyComponent ref={workspaceRef} initialXml={xml} />
-            <button onClick={handleGenerate} className="btn primary-button" style={{ marginTop: '1rem' }}>
+            <button 
+              onClick={handleGenerate} 
+              className="btn primary-button" 
+              style={{ position: 'absolute', bottom: '3rem', right: '1rem' }}
+            >
               Generate Code
             </button>
-          </>
+          </div>
         )}
       </div>
     </div>
