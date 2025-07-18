@@ -3,6 +3,7 @@ import { Chess } from 'chess.js';
 import { getBot } from '../bot/botInterface';
 import InfoPanel from '../components/InfoPanel';
 import BotSelector from '../components/BotSelector';
+import ToggleGroup from '../components/ToggleGroup';
 import { Chessground } from 'chessground';
 import { toDests } from './util';
 import '../chessground-base.css';
@@ -234,36 +235,25 @@ const GamePage = ({ selectedBot, onBotChange, botNames }) => {
         {/* Combined panel for controls */}
         <div className="bot-panel glass-card">
           {/* Game Mode Selector */}
-          <div className="toggle-group">
-            <button
-              className={`toggle-btn ${gameMode === 'bot-human' ? 'active' : ''}`}
-              onClick={() => setGameMode('bot-human')}
-            >
-              <span>Bot vs Human</span>
-            </button>
-            <button
-              className={`toggle-btn ${gameMode === 'bot-bot' ? 'active' : ''}`}
-              onClick={() => setGameMode('bot-bot')}
-            >
-              <span>Bot vs Bot</span>
-            </button>
-          </div>
+          <ToggleGroup
+            options={[
+              { value: 'bot-human', label: 'Bot vs Human' },
+              { value: 'bot-bot', label: 'Bot vs Bot' }
+            ]}
+            value={gameMode}
+            onChange={setGameMode}
+          />
 
           {gameMode === 'bot-human' && (
-            <div className="toggle-group">
-              <button
-                className={`toggle-btn ${playerColor === 'white' ? 'active' : ''}`}
-                onClick={() => setPlayerColor('white')}
-              >
-                <span>Play as White</span>
-              </button>
-              <button
-                className={`toggle-btn ${playerColor === 'black' ? 'active' : ''}`}
-                onClick={() => setPlayerColor('black')}
-              >
-                <span>Play as Black</span>
-              </button>
-            </div>
+            <ToggleGroup
+              options={[
+                { value: 'white', label: 'Play as White' },
+                { value: 'black', label: 'Play as Black' }
+              ]}
+              value={playerColor}
+              onChange={setPlayerColor}
+              size="small"
+            />
           )}
 
           {/* Bot Selectors */}
