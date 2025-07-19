@@ -58,11 +58,15 @@ const BlocklyComponent = forwardRef(({ onCodeChange, initialXml }, ref) => {
     },
   }));
 
-  return <div ref={blocklyDiv} style={{
-    height: '50vh',
-    minHeight: '300px',
-    width: '100%'
-  }} />;
+  return <div 
+    ref={blocklyDiv} 
+    className="blockly-container" 
+    style={{
+      height: '50vh',
+      minHeight: '300px',
+      width: '100%'
+    }} 
+  />;
 });
 
 export default BlocklyComponent;
