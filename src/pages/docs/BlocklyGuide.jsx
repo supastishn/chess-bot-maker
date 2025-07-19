@@ -6,25 +6,45 @@ const BlocklyGuide = () => {
     <div className="docs-section">
       <h1 className="page-title"><Wrench size={24} /> Blockly Visual Builder</h1>
       <div className="docs-card glass-card">
-        <h2>New Advanced Blocks</h2>
-        <p>We've added several new blocks to give your bots more strategic capabilities:</p>
-        <ul className="method-summary">
-          <li><strong>is checkmate:</strong> A boolean block that returns true if the game is over by checkmate.</li>
-          <li><strong>get position score:</strong> Returns a numerical score of the board, considering material and center control. Useful for direct comparisons.</li>
-          <li><strong>get threatened squares:</strong> Takes a color ('w' or 'b') and returns an array of squares under attack by that color.</li>
-          <li><strong>look ahead:</strong> Simulates a move and returns a score, allowing your bot to think multiple steps into the future.</li>
-        </ul>
-        
-        <h2>Example: A Smarter Bot</h2>
-        <p>Here's how you might combine these blocks to create a bot that avoids simple blunders:</p>
-        <div className="syntax-highlighting">
-          <pre>
-{`1. Get a list of all [available moves].
-2. For each move in the list:
-   a. Use the [look ahead] block to get a score for the resulting position.
-3. Keep track of the move with the highest score.
-4. After checking all moves, play the best move found.`}
-          </pre>
+        <h2>All Blocks</h2>
+        <p>Complete list of available blocks:</p>
+        <div className="blocks-grid">
+          <div className="block-category">
+            <h3>Game State</h3>
+            <ul className="method-summary">
+              <li>get available moves</li>
+              <li>get verbose moves</li>
+              <li>get current turn</li>
+              <li>get move count</li>
+              <li>get FEN</li>
+              <li>get game phase</li>
+              <li>is in check</li>
+              <li>is checkmate</li>
+              <li>is stalemate</li>
+              <li>is draw</li>
+              <li>is game over</li>
+            </ul>
+          </div>
+          <div className="block-category">
+            <h3>Analysis</h3>
+            <ul className="method-summary">
+              <li>evaluate material</li>
+              <li>get position score</li>
+              <li>is attacked</li>
+              <li>get threatened squares</li>
+              <li>look ahead</li>
+            </ul>
+          </div>
+          <div className="block-category">
+            <h3>Decision Making</h3>
+            <ul className="method-summary">
+              <li>prioritize strategy</li>
+              <li>get book moves</li>
+              <li>play book move</li>
+              <li>stockfish move</li>
+              <li>return move</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
