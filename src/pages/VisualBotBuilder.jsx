@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useLocation, useNavigate, HashRouter } from 'react-router-dom';
+import { UNSAFE_NavigationContext as NavigationContext } from 'react-router';
 import BlocklyComponent from '../components/BlocklyComponent';
 import { getBotBlocklyXml } from '../bot/botInterface';
 
@@ -87,6 +88,10 @@ const VisualBotBuilder = ({ onRegisterBot }) => {
 };
 
 export default function VisualBotBuilderWithRouter(props) {
+  const navigationContext = useContext(NavigationContext);
+  if (navigationContext) {
+    return <VisualBotBuilder {...props} />;
+  }
   return (
     <HashRouter>
       <VisualBotBuilder {...props} />

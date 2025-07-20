@@ -23,7 +23,7 @@ export const getBotBlocklyXml = (name) => botBlocklyXml.get(name);
 export const getBotType = (name) => botTypes.get(name) || 'code';
 
 const createBotHelper = (gameClient) => {
-  const helper = Object.create(gameClient);
+  const helper = Object.assign({}, gameClient);
 
   // Game state methods
   if (gameClient.getAvailableMoves === undefined) helper.getAvailableMoves = () => {
@@ -232,6 +232,7 @@ export const registerBot = (name, botFunction, source, blocklyXml = null) => {
 };
 
 export const registerUserBot = (name, botFunction, source, blocklyXml = null) => {
+  userBotNames.add(name);
   registerBot(name, botFunction, source, blocklyXml); // Register in-memory for the current session
 
   try {
