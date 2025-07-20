@@ -35,6 +35,7 @@ beforeEach(() => {
   });
 });
 
+describe('botInterface', () => {
   test('registerBot registers function bots', () => {
     const mockBot = vi.fn(() => 'e2e4');
     registerBot('test-bot', mockBot);
@@ -72,39 +73,19 @@ beforeEach(() => {
   });
 
   test('build-in bot behaviors', () => {
-    // Add mockChess implementation
-    const mockGame = {
-      turn: vi.fn(() => 'w'),
+    const mockGame = mockGameClient({
       getAvailableMoves: vi.fn(() => ['e2e4', 'g1f3']),
-      evaluateMaterial: vi.fn(() => 1.5),
       isCheckmate: vi.fn(),
-      fen: vi.fn(() => 'mock-fen'),
-      moves: vi.fn(() => []),
-      history: vi.fn(() => []),
-      undo: vi.fn(),
-      move: vi.fn(),
-      getVerboseMoves: vi.fn(() => []),
-      getTurn: vi.fn(() => 'w'),
-      isAttacked: vi.fn(() => false),
-      lookAhead: vi.fn(),
-      prioritizeStrategy: vi.fn(),
-      getMoveCount: vi.fn(),
-      stockfish: vi.fn(),
-      getGameResult: vi.fn(() => 'ongoing'),
-      getStatus: vi.fn(),
-      isInCheck: vi.fn(),
-      getThreatenedSquares: vi.fn(),
-    };
-    mockGame.isCheckmate.mockImplementation(() => true);
-
+    });
+    
+    // Test random bot
+    const randomBot = getBot('random-bot');
+    expect(['e2e4', 'g1f3']).toContain(randomBot(mockGame));
+    
     // Test material bot
+    mockGame.isCheckmate.mockImplementationOnce(true);
     const materialBot = getBot('material-bot');
     materialBot(mockGame);
     expect(mockGame.isCheckmate).toHaveBeenCalled();
-
-    // Test random bot
-    const randomBot = getBot('random-bot');
-    const move = randomBot(mockGame);
-    expect(['e2e4', 'g1f3']).toContain(move);
   });
 });

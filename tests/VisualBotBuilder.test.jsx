@@ -41,9 +41,6 @@ describe('VisualBotBuilder', () => {
     );
   });
 
-import { HashRouter } from 'react-router-dom';
-import { waitFor } from '@testing-library/react';
-
   test('edits existing bot', async () => {
     const existingXml = '<xml><block type="get_available_moves"></block></xml>';
     getBotBlocklyXml.mockReturnValue(existingXml);
