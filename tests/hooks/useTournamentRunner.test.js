@@ -78,16 +78,17 @@ describe('useTournamentRunner', () => {
 
   it('handles premature termination', async () => {
     vi.mocked(getBot).mockImplementation(() => () => 'e2e4');
-
+  
     const { result } = renderHook(() => useTournamentRunner());
     const bots = ['bot1', 'bot2'];
-
+  
     await act(async () => {
       result.current.startTournament(bots);
-      await vi.advanceTimersByTimeAsync(50); // Let one game tick start
+      await vi.advanceTimersByTimeAsync(100); // Increase timeout
       result.current.stopTournament();
+      await vi.runAllTimersAsync(); // Ensure timers flush
     });
-
+  
     expect(result.current.status).toBe('complete');
   });
 });

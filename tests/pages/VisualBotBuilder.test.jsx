@@ -4,9 +4,10 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { HashRouter } from 'react-router-dom';
 import VisualBotBuilder from '../../src/pages/VisualBotBuilder';
 
-// Mock Blockly execution
+ // Mock Blockly execution
 const mockBlocklyInstance = {
-  workspaceToCode: vi.fn(() => `console.log("Generated code")`)
+  workspaceToCode: vi.fn(() => `console.log("Generated code")`),
+  workspaceToXml: vi.fn(() => '<xml></xml>')
 };
 
 vi.mock('../../src/components/BlocklyComponent', () => ({

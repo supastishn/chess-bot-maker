@@ -108,22 +108,6 @@ const useTournamentRunner = () => {
       return;
     }
     isRunningRef.current = true;
-    setTournamentState({
-      status: 'running',
-      standings: botNames.map(name => ({ name, w: 0, l: 0, d: 0, p: 0 })),
-      matches: (() => {
-        const arr = [];
-        for (let i = 0; i < botNames.length; i++) {
-          for (let j = i + 1; j < botNames.length; j++) {
-            arr.push({ white: botNames[i], black: botNames[j] });
-            arr.push({ white: botNames[j], black: botNames[i] });
-          }
-        }
-        return arr;
-      })(),
-      currentMatch: null,
-    });
-
     const newMatches = [];
     for (let i = 0; i < botNames.length; i++) {
       for (let j = i + 1; j < botNames.length; j++) {
@@ -131,6 +115,13 @@ const useTournamentRunner = () => {
         newMatches.push({ white: botNames[j], black: botNames[i] });
       }
     }
+    setTournamentState({
+      status: 'running',
+      standings: botNames.map(name => ({ name, w: 0, l: 0, d: 0, p: 0 })),
+      matches: newMatches,
+      completedMatches: [],
+      currentMatch: null,
+    });
 
     // Asynchronous match runner to avoid UI blocking
     const runMatches = async () => {
