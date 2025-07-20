@@ -93,9 +93,9 @@ javascriptGenerator['prioritize_strategy'] = function(block) {
   }`;
   return [`game.prioritizeStrategy(${weights})`, javascriptGenerator.ORDER_FUNCTION_CALL];
 };
-// --- Stockfish Generator ---
+ // --- Stockfish Generator ---
 javascriptGenerator['stockfish_move'] = function(block) {
   const depth = javascriptGenerator.valueToCode(block, 'DEPTH', 
     javascriptGenerator.ORDER_ATOMIC) || 15;
-  return [`await game.stockfish.getBestMove(game.getFEN(), ${depth})`, javascriptGenerator.ORDER_FUNCTION_CALL];
+  return [`await game.stockfish().getBestMove(game.getFEN(), ${depth})`, javascriptGenerator.ORDER_FUNCTION_CALL];
 };

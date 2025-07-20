@@ -164,15 +164,15 @@ const createBotHelper = (gameClient) => {
       if (!stockfishEngine && typeof Worker !== 'undefined') {
         stockfishEngine = new StockfishEngine();
       }
-      await stockfishEngine.initialized;
-
-      if (this.elo >= 3190) {
-        stockfishEngine.disableEloLimit();
-      } else {
-        stockfishEngine.setElo(this.elo);
-      }
-      stockfishEngine.setOption("Hash", this.hashSize);
-      stockfishEngine.setOption("Contempt", this.contempt);
+      return stockfishEngine.initialized.then(() => {
+        if (this.elo >= 3190) {
+          stockfishEngine.disableEloLimit();
+        } else {
+          stockfishEngine.setElo(this.elo);
+        }
+        stockfishEngine.setOption("Hash", this.hashSize);
+        stockfishEngine.setOption("Contempt", this.contempt);
+      });
     },
     async getBestMove(fen, depth = 15) {
       // Auto-initialize on first call in a compatible environment

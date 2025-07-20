@@ -37,7 +37,7 @@ const VisualBotBuilder = ({ onRegisterBot, location: propLocation }) => {
   };
 
   const handleRegister = () => {
-    const wrapped = `(game) => {\n${code}\n}`;
+    const wrapped = `async (game) => {\n${code}\n}`;
     if (onRegisterBot(botName, wrapped, wrapped, xml)) {
       navigate('/create-bot');
     }
