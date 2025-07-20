@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, HashRouter } from 'react-router-dom';
 import BlocklyComponent from '../components/BlocklyComponent';
 import { getBotBlocklyXml } from '../bot/botInterface';
 
@@ -86,4 +86,10 @@ const VisualBotBuilder = ({ onRegisterBot }) => {
   );
 };
 
-export default VisualBotBuilder;
+export default function VisualBotBuilderWithRouter(props) {
+  return (
+    <HashRouter>
+      <VisualBotBuilder {...props} />
+    </HashRouter>
+  );
+}

@@ -43,7 +43,7 @@ describe('VisualBotBuilder', () => {
     expect(await screen.findByDisplayValue(/Generated code/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Register Bot/i })).toBeInTheDocument();
     
-    fireEvent.click(screen.getByRole('button', { name: /Edit Code/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Return to Editor/i }));
     expect(screen.getByTestId('mock-blockly')).toBeInTheDocument();
   });
 });

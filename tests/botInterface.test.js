@@ -43,12 +43,13 @@ describe('botInterface', () => {
 
   test('user bot registration flow', () => {
     const code = `(game) => game.getAvailableMoves()[0]`;
-    registerUserBot('user-bot', code, code, '<xml></xml>');
-    
+    const botFunction = new Function('game', `return (${code});`)();
+    registerUserBot('user-bot', botFunction, code, '<xml></xml>');
+  
     expect(isUserBot('user-bot')).toBe(true);
     expect(getBotSource('user-bot')).toBe(code);
     expect(getBotBlocklyXml('user-bot')).toBe('<xml></xml>');
-    
+  
     deleteUserBot('user-bot');
     expect(isUserBot('user-bot')).toBe(false);
   });
@@ -67,6 +68,7 @@ describe('botInterface', () => {
 
   test('build-in bot behaviors', async () => {
     const mockGame = {
+      turn: vi.fn(() => 'w'),
       getAvailableMoves: vi.fn(() => ['e2e4', 'g1f3']),
       evaluateMaterial: vi.fn(() => 1.5),
       isCheckmate: vi.fn().mockReturnValue(true),
