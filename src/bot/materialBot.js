@@ -1,5 +1,5 @@
 export const materialBot = (game) => {
-  const moves = game.getAvailableMoves?.() || [];
+  const moves = typeof game.getAvailableMoves === 'function' ? game.getAvailableMoves() : [];
   if (moves.length === 0) return null;
 
   // --- Check for immediate checkmate ---

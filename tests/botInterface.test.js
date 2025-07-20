@@ -48,7 +48,7 @@ describe('botInterface', () => {
   });
 
   test('user bot registration flow', () => {
-    localStorageMock.getItem.mockReturnValueOnce(JSON.stringify([{name: 'user-bot'}]));
+    mockLocalStorage.getItem.mockReturnValueOnce(JSON.stringify([{name: 'user-bot'}]));
 
     const code = `(game) => game.getAvailableMoves()[0]`;
     const botFunction = new Function('game', `return (${code});`)();

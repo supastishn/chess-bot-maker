@@ -221,10 +221,14 @@ export const registerBot = (name, botFunction, source, blocklyXml = null) => {
   } else {
     botTypes.set(name, 'code');
   }
-  // Wrap the botFunction to provide the helper API
-  registeredBots.set(name, (gameClient) =>
-    botFunction(createBotHelper(gameClient))
-  );
+  // Wrap the botFunction to provide the helper API with proper error handling
+  registeredBots.set(name, (gameClient) => {
+    try {
+      return botFunction(createBotHelper(gameClient));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  });
 };
 
 export const registerUserBot = (name, botFunction, source, blocklyXml = null) => {

@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { HashRouter } from 'react-router-dom';
 import VisualBotBuilder from '../src/pages/VisualBotBuilder';
 import { getBotBlocklyXml } from '../src/bot/botInterface';
 
