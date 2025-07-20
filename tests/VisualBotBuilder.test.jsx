@@ -16,6 +16,8 @@ vi.mock('../src/components/BlocklyComponent', () => ({
   })
 }));
 
+const mockRegister = vi.fn();
+
 describe('VisualBotBuilder', () => {
   test('full flow from creation to registration', async () => {
     const onRegisterBot = vi.fn();
@@ -42,12 +44,20 @@ describe('VisualBotBuilder', () => {
   test('edits existing bot', () => {
     const existingXml = '<xml><block type="get_available_moves"></block></xml>';
     getBotBlocklyXml.mockReturnValue(existingXml);
+    // Simulate location state explicitly
     
-    render(<VisualBotBuilder onRegisterBot={vi.fn()} location={{ state: { 
-      botName: 'Existing Bot' 
-    } }} />);
+    render(
+      <VisualBotBuilder 
+        onRegisterBot={mockRegister} 
+        location={{ 
+          state: { botName: 'Existing Bot' } 
+        }} 
+      />
+    );
     
-    expect(screen.getByDisplayValue('Existing Bot')).toBeInTheDocument();
+    const nameInput = screen.getByPlaceholderText('Bot name');
+    expect(nameInput).toHaveValue('Existing Bot');
+    expect(nameInput).toBeDisabled();
   });
 
   test('handles Blockly errors', () => {
