@@ -7,8 +7,8 @@ describe('BlocklyGuide', () => {
   test('renders Blockly documentation', () => {
     render(<BlocklyGuide />);
     
-    expect(screen.getByRole('heading', { name: /Blockly Visual Builder/i })).toBeInTheDocument();
-    expect(screen.getByText(/New Advanced Blocks/i)).toBeInTheDocument();
-    expect(screen.getByText(/A Smarter Bot/i)).toBeInTheDocument();
+    expect(screen.getByText(/All Blocks/i)).toBeInTheDocument();
+    expect(screen.getByText(/Game State/i)).toBeInTheDocument();
+    expect(screen.getByText(/Decision Making/i)).toBeInTheDocument();
   });
 });

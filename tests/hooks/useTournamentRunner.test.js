@@ -12,6 +12,7 @@ describe('useTournamentRunner', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.spyOn(global, 'setTimeout');
     vi.mocked(getBot).mockClear();
 
     chessMock = {

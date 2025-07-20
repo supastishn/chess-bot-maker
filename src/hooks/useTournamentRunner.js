@@ -11,10 +11,24 @@ const useTournamentRunner = () => {
       if (saved) {
         const data = JSON.parse(saved);
         if (data.status === 'running') data.status = 'complete';
-        return data;
+        return {
+          standings: data.standings || [],
+          matches: data.matches || [],
+          completedMatches: data.completedMatches || [],
+          currentMatch: data.currentMatch || null,
+          status: data.status || 'idle'
+        };
       }
-    } catch (e) { console.error("Failed to load tournament data:", e); }
-    return { standings: [], matches: [], completedMatches: [], currentMatch: null, status: 'idle' };
+    } catch (e) {
+      console.error("Failed to load tournament data:", e);
+    }
+    return {
+      standings: [],
+      matches: [],
+      completedMatches: [],
+      currentMatch: null,
+      status: 'idle'
+    };
   });
 
   const { standings, matches, currentMatch, status } = tournamentState;

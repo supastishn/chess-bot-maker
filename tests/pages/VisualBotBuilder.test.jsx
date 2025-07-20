@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { HashRouter } from 'react-router-dom';
 import VisualBotBuilder from '../../src/pages/VisualBotBuilder';
 
 // Mock Blockly execution
@@ -19,7 +20,11 @@ describe('VisualBotBuilder', () => {
   const mockRegister = vi.fn();
   
   test('renders visual builder interface', () => {
-    render(<VisualBotBuilder onRegisterBot={mockRegister} />);
+    render(
+      <HashRouter>
+        <VisualBotBuilder onRegisterBot={mockRegister} />
+      </HashRouter>
+    );
     
     expect(screen.getByText(/Visual Bot Builder/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Bot name/i)).toBeInTheDocument();
@@ -27,7 +32,11 @@ describe('VisualBotBuilder', () => {
   });
 
   test('switches between visual and code views', async () => {
-    render(<VisualBotBuilder onRegisterBot={mockRegister} />);
+    render(
+      <HashRouter>
+        <VisualBotBuilder onRegisterBot={mockRegister} />
+      </HashRouter>
+    );
     
     fireEvent.click(screen.getByRole('button', { name: /Generate Code/i }));
     expect(await screen.findByDisplayValue(/Generated code/i)).toBeInTheDocument();
