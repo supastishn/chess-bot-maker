@@ -7,10 +7,17 @@ import { getBotBlocklyXml } from '../src/bot/botInterface';
 import { vi } from 'vitest';
 
 vi.mock('../src/bot/botInterface');
+
+let shouldThrowBlocklyError = false;
 vi.mock('../src/components/BlocklyComponent', () => ({
   default: React.forwardRef((props, ref) => {
     React.useImperativeHandle(ref, () => ({
-      workspaceToCode: vi.fn(() => 'generated code'),
+      workspaceToCode: vi.fn(() => {
+        if (shouldThrowBlocklyError) {
+          throw new Error('Blockly error');
+        }
+        return 'generated code';
+      }),
       workspaceToXml: vi.fn(() => '<xml></xml>')
     }));
     return <div data-testid="mock-blockly" />;
@@ -20,6 +27,10 @@ vi.mock('../src/components/BlocklyComponent', () => ({
 const mockRegister = vi.fn();
 
 describe('VisualBotBuilder', () => {
+  beforeEach(() => {
+    shouldThrowBlocklyError = false;
+  });
+
   test('full flow from creation to registration', async () => {
     const onRegisterBot = vi.fn();
     render(<VisualBotBuilder onRegisterBot={onRegisterBot} />);
@@ -61,23 +72,13 @@ describe('VisualBotBuilder', () => {
   });
 
   test('handles Blockly errors', () => {
-    const originalError = console.error;
-    console.error = vi.fn();
-
-    vi.doMock('../../src/components/BlocklyComponent', () => ({
-      default: React.forwardRef((props, ref) => {
-        React.useImperativeHandle(ref, () => ({
-          workspaceToCode: () => { throw new Error('Blockly error') },
-          workspaceToXml: () => '<xml></xml>'
-        }));
-        return <div data-testid="mock-blockly" />;
-      })
-    }));
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    shouldThrowBlocklyError = true;
 
     render(<VisualBotBuilder onRegisterBot={vi.fn()} />);
     fireEvent.click(screen.getByText('Generate Code'));
 
-    expect(console.error).toHaveBeenCalledWith('Error generating code:', expect.any(Error));
-    console.error = originalError;
+    expect(errorSpy).toHaveBeenCalledWith('Error generating code:', expect.any(Error));
+    errorSpy.mockRestore();
   });
 });
