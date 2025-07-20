@@ -42,6 +42,26 @@ const createBotHelper = (gameClient) => {
   if (gameClient.isAttacked === undefined) helper.isAttacked = (square, byColor) => gameClient.isAttacked(square, byColor);
   if (gameClient.getMoveCount === undefined) helper.getMoveCount = () => gameClient.history().length;
 
+  // Add getGamePhase helper
+  if (gameClient.getGamePhase === undefined) helper.getGamePhase = () => {
+    const moveCount = helper.getMoveCount();
+    return moveCount < 15 ? 'opening' : moveCount < 40 ? 'middlegame' : 'endgame';
+  };
+
+  // Add getThreatenedSquares helper
+  if (gameClient.getThreatenedSquares === undefined) helper.getThreatenedSquares = (byColor) => {
+    // All 64 squares
+    const files = ['a','b','c','d','e','f','g','h'];
+    const ranks = ['1','2','3','4','5','6','7','8'];
+    const allSquares = [];
+    for (const f of files) for (const r of ranks) allSquares.push(f + r);
+    const squares = [];
+    for (const sq of allSquares) {
+      if (helper.isAttacked(sq, byColor)) squares.push(sq);
+    }
+    return squares;
+  };
+
   if (gameClient.setElo === undefined) helper.setElo = (elo) => {
     if (!stockfishEngine) stockfishEngine = new StockfishEngine();
     stockfishEngine.initialized.then(() => stockfishEngine.setElo(elo));

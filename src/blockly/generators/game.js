@@ -44,8 +44,8 @@ javascriptGenerator['get_position_score'] = function() {
 javascriptGenerator['look_ahead'] = function(block) {
   const move = javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_NONE) || "''";
   const depth = javascriptGenerator.valueToCode(block, 'DEPTH', javascriptGenerator.ORDER_ATOMIC) || 2;
-  const topics = javascriptGenerator.valueToCode(block, 'TOPICS', javascriptGenerator.ORDER_NONE) || "['all']";
-  return [`game.lookAhead(${move}, ${depth}, ${topics}).score`, javascriptGenerator.ORDER_FUNCTION_CALL];
+  // topics parameter removed for compatibility
+  return [`game.lookAhead(${move}, ${depth}).score`, javascriptGenerator.ORDER_FUNCTION_CALL];
 };
 
 javascriptGenerator['get_game_phase'] = function() {
