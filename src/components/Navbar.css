@@ -93,6 +93,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-left: 0.5rem;
+  color: var(--color-text-primary);
 }
 
 .theme-toggle:hover {
@@ -106,7 +107,7 @@
   width: 1.2rem;
   height: 1.2rem;
   transition: transform 0.3s ease;
-  color: var(--color-text-primary);
+  color: inherit;
 }
 
 .theme-toggle:hover .theme-icon {
