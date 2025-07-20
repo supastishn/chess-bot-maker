@@ -1,21 +1,20 @@
 import { vi } from 'vitest';
 
+import { vi } from 'vitest';
+
 export const mockGameClient = (overrides = {}) => ({
-  // --- Methods mocked by tests ---
-  getAvailableMoves: vi.fn(),
+  getAvailableMoves: vi.fn(() => []),
   getVerboseMoves: vi.fn(() => []),
-  getTurn: vi.fn(),
+  getTurn: vi.fn(() => 'w'),
   isAttacked: vi.fn(() => false),
   lookAhead: vi.fn(),
   prioritizeStrategy: vi.fn(),
   getMoveCount: vi.fn(),
   isCheckmate: vi.fn(),
   stockfish: vi.fn(),
-
-  // --- Underlying chess.js methods for helpers ---
   moves: vi.fn(() => []),
   history: vi.fn(() => []),
-  turn: vi.fn().mockReturnValue('w'),
+  turn: vi.fn(() => 'w'),
   undo: vi.fn(),
   move: vi.fn(),
   fen: vi.fn(() => 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'),

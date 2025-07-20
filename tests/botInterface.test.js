@@ -11,6 +11,8 @@ import {
 } from '../src/bot/botInterface';
 import { Chess } from 'chess.js';
 
+import { mockGameClient } from './utils';
+
 // Mock localStorage
 const localStorageMock = (() => {
   let store = {};
@@ -23,6 +25,7 @@ const localStorageMock = (() => {
 })();
 
 global.localStorage = localStorageMock;
+Object.setPrototypeOf(window.localStorage, localStorageMock);
 
 describe('botInterface', () => {
   beforeEach(() => {
@@ -45,9 +48,7 @@ describe('botInterface', () => {
   });
 
   test('user bot registration flow', () => {
-    // Force "user-bot" to be recognized as a user bot
-    vi.spyOn(window.localStorage.__proto__, 'getItem')
-      .mockReturnValueOnce(JSON.stringify([{name: 'user-bot'}]));
+    localStorageMock.getItem.mockReturnValueOnce(JSON.stringify([{name: 'user-bot'}]));
 
     const code = `(game) => game.getAvailableMoves()[0]`;
     const botFunction = new Function('game', `return (${code});`)();
@@ -63,7 +64,10 @@ describe('botInterface', () => {
     });
     registerBot('error-bot', errorBot);
 
-    const mockGame = mockGameClient();
+    const mockGame = {
+      getAvailableMoves: vi.fn(() => []),
+      getTurn: vi.fn(() => 'w')
+    };
     const bot = getBot('error-bot');
     await expect(bot(mockGame)).rejects.toThrow('Bot error');
   });

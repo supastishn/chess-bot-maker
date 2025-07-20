@@ -49,11 +49,12 @@ import { waitFor } from '@testing-library/react';
     getBotBlocklyXml.mockReturnValue(existingXml);
 
     render(
-      <VisualBotBuilder 
-        onRegisterBot={mockRegister} 
-        location={{ state: { botName: 'Existing Bot' } }} 
-      />,
-      { wrapper: HashRouter }
+      <HashRouter>
+        <VisualBotBuilder 
+          onRegisterBot={mockRegister} 
+          location={{ state: { botName: 'Existing Bot' } }} 
+        />
+      </HashRouter>
     );
 
     await waitFor(() => {
