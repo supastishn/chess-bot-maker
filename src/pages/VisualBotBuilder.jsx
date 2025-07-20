@@ -4,13 +4,13 @@ import { UNSAFE_NavigationContext as NavigationContext } from 'react-router';
 import BlocklyComponent from '../components/BlocklyComponent';
 import { getBotBlocklyXml } from '../bot/botInterface';
 
-const VisualBotBuilder = ({ onRegisterBot }) => {
+const VisualBotBuilder = ({ onRegisterBot, location: propLocation }) => {
   const [botName, setBotName] = useState('');
   const [code, setCode] = useState('');
   const [xml, setXml] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const workspaceRef = useRef(null);
-  const location = useLocation();
+  const location = propLocation || useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,10 +26,14 @@ const VisualBotBuilder = ({ onRegisterBot }) => {
   }, [location.state]);
 
   const handleGenerate = () => {
-    const js = workspaceRef.current.workspaceToCode();
-    const newXml = workspaceRef.current.workspaceToXml();
-    setCode(js);
-    setXml(newXml);
+    try {
+      const js = workspaceRef.current.workspaceToCode();
+      const newXml = workspaceRef.current.workspaceToXml();
+      setCode(js);
+      setXml(newXml);
+    } catch (e) {
+      console.error('Error generating code:', e);
+    }
   };
 
   const handleRegister = () => {
