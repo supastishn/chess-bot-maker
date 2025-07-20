@@ -630,7 +630,14 @@ code {
   border-radius: 8px !important;
 }
 
-/* Remove the inversion filter */
+/* Keep the inversion filter in dark mode for board container */
 [data-theme="dark"] .blockly-container {
-  filter: none;
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* But override toolbox labels to stay readable */
+[data-theme="dark"] .blocklyToolboxCategoryLabel {
+  filter: invert(1) hue-rotate(180deg) !important;
+  color: var(--blockly-toolbox-label-color) !important;
+  background-color: var(--blockly-toolbox-background) !important;
 }
