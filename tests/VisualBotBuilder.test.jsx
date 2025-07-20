@@ -41,23 +41,26 @@ describe('VisualBotBuilder', () => {
     );
   });
 
-  test('edits existing bot', () => {
+import { HashRouter } from 'react-router-dom';
+import { waitFor } from '@testing-library/react';
+
+  test('edits existing bot', async () => {
     const existingXml = '<xml><block type="get_available_moves"></block></xml>';
     getBotBlocklyXml.mockReturnValue(existingXml);
-    // Simulate location state explicitly
-    
+
     render(
       <VisualBotBuilder 
         onRegisterBot={mockRegister} 
-        location={{ 
-          state: { botName: 'Existing Bot' } 
-        }} 
-      />
+        location={{ state: { botName: 'Existing Bot' } }} 
+      />,
+      { wrapper: HashRouter }
     );
-    
-    const nameInput = screen.getByPlaceholderText('Bot name');
-    expect(nameInput).toHaveValue('Existing Bot');
-    expect(nameInput).toBeDisabled();
+
+    await waitFor(() => {
+      const nameInput = screen.getByPlaceholderText('Bot name');
+      expect(nameInput).toHaveValue('Existing Bot');
+      expect(nameInput).toBeDisabled();
+    });
   });
 
   test('handles Blockly errors', () => {

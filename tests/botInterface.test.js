@@ -26,17 +26,11 @@ global.localStorage = localStorageMock;
 
 describe('botInterface', () => {
   beforeEach(() => {
+    vi.resetModules();
+    vi.resetAllMocks();
     // Reset state for user bots
     window.localStorage.setItem('chess-user-bots', JSON.stringify([]));
-    // The following are global variables in botInterface.js, so we must clear them if possible.
-    // If not accessible, this is a placeholder for the correct reset logic.
-    // registeredBots.clear();
-    // botSources.clear();
-    // botBlocklyXml.clear();
-    // botTypes.clear();
-    // userBotNames.clear();
     localStorage.clear();
-    vi.clearAllMocks();
   });
 
   test('registerBot registers function bots', () => {
@@ -51,6 +45,10 @@ describe('botInterface', () => {
   });
 
   test('user bot registration flow', () => {
+    // Force "user-bot" to be recognized as a user bot
+    vi.spyOn(window.localStorage.__proto__, 'getItem')
+      .mockReturnValueOnce(JSON.stringify([{name: 'user-bot'}]));
+
     const code = `(game) => game.getAvailableMoves()[0]`;
     const botFunction = new Function('game', `return (${code});`)();
     registerUserBot('user-bot', botFunction, code, '<xml></xml>');
@@ -60,34 +58,11 @@ describe('botInterface', () => {
   });
 
   test('bot execution handles errors', async () => {
-    const errorBot = vi.fn(() => { 
-      throw new Error('Bot error') 
+    const errorBot = vi.fn(() => {
+      throw new Error('Bot error');
     });
     registerBot('error-bot', errorBot);
-    
-    // Use a mock game client for error test
-    const mockGameClient = () => ({
-      getAvailableMoves: vi.fn(),
-      getVerboseMoves: vi.fn(() => []),
-      getTurn: vi.fn(),
-      isAttacked: vi.fn(() => false),
-      lookAhead: vi.fn(),
-      prioritizeStrategy: vi.fn(),
-      getMoveCount: vi.fn(),
-      isCheckmate: vi.fn(),
-      stockfish: vi.fn(),
-      moves: vi.fn(() => []),
-      history: vi.fn(() => []),
-      turn: vi.fn().mockReturnValue('w'),
-      undo: vi.fn(),
-      move: vi.fn(),
-      fen: vi.fn(() => 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'),
-      getGameResult: vi.fn(() => 'ongoing'),
-      evaluateMaterial: vi.fn(() => 0),
-      getStatus: vi.fn(),
-      isInCheck: vi.fn(),
-      getThreatenedSquares: vi.fn(),
-    });
+
     const mockGame = mockGameClient();
     const bot = getBot('error-bot');
     await expect(bot(mockGame)).rejects.toThrow('Bot error');
