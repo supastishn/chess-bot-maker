@@ -47,12 +47,10 @@ describe('VisualBotBuilder', () => {
     getBotBlocklyXml.mockReturnValue(existingXml);
 
     render(
-      <HashRouter>
-        <VisualBotBuilder 
-          onRegisterBot={mockRegister} 
-          location={{ state: { botName: 'Existing Bot' } }} 
-        />
-      </HashRouter>
+      <VisualBotBuilder 
+        onRegisterBot={mockRegister} 
+        location={{ state: { botName: 'Existing Bot' } }} 
+      />
     );
 
     await waitFor(() => {
@@ -76,7 +74,7 @@ describe('VisualBotBuilder', () => {
       })
     }));
 
-    render(<VisualBotBuilder onRegisterBot={vi.fn()} />, { wrapper: HashRouter });
+    render(<VisualBotBuilder onRegisterBot={vi.fn()} />);
     fireEvent.click(screen.getByText('Generate Code'));
 
     expect(console.error).toHaveBeenCalledWith('Error generating code:', expect.any(Error));

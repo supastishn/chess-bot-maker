@@ -83,7 +83,7 @@ describe('botInterface', () => {
     expect(['e2e4', 'g1f3']).toContain(randomBot(mockGame));
     
     // Test material bot
-    mockGame.isCheckmate.mockImplementationOnce(true);
+    mockGame.isCheckmate.mockReturnValueOnce(true);
     const materialBot = getBot('material-bot');
     materialBot(mockGame);
     expect(mockGame.isCheckmate).toHaveBeenCalled();
