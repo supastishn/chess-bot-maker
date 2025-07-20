@@ -13,28 +13,27 @@ import { Chess } from 'chess.js';
 
 import { mockGameClient } from './utils';
 
-// Mock localStorage
-const localStorageMock = (() => {
-  let store = {};
-  return {
-    getItem: vi.fn(key => store[key]),
-    setItem: vi.fn((key, value) => { store[key] = value }),
-    clear: vi.fn(() => { store = {} }),
-    removeItem: vi.fn(key => delete store[key])
-  };
-})();
+const mockLocalStorage = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  clear: vi.fn(),
+  removeItem: vi.fn(),
+  store: {}
+};
 
-global.localStorage = localStorageMock;
-Object.setPrototypeOf(window.localStorage, localStorageMock);
-
-describe('botInterface', () => {
-  beforeEach(() => {
-    vi.resetModules();
-    vi.resetAllMocks();
-    // Reset state for user bots
-    window.localStorage.setItem('chess-user-bots', JSON.stringify([]));
-    localStorage.clear();
+beforeEach(() => {
+  Object.defineProperty(window, 'localStorage', {
+    value: {
+      getItem: key => mockLocalStorage.getItem(key),
+      setItem: (key, value) => mockLocalStorage.setItem(key, value),
+      clear: () => mockLocalStorage.clear(),
+      removeItem: key => mockLocalStorage.removeItem(key),
+      key: vi.fn(),
+      length: 0
+    },
+    writable: true
   });
+});
 
   test('registerBot registers function bots', () => {
     const mockBot = vi.fn(() => 'e2e4');
