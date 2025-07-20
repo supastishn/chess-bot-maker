@@ -19,11 +19,8 @@ javascriptGenerator['get_turn'] = function() {
 };
 
 javascriptGenerator['return_move'] = function(block) {
-  const moveCode =
-    javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_NONE) || 'null';
-  const code = `return ${moveCode};\n`;
-  // return [code, order] like all the others
-  return [code, javascriptGenerator.ORDER_NONE];
+  const moveCode = javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_NONE) || 'null';
+  return `return ${moveCode};\n`;
 };
 
 javascriptGenerator['evaluate_material'] = function() {
