@@ -68,15 +68,15 @@ import { waitFor } from '@testing-library/react';
     const originalError = console.error;
     console.error = vi.fn();
 
-    vi.doMock('../src/components/BlocklyComponent', () => 
-      React.forwardRef((props, ref) => {
+    vi.doMock('../../src/components/BlocklyComponent', () => ({
+      default: React.forwardRef((props, ref) => {
         React.useImperativeHandle(ref, () => ({
-          workspaceToCode: () => { throw new Error('Blockly error'); },
+          workspaceToCode: () => { throw new Error('Blockly error') },
           workspaceToXml: () => '<xml></xml>'
         }));
         return <div data-testid="mock-blockly" />;
       })
-    );
+    }));
 
     render(<VisualBotBuilder onRegisterBot={vi.fn()} />, { wrapper: HashRouter });
     fireEvent.click(screen.getByText('Generate Code'));
