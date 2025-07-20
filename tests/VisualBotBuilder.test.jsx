@@ -63,9 +63,8 @@ describe('VisualBotBuilder', () => {
   test('handles Blockly errors', () => {
     const originalError = console.error;
     console.error = vi.fn();
-    
-    // Simulate error in workspaceToCode
-    vi.mocked(require('../src/components/BlocklyComponent').default).mockImplementationOnce(
+
+    vi.doMock('../src/components/BlocklyComponent', () => 
       React.forwardRef((props, ref) => {
         React.useImperativeHandle(ref, () => ({
           workspaceToCode: () => { throw new Error('Blockly error'); },
@@ -74,10 +73,10 @@ describe('VisualBotBuilder', () => {
         return <div data-testid="mock-blockly" />;
       })
     );
-    
-    render(<VisualBotBuilder onRegisterBot={vi.fn()} />);
+
+    render(<VisualBotBuilder onRegisterBot={vi.fn()} />, { wrapper: HashRouter });
     fireEvent.click(screen.getByText('Generate Code'));
-    
+
     expect(console.error).toHaveBeenCalledWith('Error generating code:', expect.any(Error));
     console.error = originalError;
   });
