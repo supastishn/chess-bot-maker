@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { vi } from 'vitest';
-import useTournamentRunner from '../../src/hooks/useTournamentRunner';
-import { getBot } from '../../src/bot/botInterface';
+import useTournamentRunner from '../../src/hooks/useTournamentRunner.js';
+import { getBot } from '../../src/bot/botInterface.js';
 
 // Mock dependencies
 vi.mock('../../src/bot/botInterface', () => ({

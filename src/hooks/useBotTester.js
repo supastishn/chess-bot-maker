@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { getBotNames, registerBot, getBot } from '../bot/botInterface';
+import { getBotNames, registerBot, getBot } from '../bot/botInterface.js';
 import { Chess } from 'chess.js';
 
 const useBotTester = () => {
