@@ -1,28 +1,21 @@
 import * as Blockly from 'blockly/core';
 import { javascriptGenerator } from 'blockly/javascript';
 
-// Centralized core block generators
-const coreGenerators = {
-  'get_available_moves': `game.getAvailableMoves()`,
-  'get_verbose_moves': `game.getVerboseMoves()`,
-  'get_turn': `game.getTurn()`,
-  'evaluate_material': `game.evaluateMaterial()`,
-  'get_book_moves': `game.getBookMoves()`,
-  'play_book_move': `game.playBookMove()`,
-  'get_game_phase': `game.getGamePhase()`,
-  'is_in_check': `game.isInCheck()`,
-  'is_checkmate': `game.isCheckmate()`,
-  'is_stalemate': `game.isStalemate()`,
-  'is_draw': `game.isDraw()`,
-  'is_game_over': `game.isGameOver()`,
-  'get_fen': `game.getFEN()`,
-  'get_move_count': `game.getMoveCount()`,
-  'get_position_score': `game.getPositionScore()`
-};
-
-Object.entries(coreGenerators).forEach(([block, code]) => {
-  javascriptGenerator[block] = () => [code, javascriptGenerator.ORDER_FUNCTION_CALL];
-});
+javascriptGenerator['get_available_moves'] = () => ['game.getAvailableMoves()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['get_verbose_moves'] = () => ['game.getVerboseMoves()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['get_turn'] = () => ['game.getTurn()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['evaluate_material'] = () => ['game.evaluateMaterial()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['get_book_moves'] = () => ['game.getBookMoves()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['play_book_move'] = () => ['game.playBookMove()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['get_game_phase'] = () => ['game.getGamePhase()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['is_in_check'] = () => ['game.isInCheck()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['is_checkmate'] = () => ['game.isCheckmate()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['is_stalemate'] = () => ['game.isStalemate()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['is_draw'] = () => ['game.isDraw()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['is_game_over'] = () => ['game.isGameOver()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['get_fen'] = () => ['game.getFEN()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['get_move_count'] = () => ['game.getMoveCount()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['get_position_score'] = () => ['game.getPositionScore()', javascriptGenerator.ORDER_FUNCTION_CALL];
 
 // Statement block for returning a move
 javascriptGenerator['return_move'] = function(block) {
@@ -30,7 +23,6 @@ javascriptGenerator['return_move'] = function(block) {
   return `return ${moveCode};\n`;
 };
 
-// Advanced generators
 javascriptGenerator['look_ahead'] = function(block) {
   const move = javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_NONE) || "''";
   const depth = javascriptGenerator.valueToCode(block, 'DEPTH', javascriptGenerator.ORDER_ATOMIC) || 2;
