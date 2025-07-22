@@ -19,14 +19,21 @@ javascriptGenerator['get_position_score'] = () => ['game.getPositionScore()', ja
 
 javascriptGenerator['return_move'] = function(block) {
   const moveCode = javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_NONE) || 'null';
-  return `return ${moveCode};\n`;
+  // If moveCode is a quoted string, return as-is; else, wrap in single quotes
+  if ((/^'.*'$/.test(moveCode)) || (/^".*"$/.test(moveCode))) {
+    return `return ${moveCode};\n`;
+  }
+  return `return '${moveCode}';\n`;
 };
 
 javascriptGenerator['look_ahead'] = function(block) {
   const move = javascriptGenerator.valueToCode?.(block, 'MOVE', javascriptGenerator.ORDER_NONE) || "''";
   const depth = javascriptGenerator.valueToCode?.(block, 'DEPTH', javascriptGenerator.ORDER_ATOMIC) || 2;
-  // topics parameter removed for compatibility
-  return [`game.lookAhead(${move}, ${depth}).score`, javascriptGenerator.ORDER_FUNCTION_CALL];
+  // If move is a quoted string, use as-is; else, wrap in single quotes
+  if ((/^'.*'$/.test(move)) || (/^".*"$/.test(move))) {
+    return [`game.lookAhead(${move}, ${depth}).score`, javascriptGenerator.ORDER_FUNCTION_CALL];
+  }
+  return [`game.lookAhead('${move}', ${depth}).score`, javascriptGenerator.ORDER_FUNCTION_CALL];
 };
 
 javascriptGenerator['get_threatened_squares'] = function(block) {
