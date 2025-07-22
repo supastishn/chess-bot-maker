@@ -1,7 +1,8 @@
 import React from 'react';
 import { RefreshCw } from 'lucide-react';
 
-const InfoPanel = ({ status: { isCheckmate, isStalemate, isRepetition }, turn, onReset }) => {
+const InfoPanel = ({ status, turn, onReset }) => {
+  const { isCheckmate, isStalemate, isRepetition } = status;
   const statusText = 
     isCheckmate ? `${turn === 'white' ? 'Black' : 'White'} wins by Checkmate` :
     isStalemate ? 'Draw by Stalemate!' :

@@ -97,16 +97,13 @@ const createBotHelper = (gameClient) => {
   const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 100 };
   if (gameClient.evaluateMaterial === undefined) helper.evaluateMaterial = () => {
     const board = gameClient.board();
-    let score = 0;
-    for (const row of board) {
-      for (const piece of row) {
-        if (piece) {
-          const value = pieceValues[piece.type] || 0;
-          score += piece.color === 'w' ? value : -value;
-        }
-      }
-    }
-    return score;
+    return board.reduce((total, row) => 
+      row.reduce((sum, piece) => {
+        if (!piece) return sum;
+        const value = pieceValues[piece.type] || 0;
+        return sum + (piece.color === 'w' ? value : -value);
+      }, total), 
+    0);
   };
 
   if (gameClient.lookAhead === undefined) helper.lookAhead = (move, depth) => {

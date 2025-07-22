@@ -18,26 +18,19 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <div className="navbar-brand">
-          <NavLink to="/" className="brand-link">
-            <Crown className="brand-icon" />
-            Chess vs Bot
-          </NavLink>
-        </div>
+        <NavLink to="/" className="brand-link" aria-label="Home">
+          <Crown className="brand-icon" />
+          Chess vs Bot
+        </NavLink>
         <div className="navbar-menu">
-          {navLinks.map((link) => (
-            <NavLink 
-              key={link.path}
-              to={link.path}
-              className="nav-link"
-              end
-            >
-              <link.icon className="nav-icon" />
-              <span className="nav-text">{link.text}</span>
+          {navLinks.map(({ path, icon: Icon, text }) => (
+            <NavLink key={path} to={path} className="nav-link">
+              <Icon className="nav-icon" />
+              <span>{text}</span>
             </NavLink>
           ))}
           <button onClick={toggleTheme} className="theme-toggle">
-            {isDark ? <Sun className="theme-icon" /> : <Moon className="theme-icon" />}
+            {isDark ? <Sun /> : <Moon />}
           </button>
         </div>
       </div>
