@@ -18,12 +18,8 @@ javascriptGenerator['get_move_count'] = () => ['game.getMoveCount()', javascript
 javascriptGenerator['get_position_score'] = () => ['game.getPositionScore()', javascriptGenerator.ORDER_FUNCTION_CALL];
 
 javascriptGenerator['return_move'] = function(block) {
-  const moveCode = javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_NONE) || 'null';
-  // If moveCode is a quoted string, return as-is; else, wrap in single quotes
-  if ((/^'.*'$/.test(moveCode)) || (/^".*"$/.test(moveCode))) {
-    return `return ${moveCode};\n`;
-  }
-  return `return '${moveCode}';\n`;
+  const code = javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_ATOMIC) || "''";
+  return `return ${code};\n`;
 };
 
 javascriptGenerator['look_ahead'] = function(block) {
