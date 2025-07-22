@@ -18,8 +18,8 @@ javascriptGenerator['get_move_count'] = () => ['game.getMoveCount()', javascript
 javascriptGenerator['get_position_score'] = () => ['game.getPositionScore()', javascriptGenerator.ORDER_FUNCTION_CALL];
 
 javascriptGenerator['return_move'] = function(block) {
-  const moveCode = javascriptGenerator.valueToCode?.(block, 'MOVE', javascriptGenerator.ORDER_NONE) || 'null';
-  return [`return ${moveCode};\n`, javascriptGenerator.ORDER_NONE];
+  const moveCode = javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_NONE) || 'null';
+  return `return ${moveCode};\n`;
 };
 
 javascriptGenerator['look_ahead'] = function(block) {
