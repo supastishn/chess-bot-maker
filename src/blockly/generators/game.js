@@ -10,6 +10,9 @@ javascriptGenerator['play_book_move'] = () => ['game.playBookMove()', javascript
 javascriptGenerator['get_game_phase'] = () => ['game.getGamePhase()', javascriptGenerator.ORDER_FUNCTION_CALL];
 javascriptGenerator['is_in_check'] = () => ['game.isInCheck()', javascriptGenerator.ORDER_FUNCTION_CALL];
 javascriptGenerator['is_checkmate'] = () => ['game.isCheckmate()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['is_stalemate'] = () => ['game.isStalemate()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['is_draw'] = () => ['game.isDraw()', javascriptGenerator.ORDER_FUNCTION_CALL];
+javascriptGenerator['is_game_over'] = () => ['game.isGameOver()', javascriptGenerator.ORDER_FUNCTION_CALL];
 javascriptGenerator['get_fen'] = () => ['game.getFEN()', javascriptGenerator.ORDER_FUNCTION_CALL];
 javascriptGenerator['get_move_count'] = () => ['game.getMoveCount()', javascriptGenerator.ORDER_FUNCTION_CALL];
 javascriptGenerator['get_position_score'] = () => ['game.getPositionScore()', javascriptGenerator.ORDER_FUNCTION_CALL];
@@ -20,13 +23,9 @@ javascriptGenerator['return_move'] = function(block) {
 };
 
 javascriptGenerator['look_ahead'] = function(block) {
-  const move = javascriptGenerator.valueToCode?.(block, 'MOVE', javascriptGenerator.ORDER_NONE) || "''";
-  const depth = javascriptGenerator.valueToCode?.(block, 'DEPTH', javascriptGenerator.ORDER_ATOMIC) || 2;
-  // If move is a quoted string, use as-is; else, wrap in single quotes
-  if ((/^'.*'$/.test(move)) || (/^".*"$/.test(move))) {
-    return [`game.lookAhead(${move}, ${depth}).score`, javascriptGenerator.ORDER_FUNCTION_CALL];
-  }
-  return [`game.lookAhead('${move}', ${depth}).score`, javascriptGenerator.ORDER_FUNCTION_CALL];
+  const move = javascriptGenerator.valueToCode(block, 'MOVE', javascriptGenerator.ORDER_NONE) || "''";
+  const depth = javascriptGenerator.valueToCode(block, 'DEPTH', javascriptGenerator.ORDER_ATOMIC) || 2;
+  return [`game.lookAhead(${move}, ${depth}).score`, javascriptGenerator.ORDER_FUNCTION_CALL];
 };
 
 javascriptGenerator['get_threatened_squares'] = function(block) {
@@ -54,8 +53,8 @@ javascriptGenerator['prioritize_strategy'] = function(block) {
   return [`game.prioritizeStrategy(${weights})`, javascriptGenerator.ORDER_FUNCTION_CALL];
 };
 
-// Stockfish generator
+ // Stockfish generator
 javascriptGenerator['stockfish_move'] = function(block) {
-  const depth = javascriptGenerator.valueToCode?.(block, 'DEPTH', javascriptGenerator.ORDER_ATOMIC) || 15;
-  return [`await game.stockfish().getBestMove(game.getFEN(), ${depth})`, javascriptGenerator.ORDER_FUNCTION_CALL];
+  const depth = javascriptGenerator.valueToCode(block, 'DEPTH', javascriptGenerator.ORDER_ATOMIC) || 15;
+  return [`await game.stockfish().getBestMove(game.getFEN(), ${depth})`, javascriptGenerator.ORDER_AWAIT];
 };
