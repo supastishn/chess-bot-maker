@@ -96,7 +96,7 @@ Blockly.Blocks['stockfish_move'] = {
   init() {
     this.appendValueInput("DEPTH")
       .appendField("get Stockfish move at depth");
-    this.setOutput(true, "Object");
+    this.setOutput(true, "String");
     this.setColour('#3388DD');
   }
 };

@@ -17,16 +17,25 @@ describe('Blockly game block generators', () => {
       expect(typeof javascriptGenerator[type]).toBe('function');
     });
 
-    test(`generator for block ${type} returns code and order`, () => {
+    test(`generator for block ${type} returns correct format`, () => {
       // Create a minimal stub block:
-      const block = { type };
-      block.getFieldValue = () => null;
-      block.getInputTargetBlock = () => null;
+      const block = {
+        type,
+        getFieldValue: () => null,
+        getInputTargetBlock: () => null,
+      };
       // Stub valueToCode to avoid missing inputs:
       javascriptGenerator.valueToCode = () => `'x'`;
       const result = javascriptGenerator[type](block);
-      expect(Array.isArray(result)).toBe(true);
-      expect(typeof result[0]).toBe('string');
+
+      // Statement blocks return a string, value blocks return an array [code, order]
+      if (type === 'return_move') {
+        expect(typeof result).toBe('string');
+      } else {
+        expect(Array.isArray(result)).toBe(true);
+        expect(typeof result[0]).toBe('string');
+        expect(typeof result[1]).toBe('number');
+      }
     });
   });
 });
