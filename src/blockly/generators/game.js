@@ -29,21 +29,21 @@ javascriptGenerator['look_ahead'] = function(block) {
 };
 
 javascriptGenerator['get_threatened_squares'] = function(block) {
-  const color = javascriptGenerator.valueToCode?.(block, 'COLOR', javascriptGenerator.ORDER_NONE) || "'w'";
+  const color = javascriptGenerator.valueToCode(block, 'COLOR', javascriptGenerator.ORDER_NONE) || "'w'";
   return [`game.getThreatenedSquares(${color})`, javascriptGenerator.ORDER_FUNCTION_CALL];
 };
 
 javascriptGenerator['is_attacked'] = function(block) {
-  const square = javascriptGenerator.valueToCode?.(block, 'SQUARE', javascriptGenerator.ORDER_NONE) || "''";
-  const color = javascriptGenerator.valueToCode?.(block, 'COLOR', javascriptGenerator.ORDER_NONE) || "'w'";
+  const square = javascriptGenerator.valueToCode(block, 'SQUARE', javascriptGenerator.ORDER_NONE) || "''";
+  const color = javascriptGenerator.valueToCode(block, 'COLOR', javascriptGenerator.ORDER_NONE) || "'w'";
   return [`game.isAttacked(${square}, ${color})`, javascriptGenerator.ORDER_FUNCTION_CALL];
 };
 
 javascriptGenerator['prioritize_strategy'] = function(block) {
-  const material = javascriptGenerator.valueToCode?.(block, 'MATERIAL', javascriptGenerator.ORDER_ATOMIC) || null;
-  const development = javascriptGenerator.valueToCode?.(block, 'DEVELOPMENT', javascriptGenerator.ORDER_ATOMIC) || null;
-  const centerControl = javascriptGenerator.valueToCode?.(block, 'CENTER_CONTROL', javascriptGenerator.ORDER_ATOMIC) || null;
-  const kingSafety = javascriptGenerator.valueToCode?.(block, 'KING_SAFETY', javascriptGenerator.ORDER_ATOMIC) || null;
+  const material = javascriptGenerator.valueToCode(block, 'MATERIAL', javascriptGenerator.ORDER_ATOMIC) || null;
+  const development = javascriptGenerator.valueToCode(block, 'DEVELOPMENT', javascriptGenerator.ORDER_ATOMIC) || null;
+  const centerControl = javascriptGenerator.valueToCode(block, 'CENTER_CONTROL', javascriptGenerator.ORDER_ATOMIC) || null;
+  const kingSafety = javascriptGenerator.valueToCode(block, 'KING_SAFETY', javascriptGenerator.ORDER_ATOMIC) || null;
   const weights = `{
     material: ${material},
     development: ${development},

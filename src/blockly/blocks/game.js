@@ -43,9 +43,6 @@ Blockly.Blocks['look_ahead'] = {
       .appendField("look ahead for move");
     this.appendValueInput("DEPTH")
       .appendField("depth");
-    this.appendValueInput("TOPICS")
-      .appendField("topics")
-      .setCheck("Array");
     this.setOutput(true, "Number");
     this.setColour('#A65C81');
   }

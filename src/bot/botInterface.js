@@ -37,6 +37,7 @@ const createBotHelper = (gameClient) => {
   if (gameClient.isDraw === undefined) helper.isDraw = () => gameClient.isDraw();
   if (gameClient.isGameOver === undefined) helper.isGameOver = () => gameClient.isGameOver();
   if (gameClient.getFEN === undefined) helper.getFEN = () => gameClient.fen();
+  if (gameClient.isInCheck === undefined) helper.isInCheck = () => gameClient.isCheck();
   if (gameClient.undoMove === undefined) helper.undoMove = () => gameClient.undo();
   if (gameClient.move === undefined) helper.move = (m) => gameClient.move(m);
   if (gameClient.isAttacked === undefined) helper.isAttacked = (square, byColor) => gameClient.isAttacked(square, byColor);
@@ -60,6 +61,18 @@ const createBotHelper = (gameClient) => {
       if (helper.isAttacked(sq, byColor)) squares.push(sq);
     }
     return squares;
+  };
+
+  if (gameClient.getPositionScore === undefined) helper.getPositionScore = () => {
+    let score = helper.evaluateMaterial();
+    const center = ['e4', 'd4', 'e5', 'd5'];
+    for (const sq of center) {
+      const piece = gameClient.get(sq);
+      if (piece) {
+        score += (piece.color === 'w' ? 0.1 : -0.1);
+      }
+    }
+    return score;
   };
 
   if (gameClient.setElo === undefined) helper.setElo = (elo) => {
