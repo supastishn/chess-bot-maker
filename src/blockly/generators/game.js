@@ -10,9 +10,6 @@ javascriptGenerator['play_book_move'] = () => ['game.playBookMove()', javascript
 javascriptGenerator['get_game_phase'] = () => ['game.getGamePhase()', javascriptGenerator.ORDER_FUNCTION_CALL];
 javascriptGenerator['is_in_check'] = () => ['game.isInCheck()', javascriptGenerator.ORDER_FUNCTION_CALL];
 javascriptGenerator['is_checkmate'] = () => ['game.isCheckmate()', javascriptGenerator.ORDER_FUNCTION_CALL];
-javascriptGenerator['is_stalemate'] = () => ['game.isStalemate()', javascriptGenerator.ORDER_FUNCTION_CALL];
-javascriptGenerator['is_draw'] = () => ['game.isDraw()', javascriptGenerator.ORDER_FUNCTION_CALL];
-javascriptGenerator['is_game_over'] = () => ['game.isGameOver()', javascriptGenerator.ORDER_FUNCTION_CALL];
 javascriptGenerator['get_fen'] = () => ['game.getFEN()', javascriptGenerator.ORDER_FUNCTION_CALL];
 javascriptGenerator['get_move_count'] = () => ['game.getMoveCount()', javascriptGenerator.ORDER_FUNCTION_CALL];
 javascriptGenerator['get_position_score'] = () => ['game.getPositionScore()', javascriptGenerator.ORDER_FUNCTION_CALL];
