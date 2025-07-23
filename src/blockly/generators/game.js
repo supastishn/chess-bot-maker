@@ -58,3 +58,10 @@ javascriptGenerator.forBlock['stockfish_move'] = function(block) {
   const depth = javascriptGenerator.valueToCode(block, 'DEPTH', javascriptGenerator.ORDER_ATOMIC) || 15;
   return [`await game.stockfish().getBestMove(game.getFEN(), ${depth})`, javascriptGenerator.ORDER_AWAIT];
 };
+
+// Main bot entry block generator
+javascriptGenerator.forBlock['bot_main'] = function(block) {
+  const statements = javascriptGenerator.statementToCode(block, 'STATEMENTS');
+  // This block is just a container; the function wrapper is added later.
+  return statements;
+};

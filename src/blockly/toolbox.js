@@ -1,5 +1,8 @@
 const toolbox = `
 <xml xmlns="https://developers.google.com/blockly/xml">
+  <category name="Program" colour="290">
+    <block type="bot_main"></block>
+  </category>
   <category name="Logic" colour="#5C81A6">
     <block type="controls_if"></block>
     <block type="logic_compare"></block>

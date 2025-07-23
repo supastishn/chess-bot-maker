@@ -97,3 +97,16 @@ Blockly.Blocks['stockfish_move'] = {
     this.setColour('#3388DD');
   }
 };
+
+// --- Main bot entry block ---
+Blockly.Blocks['bot_main'] = {
+  init() {
+    this.appendDummyInput()
+        .appendField("function start");
+    this.appendStatementInput("STATEMENTS")
+        .setCheck(null);
+    this.setColour(290);
+    this.setTooltip("The main entry for your bot's logic. All your code should go in here.");
+    this.setHelpUrl('');
+  }
+};
