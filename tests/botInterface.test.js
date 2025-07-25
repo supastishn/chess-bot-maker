@@ -7,7 +7,7 @@ import {
   deleteUserBot,
   isUserBot,
   getBotSource,
-  getBotBlocklyXml
+  getBotBlocklyJson
 } from '../src/bot/botInterface';
 import { Chess } from 'chess.js';
 
@@ -52,10 +52,11 @@ describe('botInterface', () => {
 
     const code = `(game) => game.getAvailableMoves()[0]`;
     const botFunction = new Function('game', `return (${code});`)();
-    registerUserBot('user-bot', botFunction, code, '<xml></xml>');
+    registerUserBot('user-bot', botFunction, code, '{"blocks":{}}');
     
     expect(isUserBot('user-bot')).toBe(true);
     expect(getBotSource('user-bot')).toBe(code);
+    expect(getBotBlocklyJson('user-bot')).toBe('{"blocks":{}}');
   });
 
   test('bot execution handles errors', async () => {

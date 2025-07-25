@@ -11,7 +11,7 @@ import '../blockly/generators/game';
 
 Blockly.setLocale(En);
 
-const BlocklyComponent = forwardRef(({ onCodeChange, initialXml }, ref) => {
+const BlocklyComponent = forwardRef(({ onCodeChange, initialJson }, ref) => {
   const blocklyDiv = useRef(null);
   const workspace = useRef(null);
 
@@ -33,9 +33,13 @@ const BlocklyComponent = forwardRef(({ onCodeChange, initialXml }, ref) => {
       }
     });
 
-    if (initialXml) {
-      const xmlDom = Blockly.Xml.textToDom(initialXml);
-      Blockly.Xml.domToWorkspace(xmlDom, workspace.current);
+    if (initialJson) {
+      try {
+        const jsonState = JSON.parse(initialJson);
+        Blockly.serialization.workspaces.load(jsonState, workspace.current);
+      } catch (e) {
+        console.error("Error loading Blockly workspace state:", e);
+      }
     }
 
     javascriptGenerator.addReservedWords('game');
@@ -48,13 +52,13 @@ const BlocklyComponent = forwardRef(({ onCodeChange, initialXml }, ref) => {
     return () => {
       workspace.current?.dispose();
     };
-  }, [onCodeChange, initialXml]);
+  }, [onCodeChange, initialJson]);
 
   useImperativeHandle(ref, () => ({
     workspaceToCode: () => javascriptGenerator.workspaceToCode(workspace.current),
-    workspaceToXml: () => {
-      const xml = Blockly.Xml.workspaceToDom(workspace.current);
-      return Blockly.Xml.domToText(xml);
+    workspaceToJson: () => {
+      const jsonState = Blockly.serialization.workspaces.save(workspace.current);
+      return JSON.stringify(jsonState);
     },
   }));
 

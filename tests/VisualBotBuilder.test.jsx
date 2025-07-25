@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { HashRouter } from 'react-router-dom';
 import VisualBotBuilder from '../src/pages/VisualBotBuilder';
-import { getBotBlocklyXml } from '../src/bot/botInterface';
+import { getBotBlocklyJson } from '../src/bot/botInterface';
 
 import { vi } from 'vitest';
 
@@ -18,7 +18,7 @@ vi.mock('../src/components/BlocklyComponent', () => ({
         }
         return 'generated code';
       }),
-      workspaceToXml: vi.fn(() => '<xml></xml>')
+      workspaceToJson: vi.fn(() => '{"blocks":{}}')
     }));
     return <div data-testid="mock-blockly" />;
   })
@@ -49,13 +49,13 @@ describe('VisualBotBuilder', () => {
       'New Bot', 
       expect.stringContaining('generated code'),
       expect.stringContaining('generated code'),
-      '<xml></xml>'
+      '{"blocks":{}}'
     );
   });
 
   test('edits existing bot', async () => {
-    const existingXml = '<xml><block type="get_available_moves"></block></xml>';
-    getBotBlocklyXml.mockReturnValue(existingXml);
+    const existingJson = '{"blocks":{"languageVersion":0,"blocks":[{"type":"get_available_moves"}]}}';
+    getBotBlocklyJson.mockReturnValue(existingJson);
 
     render(
       <VisualBotBuilder 

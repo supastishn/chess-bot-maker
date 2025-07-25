@@ -2,12 +2,12 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { UNSAFE_NavigationContext as NavigationContext } from 'react-router';
 import { useLocation, useNavigate, HashRouter } from 'react-router-dom';
 import BlocklyComponent from '../components/BlocklyComponent';
-import { getBotBlocklyXml } from '../bot/botInterface';
+import { getBotBlocklyJson } from '../bot/botInterface';
 
 const VisualBotBuilder = ({ onRegisterBot, location: propLocation }) => {
   const [botName, setBotName] = useState('');
   const [code, setCode] = useState('');
-  const [xml, setXml] = useState('');
+  const [json, setJson] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const workspaceRef = useRef(null);
   const location = propLocation || useLocation();
@@ -16,10 +16,10 @@ const VisualBotBuilder = ({ onRegisterBot, location: propLocation }) => {
   useEffect(() => {
     if (location.state?.botName) {
       const name = location.state.botName;
-      const blocklyXml = getBotBlocklyXml(name);
-      if (blocklyXml) {
+      const blocklyJson = getBotBlocklyJson(name);
+      if (blocklyJson) {
         setBotName(name);
-        setXml(blocklyXml);
+        setJson(blocklyJson);
         setIsEditing(true);
       }
     }
@@ -28,9 +28,9 @@ const VisualBotBuilder = ({ onRegisterBot, location: propLocation }) => {
   const handleGenerate = () => {
     try {
       const js = workspaceRef.current.workspaceToCode();
-      const newXml = workspaceRef.current.workspaceToXml();
+      const newJson = workspaceRef.current.workspaceToJson();
       setCode(js);
-      setXml(newXml);
+      setJson(newJson);
     } catch (e) {
       console.error('Error generating code:', e);
     }
@@ -38,7 +38,7 @@ const VisualBotBuilder = ({ onRegisterBot, location: propLocation }) => {
 
   const handleRegister = () => {
     const wrapped = `async (game) => {\n${code}\n}`;
-    if (onRegisterBot(botName, wrapped, wrapped, xml)) {
+    if (onRegisterBot(botName, wrapped, wrapped, json)) {
       navigate('/create-bot');
     }
   };
@@ -80,7 +80,7 @@ const VisualBotBuilder = ({ onRegisterBot, location: propLocation }) => {
         ) : (
           // Show ONLY Blockly and Generate button
           <>
-            <BlocklyComponent ref={workspaceRef} initialXml={xml} />
+            <BlocklyComponent ref={workspaceRef} initialJson={json} />
             <button onClick={handleGenerate} className="btn primary-button" style={{ marginTop: '1rem' }}>
               Generate Code
             </button>
