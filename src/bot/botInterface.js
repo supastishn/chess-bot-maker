@@ -282,6 +282,9 @@ export const registerUserBot = (name, botFunction, source, blocklyJson = null) =
 };
 
 const stockfishBotFn = async (game) => {
+  const bookMove = game.playBookMove();
+  if (bookMove) return bookMove;
+
   const fen = game.getFEN ? game.getFEN() : game.fen();
   // Correctly call the stockfish helper to get the API object
   return game.stockfish().getBestMove(fen);
@@ -299,6 +302,9 @@ export const getBotNames = () => Array.from(registeredBots.keys());
 import { materialBot } from './materialBot.js';
 
 const guruBotFn = (game) => {
+  const bookMove = game.playBookMove();
+  if (bookMove) return bookMove;
+
   const moves = game.getAvailableMoves();
   if (moves.length === 0) return null;
   
@@ -314,6 +320,9 @@ registerBot('guru-bot', guruBotFn, guruBotFn.toString());
 registerBot('material-bot', materialBot, materialBot.toString());
 
 const aggressiveBotFn = (game) => {
+  const bookMove = game.playBookMove();
+  if (bookMove) return bookMove;
+
   const moves = game.getVerboseMoves();
   if (!moves.length) return null;
 
@@ -340,6 +349,9 @@ const aggressiveBotFn = (game) => {
 registerBot('aggressive-bot', aggressiveBotFn, aggressiveBotFn.toString());
 
 const defensiveBotFn = (game) => {
+  const bookMove = game.playBookMove();
+  if (bookMove) return bookMove;
+
   const moves = game.getAvailableMoves();
   if (!moves.length) return null;
 
@@ -359,7 +371,12 @@ const defensiveBotFn = (game) => {
 registerBot('defensive-bot', defensiveBotFn, defensiveBotFn.toString());
 
 const positionalBotFn = (game) => {
+  const bookMove = game.playBookMove();
+  if (bookMove) return bookMove;
+
   const moves = game.getAvailableMoves();
+  if (!moves.length) return null;
+
   let bestScore = -Infinity;
   let bestMove = moves[0];
 
@@ -386,6 +403,9 @@ const toggleBotFn = (game) => {
 registerBot('toggle-bot', toggleBotFn, toggleBotFn.toString());
 
 const randomBotFn = (game) => {
+  const bookMove = game.playBookMove();
+  if (bookMove) return bookMove;
+
   const moves = game.getAvailableMoves();
   return moves.length > 0
     ? moves[Math.floor(Math.random() * moves.length)]

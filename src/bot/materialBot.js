@@ -1,4 +1,7 @@
 export const materialBot = (game) => {
+  const bookMove = game.playBookMove();
+  if (bookMove) return bookMove;
+
   const moves = typeof game.getAvailableMoves === 'function' ? game.getAvailableMoves() : [];
   if (moves.length === 0) return null;
 
