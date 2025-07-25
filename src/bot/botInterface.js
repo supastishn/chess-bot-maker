@@ -421,21 +421,51 @@ const randomBotFn = (game) => {
 registerBot('random-bot', randomBotFn, randomBotFn.toString());
 registerBot('starter-bot', randomBotFn, randomBotFn.toString());
 
-const loadUserBots = () => {
+/**
+ * Initialize and load all bots (built-in and user) with ELO support.
+ */
+const initializeAndLoadBots = () => {
+  const BUILT_IN_BOTS = [
+    { name: 'stockfish-bot', fn: stockfishBotFn, elo: 1800 },
+    { name: 'guru-bot', fn: guruBotFn, elo: 1600 },
+    { name: 'material-bot', fn: materialBot, elo: 1400 },
+    { name: 'positional-bot', fn: positionalBotFn, elo: 1500 },
+    { name: 'aggressive-bot', fn: aggressiveBotFn, elo: 1300 },
+    { name: 'defensive-bot', fn: defensiveBotFn, elo: 1200 },
+    { name: 'toggle-bot', fn: toggleBotFn, elo: 1400 },
+    { name: 'random-bot', fn: randomBotFn, elo: 800 },
+    { name: 'starter-bot', fn: randomBotFn, elo: 800 }
+  ];
+
   try {
-    const userBots = JSON.parse(localStorage.getItem(USER_BOTS_KEY) || '[]');
-    userBots.forEach(({ name, source, blocklyJson }) => {
-      if (registeredBots.has(name)) return; // Avoid re-registering
+    let botsInStorage = JSON.parse(localStorage.getItem(USER_BOTS_KEY) || '[]');
+
+    // If no bots exist in storage, seed with built-in bots.
+    if (botsInStorage.length === 0) {
+      console.log('[Bot] Seeding localStorage with built-in bots.');
+      botsInStorage = BUILT_IN_BOTS.map(bot => ({
+        name: bot.name,
+        source: bot.fn.toString(),
+        blocklyJson: null,
+        elo: bot.elo
+      }));
+      localStorage.setItem(USER_BOTS_KEY, JSON.stringify(botsInStorage));
+    }
+
+    // Load all bots from localStorage (either pre-existing or freshly seeded)
+    botsInStorage.forEach(({ name, source, blocklyJson, elo }) => {
+      if (registeredBots.has(name)) return;
       try {
-        userBotNames.add(name);
+        userBotNames.add(name); // Mark as a "user" bot (editable, deletable)
         const botFunction = new Function('game', `return ${source};`)();
-        registerBot(name, botFunction, source, blocklyJson);
+        registerBot(name, botFunction, source, blocklyJson, elo);
       } catch (e) {
         console.error(`Error loading bot "${name}" from localStorage:`, e);
       }
     });
+
   } catch (e) {
-    console.error("Failed to load user bots from localStorage:", e);
+    console.error("Failed to initialize or load bots from localStorage:", e);
   }
 };
 
@@ -462,4 +492,4 @@ export const deleteUserBot = (name) => {
   }
 };
 
-loadUserBots();
+initializeAndLoadBots();
