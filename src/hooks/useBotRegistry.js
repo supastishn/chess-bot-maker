@@ -10,7 +10,7 @@ export const useBotRegistry = () => {
       return false;
     }
     try {
-      registerUserBot(name, new Function('game', `return ${code};`)(), source, blocklyJson, elo);
+      registerUserBot(name, new Function(`return (${code});`)(), source, blocklyJson, elo);
       setBotNames(getBotNamesFromInterface());
       return true;
     } catch (e) {

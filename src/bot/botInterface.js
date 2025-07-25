@@ -458,7 +458,7 @@ const initializeAndLoadBots = () => {
         // ALWAYS register from local storage. This ensures user edits to built-in bots are loaded.
         userBotNames.add(name); // Mark as a "user" bot (editable, deletable)
         // By wrapping source in parentheses, we ensure arrow functions are parsed correctly.
-        const botFunction = new Function('game', `return (${source});`)();
+        const botFunction = new Function(`return (${source});`)();
         // This will overwrite the built-in bot with the (potentially modified) version from localStorage.
         registerBot(name, botFunction, source, blocklyJson, elo);
       } catch (e) {
