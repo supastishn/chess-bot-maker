@@ -102,11 +102,11 @@ Blockly.Blocks['stockfish_move'] = {
 Blockly.Blocks['bot_main'] = {
   init() {
     this.appendDummyInput()
-        .appendField("function start");
+        .appendField("bot logic (inside function)");
     this.appendStatementInput("STATEMENTS")
         .setCheck(null);
     this.setColour(290);
-    this.setTooltip("The main entry for your bot's logic. All your code should go in here.");
+    this.setTooltip("The main entry for your bot's logic. The (game) => { ... } wrapper is added automatically.");
     this.setHelpUrl('');
   }
 };

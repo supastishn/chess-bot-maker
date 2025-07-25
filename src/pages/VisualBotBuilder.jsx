@@ -63,7 +63,7 @@ const VisualBotBuilder = ({ onRegisterBot, location: propLocation }) => {
               className="form-textarea"
               readOnly
               rows={10}
-              value={code}
+              value={`// The (game) => { ... } wrapper is added automatically on registration.\n// This is the body of your bot's function.\n\n${code}`}
             />
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
               <button onClick={handleRegister} className="btn primary-button">
