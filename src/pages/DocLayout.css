@@ -94,3 +94,62 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Tooltip for Blockly guide */
+.tooltip-container {
+  position: relative;
+  cursor: help;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 250px;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  text-align: left;
+  border-radius: 8px;
+  padding: 12px;
+  position: absolute;
+  z-index: 10;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -125px; /* Half of width to center */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Tooltip Arrow */
+.tooltip-text::after, .tooltip-text::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  border-style: solid;
+  border-color: transparent;
+}
+
+/* Arrow Border */
+.tooltip-text::after {
+  margin-left: -6px;
+  border-width: 6px;
+  border-top-color: var(--color-border);
+}
+
+/* Arrow Fill */
+.tooltip-text::before {
+  margin-left: -5px;
+  border-width: 5px;
+  border-top-color: var(--color-bg-secondary);
+  transform: translateY(-1px);
+}
