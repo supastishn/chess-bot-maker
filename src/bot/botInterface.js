@@ -454,7 +454,10 @@ const initializeAndLoadBots = () => {
 
     // Load all bots from localStorage (either pre-existing or freshly seeded)
     botsInStorage.forEach(({ name, source, blocklyJson, elo }) => {
-      if (registeredBots.has(name)) return;
+      if (registeredBots.has(name)) {
+        userBotNames.add(name); // Mark as user-editable
+        return;
+      }
       try {
         userBotNames.add(name); // Mark as a "user" bot (editable, deletable)
         const botFunction = new Function('game', `return ${source};`)();
