@@ -22,22 +22,22 @@ const BotLibrary = ({ onEdit, onDelete }) => {
         </select>
       </div>
 
+      {selectedBot && (
+        <div className="bot-code-viewer">
+          <pre className="form-textarea">
+            {getBotSource(selectedBot)}
+          </pre>
+        </div>
+      )}
+
       {onEdit && onDelete && isEditable && (
-        <div className="action-buttons" style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'flex-end' }}>
+        <div className="action-buttons" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', justifyContent: 'center' }}>
           <button onClick={() => onEdit(selectedBot)} className="btn">
             Edit
           </button>
           <button onClick={() => onDelete(selectedBot)} className="btn reset-button">
             Delete
           </button>
-        </div>
-      )}
-
-      {selectedBot && (
-        <div className="bot-code-viewer" style={{ marginTop: isEditable ? '1rem' : '0' }}>
-          <pre className="form-textarea">
-            {getBotSource(selectedBot)}
-          </pre>
         </div>
       )}
     </div>
