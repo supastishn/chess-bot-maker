@@ -10,7 +10,7 @@ export const materialBot = (game) => {
       // This move is illegal for some reason, so we skip it.
       continue;
     }
-    
+
     const isMate = game.isCheckmate();
     game.undo(); // Crucial: undo the move to restore state for the next loop iteration.
 
