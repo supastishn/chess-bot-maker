@@ -13,6 +13,7 @@ const registeredBots = new Map();
 const botSources = new Map();
 const botBlocklyJson = new Map();
 const botTypes = new Map();
+const botElos = new Map();
 const DEFAULT_BOT_NAME = 'starter-bot';
 
 export const getBotSource = (name) => {
@@ -21,6 +22,7 @@ export const getBotSource = (name) => {
 
 export const getBotBlocklyJson = (name) => botBlocklyJson.get(name);
 export const getBotType = (name) => botTypes.get(name) || 'code';
+export const getBotElo = (name) => botElos.get(name);
 
 const createBotHelper = (gameClient) => {
   const helper = Object.assign({}, gameClient);
@@ -237,7 +239,7 @@ const createBotHelper = (gameClient) => {
   return helper;
 };
 
-export const registerBot = (name, botFunction, source, blocklyJson = null) => {
+export const registerBot = (name, botFunction, source, blocklyJson = null, elo = null) => {
   console.log(`[Bot] Registering bot: ${name}`);
   if (typeof botFunction !== 'function') {
     throw new Error('Bot must be a function');
@@ -251,6 +253,9 @@ export const registerBot = (name, botFunction, source, blocklyJson = null) => {
   } else {
     botTypes.set(name, 'code');
   }
+  if (elo) {
+    botElos.set(name, elo);
+  }
   // Wrap the botFunction to provide the helper API with proper error handling
   registeredBots.set(name, (gameClient) => {
     try {
@@ -261,14 +266,16 @@ export const registerBot = (name, botFunction, source, blocklyJson = null) => {
   });
 };
 
-export const registerUserBot = (name, botFunction, source, blocklyJson = null) => {
+export const registerUserBot = (name, botFunction, source, blocklyJson = null, elo = null) => {
   userBotNames.add(name);
-  registerBot(name, botFunction, source, blocklyJson); // Register in-memory for the current session
+  registerBot(name, botFunction, source, blocklyJson, elo); // Register in-memory for the current session
 
   try {
     const userBots = JSON.parse(localStorage.getItem(USER_BOTS_KEY) || '[]');
     const botIndex = userBots.findIndex(b => b.name === name);
-    const newBot = { name, source, blocklyJson };
+
+    const existingElo = botIndex > -1 ? userBots[botIndex].elo : null;
+    const newBot = { name, source, blocklyJson, elo: elo || existingElo };
 
     if (botIndex > -1) {
       userBots[botIndex] = newBot;
@@ -442,6 +449,7 @@ export const deleteUserBot = (name) => {
     botSources.delete(name);
     botBlocklyJson.delete(name);
     botTypes.delete(name);
+    botElos.delete(name);
     userBotNames.delete(name);
 
     const userBots = JSON.parse(localStorage.getItem(USER_BOTS_KEY) || '[]');

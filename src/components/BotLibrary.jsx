@@ -1,5 +1,5 @@
 import React from 'react';
-import { getBotNames, getBotSource, isUserBot } from '../bot/botInterface';
+import { getBotNames, getBotSource, isUserBot, getBotElo } from '../bot/botInterface';
 
 const BotLibrary = ({ onEdit, onDelete }) => {
   const botNames = getBotNames().filter(name => !name.startsWith('__temp'));
@@ -16,9 +16,14 @@ const BotLibrary = ({ onEdit, onDelete }) => {
           value={selectedBot}
           onChange={e => setSelectedBot(e.target.value)}
         >
-          {botNames.map(name => (
-            <option key={name} value={name}>{name}</option>
-          ))}
+          {botNames.map(name => {
+            const elo = getBotElo(name);
+            return (
+              <option key={name} value={name}>
+                {name} {elo ? `(${elo} ELO)` : ''}
+              </option>
+            );
+          })}
         </select>
       </div>
 

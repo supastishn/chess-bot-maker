@@ -4,7 +4,7 @@ import { Zap } from 'lucide-react';
 import useBotTester from '../hooks/useBotTester.js';
 import BotPerformanceWidget from '../components/BotPerformanceWidget';
 import BotLibrary from '../components/BotLibrary';
-import { getBotSource, getBotType } from '../bot/botInterface';
+import { getBotSource, getBotType, getBotElo } from '../bot/botInterface';
 
 const CUSTOM_BOT_PLACEHOLDER = `(game) => {
   // Returns UCI string: 'e2e4' or 'e7e8q'
@@ -49,10 +49,13 @@ const CreateBot = ({ onRegisterBot, onDeleteBot }) => {
       alert('Please provide a name and code for the bot.');
       return;
     }
+    const existingElo = getBotElo(customBotName);
     const success = onRegisterBot(
       customBotName,
       customBotCode,
-      customBotCode
+      customBotCode,
+      null,
+      testResults?.rating || existingElo
     );
     if (success) {
       navigate('/');

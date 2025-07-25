@@ -4,13 +4,13 @@ import { getBotNames as getBotNamesFromInterface, registerUserBot, deleteUserBot
 export const useBotRegistry = () => {
   const [botNames, setBotNames] = useState(getBotNamesFromInterface());
 
-  const registerBot = (name, code, source, blocklyJson) => {
+  const registerBot = (name, code, source, blocklyJson, elo) => {
     if (!name || !code) {
       alert('Please provide bot name and code');
       return false;
     }
     try {
-      registerUserBot(name, new Function('game', `return ${code};`)(), source, blocklyJson);
+      registerUserBot(name, new Function('game', `return ${code};`)(), source, blocklyJson, elo);
       setBotNames(getBotNamesFromInterface());
       return true;
     } catch (e) {
